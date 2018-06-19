@@ -33,7 +33,7 @@ module AdventureRL
       end
     end
 
-    def get_center_point
+    def get_center
       # TODO: return mask.get_center_point or something
       #return Point.new 
     end

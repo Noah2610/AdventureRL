@@ -1,10 +1,6 @@
 module AdventureRL
   class Mask
     DEFAULT_ARGS = {
-      origin: {
-        x: :left,
-        y: :top
-      },
       #position: Point.new(0, 0),
       position: {
         x: 0,
@@ -13,13 +9,17 @@ module AdventureRL
       size: {
         width:  64,
         height: 64
+      },
+      origin: {
+        x: :left,
+        y: :top
       }
     }
     def initialize args = {}
       options   = DEFAULT_ARGS.merge args
-      @origin   = options[:origin]
       @position = get_position_from_arg options[:position]
       @size     = options[:size]
+      @origin   = options[:origin]
     end
 
     private
