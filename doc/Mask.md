@@ -103,10 +103,10 @@ only with its origin axes, `x` and `y`.
 
 ### `get_corner`
 ```ruby
-def get_corner x_axis, y_axis
+def get_corner side_x, side_y
 end
 ```
-Returns a point with the corner position of the given `x_axis` and `y_axis`.  
+Returns a point with the corner position of the given `side_x` and `side_y`.  
 For example:
 ```ruby
 mask = AdventureRL::Mask.new( ... )
