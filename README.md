@@ -15,6 +15,10 @@ Or install it yourself as:
 $ gem install AdventureRL
 ```
 
+## Documentation
+Documentation is being written and is available under the `doc/` directory  
+in the project's root directory.
+
 ## Development
 We have just started this project, so this gem is highly __Work In Progress__.  
 

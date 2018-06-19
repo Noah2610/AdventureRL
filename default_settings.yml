@@ -6,5 +6,7 @@ window:
   size:
     width:  960
     height: 540
-  caption: 'AdventureRL Window Caption!'
+  caption:    'AdventureRL Window Caption!'
+  fps:        30
+  fullscreen: false
 ...
