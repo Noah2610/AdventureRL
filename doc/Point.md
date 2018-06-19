@@ -8,8 +8,8 @@ __Table of Contents__
   - [`initialize`](#initialize)
   - [`x`](#x)
   - [`y`](#y)
-  - [`get_position`](#getposition)
-  - [`collides_with?`](#collideswith)
+  - [`get_position`](#get_position)
+  - [`collides_with?`](#collides_with)
 
 ## Methods
 ### `initialize`

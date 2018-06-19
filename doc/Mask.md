@@ -7,13 +7,13 @@ The mask should make collision checking and the like easier.
 __Table of Contents__
 - [Methods](#methods)
   - [`initialize`](#initialize)
-  - [`collides_with?`](#collideswith)
-  - [`get_position`](#getposition)
-  - [`get_size`](#getsize)
-  - [`get_origin`](#getorigin)
-  - [`get_corner`](#getcorner)
-  - [`get_side`](#getside)
-  - [`get_center`](#getcenter)
+  - [`collides_with?`](#collides_with)
+  - [`get_position`](#get_position)
+  - [`get_size`](#get_size)
+  - [`get_origin`](#get_origin)
+  - [`get_corner`](#get_corner)
+  - [`get_side`](#get_side)
+  - [`get_center`](#get_center)
 
 ## Methods
 ### `initialize`
