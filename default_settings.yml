@@ -1,0 +1,10 @@
+# Default AdventureRL settings.
+# TODO: The developer should be able to overwrite settings here in a custom settings.yml file.
+---
+# Window settings
+window:
+  size:
+    width:  960
+    height: 540
+  caption: 'AdventureRL Window Caption!'
+...
