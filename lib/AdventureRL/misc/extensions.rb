@@ -8,6 +8,12 @@ module AdventureRL::HashExtension
       next [new_key, new_val]
     end .to_h
   end
+  def sort_by_keys *keys
+    keys.flatten!
+    return self.sort_by do |key, val|
+      next keys.index key
+    end .to_h
+  end
 end
 class Hash
   include AdventureRL::HashExtension

@@ -10,6 +10,8 @@ __Table of Contents__
   - [`y`](#y)
   - [`get_position`](#get_position)
   - [`collides_with?`](#collides_with)
+  - [`keys`](#keys)
+  - [`values`](#values)
 
 ## Methods
 ### `initialize`
@@ -51,3 +53,19 @@ end
 ```
 This method checks if it is in collision / overlapping with  
 a `AdventureRL::Point` or `Adventure::Mask`; the argument accepts both.
+
+### `keys`
+```ruby
+def keys
+end
+```
+Returns the symbols `:x` and `:y` in an array, respectively.  
+Based on `Hash#keys`.
+
+### `values`
+```ruby
+def values
+end
+```
+Returns the `:x` and `:y` axes in an array, respectively.  
+Based on `Hash#values`.

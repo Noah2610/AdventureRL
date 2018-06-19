@@ -9,13 +9,9 @@ module AdventureRL
 
     def get_position target = :all
       target = target.to_sym
-      if    (target == :all)
-        return @position
-      elsif (@position.keys.include?(target))
-        return @position[target]
-      else
-        return nil
-      end
+      return @position          if (target == :all)
+      return @position[target]  if (@position.keys.include?(target))
+      return nil
     end
     alias_method :get_pos,  :get_position
     alias_method :position, :get_position
@@ -27,6 +23,17 @@ module AdventureRL
 
     def y
       return get_position :y
+    end
+
+    def keys
+      sorted_keys = [:x, :y]
+      return @position.keys.sort do |axis|
+        next sorted_keys.index axis
+      end
+    end
+
+    def values
+      return @position.sort_by_keys(keys).values
     end
   end
 end

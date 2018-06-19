@@ -3,9 +3,7 @@ module AdventureRL
     module Error
       PADDING = '  '
 
-      private
-
-      def error *messages
+      def self.error *messages
         message = messages.join ?\n
         message.gsub! /^/, PADDING
         abort([
@@ -13,6 +11,12 @@ module AdventureRL
           message,
           "#{PADDING}Exitting."
         ].join(?\n))
+      end
+
+      private
+
+      def error *messages
+        AdventureRL::Helpers::Error.error *messages
       end
     end
   end

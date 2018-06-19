@@ -8,6 +8,7 @@ __Table of Contents__
 - [Methods](#methods)
   - [`initialize`](#initialize)
   - [`collides_with?`](#collides_with)
+  - [`get_point`](#get_point)
   - [`get_position`](#get_position)
   - [`get_size`](#get_size)
   - [`get_origin`](#get_origin)
@@ -33,10 +34,11 @@ which should be passed as a hash on initialization:
 - `origin`  
   The origin of the mask is where the `position` is located on the mask.  
   It is passed as a hash with the keys `x` and `y`, and their values can be:
-  - `:top`
-  - `:bottom`
-  - `:left`
-  - `:right`
+  - for `:x` - `:left`
+  - for `:x` - `:right`
+  - for `:y` - `:top`
+  - for `:y` - `:bottom`
+  - for `:x` or `:y` - `center`
 
   Usually, if you only use the mask's methods, the origin position should be  
   irrelevant to you, and you can ommit it. The only method which's output  
@@ -69,12 +71,19 @@ end
 This method checks if it is in collision / overlapping with  
 a `AdventureRL::Point` or `Adventure::Mask`; the argument accepts both.
 
+### `get_point`
+```ruby
+def get_point
+end
+```
+Returns the point with the positions passed to it initially.
+
 ### `get_position`
 ```ruby
 def get_position target = :all
 end
 ```
-Returns its position, same as `AdventureRL::Point#get_position`
+Returns its position, same as `get_point.get_position`.
 
 ### `get_size`
 ```ruby
@@ -101,8 +110,9 @@ Returns a point with the corner position of the given `x_axis` and `y_axis`.
 For example:
 ```ruby
 mask = AdventureRL::Mask.new( ... )
-mask.get_corner :left, :top      # => Returns point with top-left corner position.
-mask.get_corner :right, :bottom  # => Returns point with botton-right corner position.
+mask.get_corner :left, :top       # => Returns point with top-left corner position.
+mask.get_corner :right, :bottom   # => Returns point with botton-right corner position.
+mask.get_corner :center, :center  # => Returns center point - same 
 ```
 
 ### `get_side`
@@ -120,8 +130,9 @@ mask.get_side :top   # => Returns y axis of the top mask edge.
 
 ### `get_center`
 ```ruby
-def get_center
+def get_center target = :all
 end
 ```
-The same as `AdventureRL::Window#get_center`.  
-Returns a point with the position of the center of the mask.
+If target is `:all`, returns a new point with the center position of the mask.  
+Otherwise, if target is `:x` or `:y`, returns an integer representing  
+the center of the target's axis.

@@ -71,12 +71,10 @@ it will return a different value:
 
 ### `get_center`
 ```ruby
-def get_center
+def get_center target = :all
 end
 ```
-Returns an `AdventureRL::Point` instance of the center of the window,  
-assuming the top-left corner of the window is `0, 0`  
-and the bottom-right corner is `get_size(:width), get_size(:height)`.
+The same as `AdventureRL::Mask#get_center`.
 
 ### `get_fps`
 ```ruby

@@ -4,12 +4,19 @@ module AdventureRL
 
     def initialize args = {}
       default_settings = DEFAULT_SETTINGS.get :window
-      @window_size = args[:size] || default_settings[:size]
-      @window_tick = 0
+      size = args[:size] || default_settings[:size]
+      @mask = Mask.new(
+        position: Point.new(0, 0),
+        size:     size,
+        origin: {
+          x: :left, y: :top
+        }
+      )
       @window_last_update_at = nil
       _set_last_update_at
+      @window_tick = 0
       super(
-        @window_size[:width], @window_size[:height],
+        get_size(:width), get_size(:height),
         fullscreen:      !!(args[:fullscreen] || default_settings[:fullscreen]),
         update_interval: (args[:fps] || default_settings[:fps])
       )
@@ -22,20 +29,16 @@ module AdventureRL
       # and will be called after #initialize
     end
 
-    def get_size target = :all
-      target = target.to_sym
-      if    (target == :all)
-        return @window_size
-      elsif (@window_size.keys.include?(target))
-        return @window_size[target]
-      else
-        return nil
-      end
+    def get_mask
+      return @mask
     end
 
-    def get_center
-      # TODO: return mask.get_center_point or something
-      #return Point.new 
+    def get_size target = :all
+      return get_mask.get_size target
+    end
+
+    def get_center target = :all
+      return get_mask.get_center target
     end
 
     def get_fps
@@ -48,6 +51,7 @@ module AdventureRL
     end
 
     def get_tick
+      return @window_tick
     end
 
     private
