@@ -1,0 +1,28 @@
+PATH
+  remote: .
+  specs:
+    AdventureRL (0.0.0)
+      gosu (~> 0.13.3)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    awesome_print (1.8.0)
+    byebug (10.0.2)
+    gosu (0.13.3)
+    minitest (5.11.3)
+    rake (10.5.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  AdventureRL!
+  awesome_print
+  bundler (~> 1.16)
+  byebug
+  minitest (~> 5.0)
+  rake (~> 10.0)
+
+BUNDLED WITH
+   1.16.2
