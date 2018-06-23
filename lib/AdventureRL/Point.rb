@@ -25,6 +25,28 @@ module AdventureRL
       return get_position :y
     end
 
+    def collides_with? other
+      return collides_with_point? other  if (other.is_a?(Point))
+      return collides_with_mask?  other  if (other.is_a?(Mask))
+      return collides_with_hash?  other  if (other.is_a?(Hash))
+    end
+
+    def collides_with_point? point
+      return get_position == point.get_position
+    end
+
+    def collides_with_mask? mask
+      return mask.collides_with_point? self
+    end
+
+    def collides_with_hash? hash
+      if (hash.keys.include_all?(:x, :y))
+        point = Point.new hash[:x], hash[:y]
+        return collides_with_point? point
+      end
+      return nil
+    end
+
     def keys
       sorted_keys = [:x, :y]
       return @position.keys.sort do |axis|

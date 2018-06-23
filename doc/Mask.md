@@ -7,14 +7,15 @@ The mask should make collision checking and the like easier.
 __Table of Contents__
 - [Methods](#methods)
   - [`initialize`](#initialize)
-  - [`collides_with?`](#collides_with)
   - [`get_point`](#get_point)
   - [`get_position`](#get_position)
   - [`get_size`](#get_size)
   - [`get_origin`](#get_origin)
   - [`get_corner`](#get_corner)
   - [`get_side`](#get_side)
+  - [`get_sides`](#get_sides)
   - [`get_center`](#get_center)
+  - [`collides_with?`](#collides_with)
 
 ## Methods
 ### `initialize`
@@ -62,14 +63,6 @@ If any or all of the above values are not passed, the defaults are used:
   }
 }
 ```
-
-### `collides_with?`
-```ruby
-def collides_with? point_or_mask
-end
-```
-This method checks if it is in collision / overlapping with  
-a `AdventureRL::Point` or `Adventure::Mask`; the argument accepts both.
 
 ### `get_point`
 ```ruby
@@ -128,6 +121,21 @@ mask.get_side :left  # => Returns x axis of the left mask edge.
 mask.get_side :top   # => Returns y axis of the top mask edge.
 ```
 
+### `get_sides`
+```ruby
+def get_sides
+end
+```
+Returns a hash with all side positions. Example return value:
+```ruby
+{
+  left:   10,
+  right:  60,
+  top:    20,
+  bottom: 70
+}
+```
+
 ### `get_center`
 ```ruby
 def get_center target = :all
@@ -136,3 +144,11 @@ end
 If target is `:all`, returns a new point with the center position of the mask.  
 Otherwise, if target is `:x` or `:y`, returns an integer representing  
 the center of the target's axis.
+
+### `collides_with?`
+```ruby
+def collides_with? point_or_mask
+end
+```
+This method checks if it is in collision / overlapping with  
+a `AdventureRL::Point` or `Adventure::Mask`; the argument accepts both.

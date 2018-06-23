@@ -18,9 +18,10 @@ module AdventureRL
   require DIR[:helpers].join 'Error'
   require DIR[:helpers].join 'Method'
   require DIR[:src].join     'Settings'
+  require DIR[:src].join     'Window'
   require DIR[:src].join     'Point'
   require DIR[:src].join     'Mask'
-  require DIR[:src].join     'Window'
+  require DIR[:src].join     'Rectangle'
 
   DEFAULT_SETTINGS = Settings.new DIR[:settings]
 end

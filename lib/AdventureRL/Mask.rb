@@ -85,6 +85,15 @@ module AdventureRL
       end
     end
 
+    def get_sides
+      return {
+        left:   get_side(:left),
+        right:  get_side(:right),
+        top:    get_side(:top),
+        bottom: get_side(:bottom)
+      }
+    end
+
     def get_center target = :all
       target = target.to_sym
       return Point.new(
@@ -92,6 +101,53 @@ module AdventureRL
         get_center_y
       )  if (target == :all)
       return method("get_center_#{target.to_s}".to_sym).call  if (get_point.keys.include? target)
+    end
+
+    def collides_with? other
+      return collides_with_point? other  if (other.is_a?(Point))
+      return collides_with_mask?  other  if (other.is_a?(Mask))
+      return collides_with_hash?  other  if (other.is_a?(Hash))
+    end
+
+    def collides_with_point? point
+      return (
+        point.x >= get_side(:left)  &&
+        point.x <  get_side(:right) &&
+        point.y >= get_side(:top)   &&
+        point.y <  get_side(:bottom)
+      )
+    end
+
+    def collides_with_mask? mask
+      this_sides  = get_sides
+      other_sides = mask.get_sides
+      return (
+        (
+          (
+              other_sides[:left] >= this_sides[:left] &&
+              other_sides[:left] <= this_sides[:right]
+          ) || (
+             other_sides[:right] >= this_sides[:left] &&
+             other_sides[:right] <= this_sides[:right]
+          )
+        ) && (
+          (
+               other_sides[:top] >= this_sides[:top]  &&
+               other_sides[:top] <= this_sides[:bottom]
+          ) || (
+            other_sides[:bottom] >= this_sides[:top]  &&
+            other_sides[:bottom] <= this_sides[:bottom]
+          )
+        )
+      )
+    end
+
+    def collides_with_hash? other_hash
+      if (hash.keys.include_all?(:x, :y))
+        other_point = Point.new hash[:x], hash[:y]
+        return collides_with_point? other_point
+      end
+      return nil
     end
 
     private

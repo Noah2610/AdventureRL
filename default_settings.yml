@@ -9,4 +9,7 @@ window:
   caption:    'AdventureRL Window Caption!'
   fps:        30
   fullscreen: false
+rectangle:
+  color:   0xff_ffffff
+  z_index: 0
 ...
