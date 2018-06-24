@@ -1,6 +1,6 @@
 module AdventureRL
   class Window < Gosu::Window
-    include Helpers::Method
+    include Helpers::MethodHelper
 
     def initialize args = {}
       default_settings = DEFAULT_SETTINGS.get :window

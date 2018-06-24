@@ -107,7 +107,7 @@ module AdventureRL
 
     def collides_with? other
       return collides_with_point? other  if (other.is_a?(Point))
-      return collides_with_mask?  other  if (other.is_a?(Mask))
+      return collides_with_mask?  other  if (other.is_a?(Mask) || other.is_a?(Rectangle))
       return collides_with_hash?  other  if (other.is_a?(Hash))
     end
 

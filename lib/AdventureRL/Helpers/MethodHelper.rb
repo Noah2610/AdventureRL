@@ -1,6 +1,6 @@
 module AdventureRL
   module Helpers
-    module Method
+    module MethodHelper
       private
 
       def method_exists? method_name
