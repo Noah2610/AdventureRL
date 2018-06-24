@@ -6,8 +6,6 @@ __Table of Contents__
 - [Methods](#methods)
   - [`initialize`](#initialize)
   - [`setup`](#setup)
-  - [`get_size`](#get_size)
-  - [`get_center`](#get_center)
   - [`get_fps`](#get_fps)
   - [`get_deltatime`](#get_deltatime)
   - [`get_tick`](#get_tick)
@@ -49,32 +47,6 @@ It will be called after `#initialize` has finished.
 You do not have to define it with taking an argument, but if you don't  
 the arguments you passed to `#initialize` (`.new`) will not be available to you  
 in `#setup`.
-
-### `get_size`
-```ruby
-def get_size target = :all
-end
-```
-This method returns the window's size. Depending on what `target` was given,  
-it will return a different value:
-
-- `:all` _(default)_  
-  Will return a hash with `:width` and `:height` keys, for example:
-  ```ruby
-  {
-    width:  960,
-    height: 540
-  }
-  ```
-- `:width` or `:height`  
-  Will return the specified axis, so `get_size(:width)` will return `960`.
-
-### `get_center`
-```ruby
-def get_center target = :all
-end
-```
-The same as `AdventureRL::Mask#get_center`.
 
 ### `get_fps`
 ```ruby

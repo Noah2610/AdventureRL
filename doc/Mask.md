@@ -7,6 +7,8 @@ The mask should make collision checking and the like easier.
 __Table of Contents__
 - [Methods](#methods)
   - [`initialize`](#initialize)
+  - [`assign_to`](#assign_to)
+  - [`get_mask`](#get_mask)
   - [`get_point`](#get_point)
   - [`get_position`](#get_position)
   - [`get_size`](#get_size)
@@ -29,9 +31,11 @@ which should be passed as a hash on initialization:
 - `position`  
   The starting position of the mask, relative to its `origin`.  
   This can be a hash with the keys `x` and `y`, or a `AdventureRL::Point`.
+
 - `size`  
   The size of the mask. It is passed as a hash with the keys  
   `width` and `height`.
+
 - `origin`  
   The origin of the mask is where the `position` is located on the mask.  
   It is passed as a hash with the keys `x` and `y`, and their values can be:
@@ -45,6 +49,14 @@ which should be passed as a hash on initialization:
   irrelevant to you, and you can ommit it. The only method which's output  
   it effects, is `#get_position`, as it will give you the point you initially  
   passed, which is the point where the origin position is.
+
+- `assign_to`  
+  You can pass any object as `assign_to`'s value. This will make it possible  
+  for the assigned object to have access to all of mask's methods directly.  
+  This defines a `#method_missing` method which pipes any missing methods to  
+  the mask. So you could _not_ create a reference to the mask _(no variable)_  
+  and just initialize the mask, assign your object, and it will have access  
+  to all of its mask's methods.
 
 If any or all of the above values are not passed, the defaults are used:
 ```ruby
@@ -60,9 +72,26 @@ If any or all of the above values are not passed, the defaults are used:
   origin: {
     x: :left,
     y: :top
-  }
+  },
+  assign_to: nil
 }
 ```
+
+### `assign_to`
+```ruby
+def assign_to object
+end
+```
+Assigns the object to the mask. The same method is called if you pass  
+the `:assign_to` key with a object in `#initialize`.
+
+### `get_mask`
+```ruby
+def get_mask
+end
+```
+Returns self. Objects which this mask was assigned to _(see #initialize)_  
+have a way of getting the actual mask with this method.
 
 ### `get_point`
 ```ruby

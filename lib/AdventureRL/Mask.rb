@@ -13,7 +13,8 @@ module AdventureRL
       origin: {
         x: :left,
         y: :top
-      }
+      },
+      assign_to: nil
     }
 
     def initialize args = {}
@@ -21,6 +22,15 @@ module AdventureRL
       @position = get_position_from_arg options[:position]
       @size     = options[:size]
       @origin   = options[:origin]
+      assign_to args[:assign_to]  if (args[:assign_to])
+    end
+
+    def assign_to object
+      AdventureRL::Helpers::PipeMethods.pipe_methods_from object, to: self
+    end
+
+    def get_mask
+      return self
     end
 
     def get_point

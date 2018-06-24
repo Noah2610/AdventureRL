@@ -5,13 +5,17 @@ module AdventureRL
     def initialize args = {}
       default_settings = DEFAULT_SETTINGS.get :window
       size = args[:size] || default_settings[:size]
-      @_mask = Mask.new(
+
+      Mask.new(
         position: Point.new(0, 0),
         size:     size,
         origin: {
           x: :left, y: :top
-        }
+        },
+        assign_to: self
       )
+
+      #AdventureRL::Helpers::PipeMethods.pipe_methods_from self, to: @_mask  # Calls any missing methods on @_mask
       @_last_update_at = nil
       _set_last_update_at
       @_deltatime = nil
@@ -29,18 +33,6 @@ module AdventureRL
     def setup args
       # This method can be overwritten by user,
       # and will be called after #initialize
-    end
-
-    def get_mask
-      return @_mask
-    end
-
-    def get_size target = :all
-      return get_mask.get_size target
-    end
-
-    def get_center target = :all
-      return get_mask.get_center target
     end
 
     def get_fps

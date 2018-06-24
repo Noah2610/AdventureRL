@@ -17,6 +17,7 @@ module AdventureRL
   require DIR[:misc].join    'extensions'
   require DIR[:helpers].join 'Error'
   require DIR[:helpers].join 'Method'
+  require DIR[:helpers].join 'PipeMethods'
   require DIR[:src].join     'Settings'
   require DIR[:src].join     'Window'
   require DIR[:src].join     'Point'
