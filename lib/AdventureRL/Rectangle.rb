@@ -2,7 +2,7 @@ module AdventureRL
   class Rectangle
     def initialize mask, args = {}
       default_settings = DEFAULT_SETTINGS.get :rectangle
-      AdventureRL::Helpers::Error.error "AdventureRL::Rectangle received '#{mask.class}' instead of AdventureRL::Mask"  unless (mask.is_a? Mask)
+      Helpers::Error.error "AdventureRL::Rectangle received '#{mask.class}' instead of AdventureRL::Mask"  unless (mask.is_a? Mask)
       mask.assign_to self
       @color   = args[:color]   || default_settings[:color]
       @z_index = args[:z_index] || default_settings[:z_index]

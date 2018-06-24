@@ -1,10 +1,27 @@
 module AdventureRL
   class Point
-    def initialize x, y
+    def initialize x, y, args = {}
       @position = {
         x: x,
         y: y
       }
+      assign_to args[:assign_to]  if (args[:assign_to])
+    end
+
+    def assign_to object
+      Helpers::PipeMethods.pipe_methods_from object, to: self
+    end
+
+    def get_point
+      return self
+    end
+
+    def x
+      return get_position :x
+    end
+
+    def y
+      return get_position :y
     end
 
     def get_position target = :all
@@ -13,16 +30,29 @@ module AdventureRL
       return @position[target]  if (@position.keys.include?(target))
       return nil
     end
-    alias_method :get_pos,  :get_position
-    alias_method :position, :get_position
-    alias_method :pos,      :get_position
 
-    def x
-      return get_position :x
-    end
-
-    def y
-      return get_position :y
+    def set_position *args
+      case args.size
+      when 2
+        @position[:x] = args[0]
+        @position[:y] = args[1]
+      when 1
+        Helpers::Error.error(
+          "Ambiguous argument `#{args[0]}' for Point#set_position"
+        )  unless (args[0].is_a?(Hash))
+        Helpers::Error.error(
+          'Hash must include either :x, :y, or both keys for Point#set_position'
+        )  unless (args[0].keys.include_any?(:x, :y))
+        @position[:x] = args[:x]  if (args[:x])
+        @position[:y] = args[:y]  if (args[:y])
+      else
+        Helpers::Error.error(
+          'Invalid amount of arguments for Point#set_position.',
+          'Pass either two arguments representing the x and y axes, respectively, or',
+          'pass a single hash with the keys :x and :y with their respective axes values.'
+        )
+      end
+      return get_position
     end
 
     def collides_with? other

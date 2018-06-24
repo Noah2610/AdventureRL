@@ -14,7 +14,6 @@ module AdventureRL
             raise NoMethodError, "undefined method `#{method_name}' for #{self} (PIPED)"
           end
         end
-
       end
     end
   end

@@ -26,6 +26,11 @@ module AdventureRL::Extensions::ArrayExtension
       next self.include? val
     end
   end
+  def include_any? *vals
+    return vals.any? do |val|
+      next self.include? val
+    end
+  end
 end
 class Array
   include AdventureRL::Extensions::ArrayExtension

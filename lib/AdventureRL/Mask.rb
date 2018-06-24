@@ -19,26 +19,18 @@ module AdventureRL
 
     def initialize args = {}
       options   = DEFAULT_ARGS.merge args
-      @position = get_position_from_arg options[:position]
+      set_position_from_arg options[:position]
       @size     = options[:size]
       @origin   = options[:origin]
       assign_to args[:assign_to]  if (args[:assign_to])
     end
 
     def assign_to object
-      AdventureRL::Helpers::PipeMethods.pipe_methods_from object, to: self
+      Helpers::PipeMethods.pipe_methods_from object, to: self
     end
 
     def get_mask
       return self
-    end
-
-    def get_point
-      return @position
-    end
-
-    def get_position target = :all
-      return get_point.get_position target
     end
 
     def get_size target = :all
@@ -162,13 +154,18 @@ module AdventureRL
 
     private
 
-    def get_position_from_arg position_arg
-      return position_arg  if (position_arg.is_a? Point)
-      return Point.new(
-        position_arg[:x],
-        position_arg[:y]
-      )                    if (position_arg.is_a? Hash)
-      return nil
+    def set_position_from_arg position_arg
+      if    (position_arg.is_a?(Point))
+        position_arg.assign_to self
+      elsif (position_arg.is_a?(Hash))
+        Point.new(
+          position_arg[:x],
+          position_arg[:y],
+          assign_to: self
+        )
+      else
+        Helpers::Error.error "Cannot set Point as `#{position_arg}' for Mask."
+      end
     end
 
     def get_side_left

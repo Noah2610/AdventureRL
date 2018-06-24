@@ -16,7 +16,7 @@ module AdventureRL
       private
 
       def error *messages
-        AdventureRL::Helpers::Error.error *messages
+        Error.error *messages
       end
     end
   end

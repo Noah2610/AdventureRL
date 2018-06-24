@@ -6,9 +6,12 @@ It should be pretty straight-forward and self-explanatory.
 __Table of Contents__
 - [Methods](#methods)
   - [`initialize`](#initialize)
+  - [`assign_to`](#assign_to)
+  - [`get_point`](#get_point)
   - [`x`](#x)
   - [`y`](#y)
   - [`get_position`](#get_position)
+  - [`set_position`](#set_position)
   - [`collides_with?`](#collides_with)
   - [`keys`](#keys)
   - [`values`](#values)
@@ -16,10 +19,28 @@ __Table of Contents__
 ## Methods
 ### `initialize`
 ```ruby
-def initialize x, y
+def initialize x, y, args = {}
 end
 ```
-Create a new point with `x` and `y` axes.
+Create a new point with `x` and `y` axes.  
+You can pass the key `:assign_to` with the value of an object with args  
+to make all point methods available directly through the object.
+
+### `assign_to`
+```ruby
+def assign_to object
+end
+```
+Assigns the object to the point.  
+Same as using the key `:assign_to` in `#initialize`.
+
+### `get_point`
+```ruby
+def get_point
+end
+```
+Returns self.  
+Useful for using from objects where the point was assigned to them.
 
 ### `x`
 ```ruby
@@ -39,12 +60,15 @@ Returns the integer for its `y` axis.
 ```ruby
 def get_position target = :all
 end
-alias_method :get_pos,  :get_position
-alias_method :position, :get_position
-alias_method :pos,      :get_position
 ```
 Returns either both axes as a hash if target is `:all` or is ommited,  
 or returns the value of target's axis.
+
+### `set_position`
+```ruby
+def set_position
+end
+```
 
 ### `collides_with?`
 ```ruby
