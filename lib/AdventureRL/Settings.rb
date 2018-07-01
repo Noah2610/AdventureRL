@@ -5,7 +5,7 @@ module AdventureRL
 
     def initialize file
       @file = Pathname.new file
-      validate_file_exists
+      validate_file_exists @file
       @content = get_file_content.keys_to_sym
     end
 
@@ -26,7 +26,7 @@ module AdventureRL
     private
 
     def validate_file_exists file = @file
-      error "File does not exist: '#{file.to_path}'"  unless (file.file?)
+      error_no_file file  unless (file_exists? file)
     end
 
     def get_file_content file = @file

@@ -54,6 +54,7 @@ module AdventureRL
       end
       return get_position
     end
+    alias_method :move_to, :set_position
 
     def move_by *args
       case args.size

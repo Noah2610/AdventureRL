@@ -2,9 +2,9 @@ module AdventureRL
   class Window < Gosu::Window
     include Helpers::MethodHelper
 
-    def initialize args = {}
+    def initialize settings = {}
       default_settings = DEFAULT_SETTINGS.get :window
-      size = args[:size] || default_settings[:size]
+      size = settings[:size] || default_settings[:size]
 
       Mask.new(
         position: Point.new(0, 0),
@@ -21,13 +21,14 @@ module AdventureRL
       @_deltatime = nil
       _set_deltatime
       @_tick = 0
+      @_target_fps = settings[:fps] || default_settings[:fps]
       super(
         get_size(:width), get_size(:height),
-        fullscreen:      !!(args[:fullscreen] || default_settings[:fullscreen]),
-        update_interval: _get_update_inteval_from_fps(args[:fps] || default_settings[:fps])
+        fullscreen:      !!(settings[:fullscreen] || default_settings[:fullscreen]),
+        update_interval: _get_update_inteval_from_fps(@_target_fps)
       )
-      self.caption = args[:caption] || default_settings[:caption]
-      _call_setup_method args
+      self.caption = settings[:caption] || default_settings[:caption]
+      _call_setup_method settings
     end
 
     def setup args
@@ -37,6 +38,10 @@ module AdventureRL
 
     def get_fps
       return Gosu.fps
+    end
+
+    def get_target_fps
+      return @_target_fps
     end
 
     def get_deltatime

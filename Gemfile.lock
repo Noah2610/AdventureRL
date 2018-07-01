@@ -12,6 +12,7 @@ GEM
     gosu (0.13.3)
     minitest (5.11.3)
     rake (10.5.0)
+    rdoc (6.0.4)
 
 PLATFORMS
   ruby
@@ -23,6 +24,7 @@ DEPENDENCIES
   byebug
   minitest (~> 5.0)
   rake (~> 10.0)
+  rdoc (~> 6.0)
 
 BUNDLED WITH
    1.16.2

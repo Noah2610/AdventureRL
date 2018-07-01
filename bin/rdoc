@@ -1,0 +1,9 @@
+#!/bin/bash
+# Generate rdoc documentation
+
+root="$( dirname "$0" )/.."
+dir="${root}/lib"
+main="${dir}/AdventureRL.rb"
+output_dir="${root}/rdoc"
+
+rdoc --main "$main" --op "$output_dir" $dir

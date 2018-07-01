@@ -1,6 +1,10 @@
 module AdventureRL
   module Helpers
     module PipeMethods
+      # This method _pipes_ or forwards any methods called on the object
+      # to the target object. It defines the <tt>method_missing</tt> method
+      # on the origin object which calls the wanted method on the target object,
+      # if it exists.
       def self.pipe_methods_from object_origin, args = {}
         object_target = args[:to]
         Error.error(

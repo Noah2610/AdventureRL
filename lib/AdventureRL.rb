@@ -4,7 +4,9 @@ require 'yaml'
 
 module AdventureRL
   entry = Pathname.new(__FILE__).realpath
+  # The root directory of the gem. Used for requiring ruby files.
   ROOT  = entry.dirname
+  # A constant containing a bunch of directories or files.
   DIR   = {
     entry:    entry,
     src:      ROOT.join('AdventureRL'),
@@ -23,6 +25,8 @@ module AdventureRL
   require DIR[:src].join     'Point'
   require DIR[:src].join     'Mask'
   require DIR[:src].join     'Rectangle'
+  require DIR[:src].join     'Clip'
 
+  # Default gem settings defined in <tt>default_settings.yml</tt>.
   DEFAULT_SETTINGS = Settings.new DIR[:settings]
 end

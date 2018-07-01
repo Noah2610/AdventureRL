@@ -1,0 +1,14 @@
+Sun, 01 Jul 2018 19:23:07 +0200
+bin/../lib/AdventureRL.rb	Sun, 01 Jul 2018 19:23:06 +0200
+bin/../lib/AdventureRL/ClipPlayer.rb	Tue, 19 Jun 2018 02:30:17 +0200
+bin/../lib/AdventureRL/Helpers/Error.rb	Thu, 28 Jun 2018 22:53:11 +0200
+bin/../lib/AdventureRL/Helpers/MethodHelper.rb	Sun, 24 Jun 2018 03:49:51 +0200
+bin/../lib/AdventureRL/Helpers/PipeMethods.rb	Sun, 24 Jun 2018 04:19:58 +0200
+bin/../lib/AdventureRL/Point.rb	Sun, 24 Jun 2018 04:25:11 +0200
+bin/../lib/AdventureRL/Rectangle.rb	Sun, 24 Jun 2018 04:24:07 +0200
+bin/../lib/AdventureRL/version.rb	Wed, 20 Jun 2018 01:56:19 +0200
+bin/../lib/AdventureRL/Mask.rb	Sun, 24 Jun 2018 04:25:00 +0200
+bin/../lib/AdventureRL/Clip.rb	Tue, 19 Jun 2018 02:30:21 +0200
+bin/../lib/AdventureRL/Settings.rb	Wed, 20 Jun 2018 01:56:19 +0200
+bin/../lib/AdventureRL/misc/extensions.rb	Sun, 24 Jun 2018 03:18:28 +0200
+bin/../lib/AdventureRL/Window.rb	Sun, 24 Jun 2018 03:50:25 +0200
