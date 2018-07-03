@@ -111,13 +111,16 @@
 
         <div class="method-description">
           
-          
+          <p>This method <em>pipes</em> or forwards any methods called on the object to
+the target object. It defines the <code>method_missing</code> method on the
+origin object which calls the wanted method on the target object, if it
+exists.</p>
           
           
 
           
           <div class="method-source-code" id="pipe_methods_from-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/PipeMethods.rb, line 4</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/PipeMethods.rb, line 8</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">pipe_methods_from</span> <span class="ruby-identifier">object_origin</span>, <span class="ruby-identifier">args</span> = {}
   <span class="ruby-identifier">object_target</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">:to</span>]
   <span class="ruby-constant">Error</span>.<span class="ruby-identifier">error</span>(

@@ -64,7 +64,15 @@
 
   <ul class="link-list" role="directory">
     
+    <li ><a href="#method-c-directory_exists-3F">::directory_exists?</a>
+    
     <li ><a href="#method-c-error">::error</a>
+    
+    <li ><a href="#method-c-error_no_directory">::error_no_directory</a>
+    
+    <li ><a href="#method-c-error_no_file">::error_no_file</a>
+    
+    <li ><a href="#method-c-file_exists-3F">::file_exists?</a>
     
   </ul>
 </div>
@@ -112,6 +120,40 @@
        </header>
 
     
+      <div id="method-c-directory_exists-3F" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">directory_exists?</span><span
+            class="method-args">(directory)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="directory_exists-3F-source">
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 33</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">directory_exists?</span> <span class="ruby-identifier">directory</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>  <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">directory</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-identifier">directory</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
       <div id="method-c-error" class="method-detail ">
         
         <div class="method-heading">
@@ -140,6 +182,110 @@
     <span class="ruby-identifier">message</span>,
     <span class="ruby-node">&quot;#{PADDING}Exiting.&quot;</span>
   ].<span class="ruby-identifier">join</span>(<span class="ruby-value">?\n</span>))
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-c-error_no_directory" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">error_no_directory</span><span
+            class="method-args">(directory)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="error_no_directory-source">
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 22</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">error_no_directory</span> <span class="ruby-identifier">directory</span>
+  <span class="ruby-identifier">dirpath</span> = <span class="ruby-identifier">directory</span>
+  <span class="ruby-identifier">dirpath</span> = <span class="ruby-identifier">directory</span>.<span class="ruby-identifier">to_path</span>  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">directory</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Pathname</span>)
+  <span class="ruby-identifier">error</span> <span class="ruby-string">&quot;Directory does not exist, or is a file:&quot;</span>, <span class="ruby-node">&quot;  &#39;#{dirpath}&#39;&quot;</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-c-error_no_file" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">error_no_file</span><span
+            class="method-args">(file)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="error_no_file-source">
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 16</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">error_no_file</span> <span class="ruby-identifier">file</span>
+  <span class="ruby-identifier">filepath</span> = <span class="ruby-identifier">file</span>
+  <span class="ruby-identifier">filepath</span> = <span class="ruby-identifier">file</span>.<span class="ruby-identifier">to_path</span>  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">file</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Pathname</span>)
+  <span class="ruby-identifier">error</span> <span class="ruby-string">&quot;File does not exist, or is a directory:&quot;</span>, <span class="ruby-node">&quot;  &#39;#{filepath}&#39;&quot;</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-c-file_exists-3F" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">file_exists?</span><span
+            class="method-args">(file)</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+          <div class="method-source-code" id="file_exists-3F-source">
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 28</span>
+<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">file_exists?</span> <span class="ruby-identifier">file</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>  <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">file</span>)
+  <span class="ruby-keyword">return</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">file?</span> <span class="ruby-identifier">file</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           

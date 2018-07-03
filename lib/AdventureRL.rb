@@ -26,6 +26,7 @@ module AdventureRL
   require DIR[:src].join     'Mask'
   require DIR[:src].join     'Rectangle'
   require DIR[:src].join     'Clip'
+  require DIR[:src].join     'ClipPlayer'
 
   # Default gem settings defined in <tt>default_settings.yml</tt>.
   DEFAULT_SETTINGS = Settings.new DIR[:settings]

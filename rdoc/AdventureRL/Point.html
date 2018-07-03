@@ -91,6 +91,8 @@
     
     <li ><a href="#method-i-move_by">#move_by</a>
     
+    <li ><a href="#method-i-move_to">#move_to</a>
+    
     <li ><a href="#method-i-set_position">#set_position</a>
     
     <li ><a href="#method-i-values">#values</a>
@@ -228,7 +230,7 @@
 
           
           <div class="method-source-code" id="collides_with-3F-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 82</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 83</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">collides_with?</span> <span class="ruby-identifier">other</span>
   <span class="ruby-keyword">return</span> <span class="ruby-identifier">collides_with_point?</span> <span class="ruby-identifier">other</span>  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Point</span>))
   <span class="ruby-keyword">return</span> <span class="ruby-identifier">collides_with_mask?</span>  <span class="ruby-identifier">other</span>  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Mask</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Rectangle</span>))
@@ -263,7 +265,7 @@
 
           
           <div class="method-source-code" id="collides_with_hash-3F-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 96</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 97</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">collides_with_hash?</span> <span class="ruby-identifier">hash</span>
   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">hash</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">include_all?</span>(<span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>))
     <span class="ruby-identifier">point</span> = <span class="ruby-constant">Point</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">hash</span>[<span class="ruby-value">:x</span>], <span class="ruby-identifier">hash</span>[<span class="ruby-value">:y</span>]
@@ -300,7 +302,7 @@
 
           
           <div class="method-source-code" id="collides_with_mask-3F-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 92</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 93</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">collides_with_mask?</span> <span class="ruby-identifier">mask</span>
   <span class="ruby-keyword">return</span> <span class="ruby-identifier">mask</span>.<span class="ruby-identifier">collides_with_point?</span> <span class="ruby-keyword">self</span>
 <span class="ruby-keyword">end</span></pre>
@@ -333,7 +335,7 @@
 
           
           <div class="method-source-code" id="collides_with_point-3F-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 88</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 89</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">collides_with_point?</span> <span class="ruby-identifier">point</span>
   <span class="ruby-keyword">return</span> <span class="ruby-identifier">get_position</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">point</span>.<span class="ruby-identifier">get_position</span>
 <span class="ruby-keyword">end</span></pre>
@@ -435,7 +437,7 @@
 
           
           <div class="method-source-code" id="keys-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 104</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 105</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">keys</span>
   <span class="ruby-identifier">sorted_keys</span> = [<span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>]
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@position</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">sort</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">axis</span><span class="ruby-operator">|</span>
@@ -471,7 +473,7 @@
 
           
           <div class="method-source-code" id="move_by-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 58</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 59</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">move_by</span> <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>
   <span class="ruby-keyword">case</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">size</span>
   <span class="ruby-keyword">when</span> <span class="ruby-value">2</span>
@@ -501,6 +503,34 @@
 
         
 
+        
+      </div>
+
+    
+      <div id="method-i-move_to" class="method-detail method-alias">
+        
+        <div class="method-heading">
+          <span class="method-name">move_to</span><span
+            class="method-args">(*args)</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+        </div>
+
+        
+
+        
+        <div class="aliases">
+          Alias for: <a href="Point.html#method-i-set_position">set_position</a>
+        </div>
         
       </div>
 
@@ -553,6 +583,10 @@
         </div>
 
         
+        <div class="aliases">
+          Also aliased as: <a href="Point.html#method-i-move_to">move_to</a>
+        </div>
+        
 
         
       </div>
@@ -577,7 +611,7 @@
 
           
           <div class="method-source-code" id="values-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 111</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Point.rb, line 112</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">values</span>
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@position</span>.<span class="ruby-identifier">sort_by_keys</span>(<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">values</span>
 <span class="ruby-keyword">end</span></pre>
