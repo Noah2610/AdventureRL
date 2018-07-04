@@ -1,6 +1,8 @@
 module AdventureRL
   class Mask
-    DEFAULT_ARGS = {
+    # Default settings for Mask.
+    # Are superseded by settings passed to <tt>#initialize</tt>.
+    DEFAULT_SETTINGS = Settings.new({
       #position: Point.new(0, 0),
       position: {
         x: 0,
@@ -15,14 +17,16 @@ module AdventureRL
         y: :top
       },
       assign_to: nil
-    }
+    })
 
-    def initialize args = {}
-      options   = DEFAULT_ARGS.merge args
-      set_position_from_arg options[:position]
-      @size     = options[:size]
-      @origin   = options[:origin]
-      assign_to args[:assign_to]  if (args[:assign_to])
+    # Pass settings Hash or <tt>AdventureRL::Settings</tt> as argument.
+    # Supersedes <tt>DEFAULT_SETTINGS</tt>.
+    def initialize settings_arg = {}
+      settings  = DEFAULT_SETTINGS.merge settings_arg
+      set_position_from settings.get(:position)
+      @size     = settings.get(:size)
+      @origin   = settings.get(:origin)
+      assign_to settings.get(:assign_to)  if (settings.get(:assign_to))
     end
 
     def assign_to object
@@ -154,17 +158,17 @@ module AdventureRL
 
     private
 
-    def set_position_from_arg position_arg
-      if    (position_arg.is_a?(Point))
-        position_arg.assign_to self
-      elsif (position_arg.is_a?(Hash))
+    def set_position_from position
+      if    (position.is_a?(Point))
+        position.assign_to self
+      elsif (position.is_a?(Hash))
         Point.new(
-          position_arg[:x],
-          position_arg[:y],
+          position[:x],
+          position[:y],
           assign_to: self
         )
       else
-        Helpers::Error.error "Cannot set Point as `#{position_arg}' for Mask."
+        Helpers::Error.error "Cannot set Point as `#{position.to_s}:#{position.class.name}' for Mask."
       end
     end
 

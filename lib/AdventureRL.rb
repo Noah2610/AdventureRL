@@ -22,6 +22,7 @@ module AdventureRL
   require DIR[:helpers].join 'PipeMethods'
   require DIR[:src].join     'Settings'
   require DIR[:src].join     'Window'
+  require DIR[:src].join     'Deltatime'
   require DIR[:src].join     'Point'
   require DIR[:src].join     'Mask'
   require DIR[:src].join     'Rectangle'

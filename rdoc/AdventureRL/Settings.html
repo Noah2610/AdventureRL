@@ -163,12 +163,14 @@ representing a path to a YAML file, or a hash with your settings.</p>
           <div class="method-source-code" id="new-source">
             <pre><span class="ruby-comment"># File lib/AdventureRL/Settings.rb, line 8</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span> <span class="ruby-identifier">arg</span>
-  <span class="ruby-keyword">if</span>    ([<span class="ruby-constant">String</span>, <span class="ruby-constant">Pathname</span>].<span class="ruby-identifier">include?</span> <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">class</span>)  <span class="ruby-comment"># Filepath to YAML settings file</span>
+  <span class="ruby-keyword">if</span>    ([<span class="ruby-constant">String</span>, <span class="ruby-constant">Pathname</span>].<span class="ruby-identifier">include?</span> <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">class</span>)
     <span class="ruby-ivar">@file</span> = <span class="ruby-constant">Pathname</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">arg</span>
     <span class="ruby-identifier">validate_file_exists</span> <span class="ruby-ivar">@file</span>
     <span class="ruby-ivar">@content</span> = <span class="ruby-identifier">get_file_content</span>(<span class="ruby-ivar">@file</span>).<span class="ruby-identifier">keys_to_sym</span>
-  <span class="ruby-keyword">elsif</span> (<span class="ruby-identifier">arg</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Hash</span>)    <span class="ruby-comment"># Settings hash</span>
+  <span class="ruby-keyword">elsif</span> (<span class="ruby-identifier">arg</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Hash</span>)
     <span class="ruby-ivar">@content</span> = <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">keys_to_sym</span>
+  <span class="ruby-keyword">elsif</span> (<span class="ruby-identifier">arg</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Settings</span>)
+    <span class="ruby-ivar">@content</span> = <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">get</span>
   <span class="ruby-keyword">end</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
@@ -209,7 +211,7 @@ representing a path to a YAML file, or a hash with your settings.</p>
 
           
           <div class="method-source-code" id="get-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Settings.rb, line 20</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Settings.rb, line 22</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get</span> <span class="ruby-operator">*</span><span class="ruby-identifier">keys</span>
   <span class="ruby-identifier">current_content</span> = <span class="ruby-ivar">@content</span>
   <span class="ruby-identifier">keys</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">key</span><span class="ruby-operator">|</span>
@@ -247,9 +249,10 @@ representing a path to a YAML file, or a hash with your settings.</p>
         <div class="method-description">
           
           <p>Merge self <a href="Settings.html">Settings</a> content with other_settings
-<a href="Settings.html">Settings</a> content. Can pass unlimited optional
-arguments as keys. If <code>keys</code> are given, then it will only merge
-the content from the keys <code>keys</code> for both <a
+<a href="Settings.html">Settings</a> content or <a
+href="../Hash.html">Hash</a>. Can pass unlimited optional arguments as
+keys. If <code>keys</code> are given, then it will only merge the content
+from the keys <code>keys</code> for both <a
 href="Settings.html">Settings</a> instances. Returns a new <a
 href="Settings.html">Settings</a> object where the values of the
 <code>keys</code> keys are its settings content.</p>
@@ -258,13 +261,20 @@ href="Settings.html">Settings</a> object where the values of the
 
           
           <div class="method-source-code" id="merge-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Settings.rb, line 40</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Settings.rb, line 42</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">merge</span> <span class="ruby-identifier">other_settings</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">keys</span>
-  <span class="ruby-identifier">error</span>(
-    <span class="ruby-string">&#39;Argument needs to be an instance of `AdventureRL::Settings\&#39;&#39;</span>,
-    <span class="ruby-node">&quot;but got a `#{other_settings.class.name}&#39;&quot;</span>
-  )  <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">other_settings</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Settings</span>)
-  <span class="ruby-keyword">return</span> <span class="ruby-constant">Settings</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">get</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">keys</span>).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">other_settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">keys</span>))
+  <span class="ruby-identifier">merged_settings</span> = <span class="ruby-keyword">nil</span>
+  <span class="ruby-keyword">if</span>    (<span class="ruby-identifier">other_settings</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Settings</span>)
+    <span class="ruby-identifier">merged_settings</span> = <span class="ruby-constant">Settings</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">get</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">keys</span>).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">other_settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">keys</span>))
+  <span class="ruby-keyword">elsif</span> (<span class="ruby-identifier">other_settings</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Hash</span>)
+    <span class="ruby-identifier">merged_settings</span> = <span class="ruby-constant">Settings</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">get</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">keys</span>).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">other_settings</span>)
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-identifier">error</span>(
+      <span class="ruby-string">&quot;Argument needs to be an instance of `AdventureRL::Settings&#39; or a Hash&quot;</span>,
+      <span class="ruby-node">&quot;but got a `#{other_settings.class.name}&#39;&quot;</span>
+    )
+  <span class="ruby-keyword">end</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">merged_settings</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           

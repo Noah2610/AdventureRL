@@ -107,6 +107,16 @@
         <dd>
         
       
+        <dt id="STACK_TRACE_PADDING">STACK_TRACE_PADDING
+        
+        <dd>
+        
+      
+        <dt id="STACK_TRACE_SIZE">STACK_TRACE_SIZE
+        
+        <dd>
+        
+      
       </dl>
     </section>
     
@@ -139,7 +149,7 @@
 
           
           <div class="method-source-code" id="directory_exists-3F-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 33</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 40</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">directory_exists?</span> <span class="ruby-identifier">directory</span>
   <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>  <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">directory</span>)
   <span class="ruby-keyword">return</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span> <span class="ruby-identifier">directory</span>
@@ -173,15 +183,20 @@
 
           
           <div class="method-source-code" id="error-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 6</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 8</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">error</span> <span class="ruby-operator">*</span><span class="ruby-identifier">messages</span>
   <span class="ruby-identifier">message</span> = <span class="ruby-identifier">messages</span>.<span class="ruby-identifier">join</span> <span class="ruby-value">?\n</span>
   <span class="ruby-identifier">message</span>.<span class="ruby-identifier">gsub!</span> <span class="ruby-regexp">/^/</span>, <span class="ruby-constant">PADDING</span>
+  <span class="ruby-identifier">stack_trace_lines</span> = <span class="ruby-identifier">caller</span>[<span class="ruby-constant">STACK_TRACE_PADDING</span> <span class="ruby-operator">...</span> (<span class="ruby-constant">STACK_TRACE_SIZE</span> <span class="ruby-operator">+</span> <span class="ruby-constant">STACK_TRACE_PADDING</span>)].<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">line</span><span class="ruby-operator">|</span>
+    <span class="ruby-keyword">next</span> <span class="ruby-node">&quot;#{PADDING}#{line}&quot;</span>
+  <span class="ruby-keyword">end</span>
   <span class="ruby-identifier">abort</span>([
     <span class="ruby-node">&quot;#{DIR[:entry].to_s} Error:&quot;</span>,
     <span class="ruby-identifier">message</span>,
-    <span class="ruby-node">&quot;#{PADDING}Exiting.&quot;</span>
-  ].<span class="ruby-identifier">join</span>(<span class="ruby-value">?\n</span>))
+    <span class="ruby-node">&quot;#{PADDING}Exiting.&quot;</span>,
+    <span class="ruby-string">&quot;Stack traceback (newest first):&quot;</span>,
+    <span class="ruby-identifier">stack_trace_lines</span>
+  ].<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value">?\n</span>))
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -212,7 +227,7 @@
 
           
           <div class="method-source-code" id="error_no_directory-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 22</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 29</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">error_no_directory</span> <span class="ruby-identifier">directory</span>
   <span class="ruby-identifier">dirpath</span> = <span class="ruby-identifier">directory</span>
   <span class="ruby-identifier">dirpath</span> = <span class="ruby-identifier">directory</span>.<span class="ruby-identifier">to_path</span>  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">directory</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Pathname</span>)
@@ -247,7 +262,7 @@
 
           
           <div class="method-source-code" id="error_no_file-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 16</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 23</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">error_no_file</span> <span class="ruby-identifier">file</span>
   <span class="ruby-identifier">filepath</span> = <span class="ruby-identifier">file</span>
   <span class="ruby-identifier">filepath</span> = <span class="ruby-identifier">file</span>.<span class="ruby-identifier">to_path</span>  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">file</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Pathname</span>)
@@ -282,7 +297,7 @@
 
           
           <div class="method-source-code" id="file_exists-3F-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 28</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Helpers/Error.rb, line 35</span>
 <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">file_exists?</span> <span class="ruby-identifier">file</span>
   <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>  <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">file</span>)
   <span class="ruby-keyword">return</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">file?</span> <span class="ruby-identifier">file</span>

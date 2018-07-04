@@ -125,9 +125,10 @@
       </header>
       <dl>
       
-        <dt id="DEFAULT_ARGS">DEFAULT_ARGS
+        <dt id="DEFAULT_SETTINGS">DEFAULT_SETTINGS
         
-        <dd>
+        <dd><p>Default settings for <a href="Mask.html">Mask</a>. Are superseded by
+settings passed to <code>#initialize</code>.</p>
         
       
       </dl>
@@ -147,7 +148,7 @@
         
         <div class="method-heading">
           <span class="method-name">new</span><span
-            class="method-args">(args = {})</span>
+            class="method-args">(settings_arg = {})</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -156,19 +157,21 @@
 
         <div class="method-description">
           
-          
+          <p>Pass settings <a href="../Hash.html">Hash</a> or
+<code>AdventureRL::Settings</code> as argument. Supersedes
+<code>DEFAULT_SETTINGS</code>.</p>
           
           
 
           
           <div class="method-source-code" id="new-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 20</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span> <span class="ruby-identifier">args</span> = {}
-  <span class="ruby-identifier">options</span>   = <span class="ruby-constant">DEFAULT_ARGS</span>.<span class="ruby-identifier">merge</span> <span class="ruby-identifier">args</span>
-  <span class="ruby-identifier">set_position_from_arg</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:position</span>]
-  <span class="ruby-ivar">@size</span>     = <span class="ruby-identifier">options</span>[<span class="ruby-value">:size</span>]
-  <span class="ruby-ivar">@origin</span>   = <span class="ruby-identifier">options</span>[<span class="ruby-value">:origin</span>]
-  <span class="ruby-identifier">assign_to</span> <span class="ruby-identifier">args</span>[<span class="ruby-value">:assign_to</span>]  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">args</span>[<span class="ruby-value">:assign_to</span>])
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 24</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span> <span class="ruby-identifier">settings_arg</span> = {}
+  <span class="ruby-identifier">settings</span>  = <span class="ruby-constant">DEFAULT_SETTINGS</span>.<span class="ruby-identifier">merge</span> <span class="ruby-identifier">settings_arg</span>
+  <span class="ruby-identifier">set_position_from</span> <span class="ruby-identifier">settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:position</span>)
+  <span class="ruby-ivar">@size</span>     = <span class="ruby-identifier">settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:size</span>)
+  <span class="ruby-ivar">@origin</span>   = <span class="ruby-identifier">settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:origin</span>)
+  <span class="ruby-identifier">assign_to</span> <span class="ruby-identifier">settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:assign_to</span>)  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:assign_to</span>))
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -207,7 +210,7 @@
 
           
           <div class="method-source-code" id="assign_to-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 28</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 32</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">assign_to</span> <span class="ruby-identifier">object</span>
   <span class="ruby-constant">Helpers</span><span class="ruby-operator">::</span><span class="ruby-constant">PipeMethods</span>.<span class="ruby-identifier">pipe_methods_from</span> <span class="ruby-identifier">object</span>, <span class="ruby-value">to:</span> <span class="ruby-keyword">self</span>
 <span class="ruby-keyword">end</span></pre>
@@ -240,7 +243,7 @@
 
           
           <div class="method-source-code" id="collides_with-3F-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 108</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 112</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">collides_with?</span> <span class="ruby-identifier">other</span>
   <span class="ruby-keyword">return</span> <span class="ruby-identifier">collides_with_point?</span> <span class="ruby-identifier">other</span>  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Point</span>))
   <span class="ruby-keyword">return</span> <span class="ruby-identifier">collides_with_mask?</span>  <span class="ruby-identifier">other</span>  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Mask</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Rectangle</span>))
@@ -275,7 +278,7 @@
 
           
           <div class="method-source-code" id="collides_with_hash-3F-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 147</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 151</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">collides_with_hash?</span> <span class="ruby-identifier">other_hash</span>
   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">hash</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">include_all?</span>(<span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>))
     <span class="ruby-identifier">other_point</span> = <span class="ruby-constant">Point</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">hash</span>[<span class="ruby-value">:x</span>], <span class="ruby-identifier">hash</span>[<span class="ruby-value">:y</span>]
@@ -312,7 +315,7 @@
 
           
           <div class="method-source-code" id="collides_with_mask-3F-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 123</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 127</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">collides_with_mask?</span> <span class="ruby-identifier">mask</span>
   <span class="ruby-identifier">this_sides</span>  = <span class="ruby-identifier">get_sides</span>
   <span class="ruby-identifier">other_sides</span> = <span class="ruby-identifier">mask</span>.<span class="ruby-identifier">get_sides</span>
@@ -365,7 +368,7 @@
 
           
           <div class="method-source-code" id="collides_with_point-3F-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 114</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 118</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">collides_with_point?</span> <span class="ruby-identifier">point</span>
   <span class="ruby-keyword">return</span> (
     <span class="ruby-identifier">point</span>.<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-identifier">get_side</span>(<span class="ruby-value">:left</span>)  <span class="ruby-operator">&amp;&amp;</span>
@@ -403,7 +406,7 @@
 
           
           <div class="method-source-code" id="get_center-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 99</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 103</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_center</span> <span class="ruby-identifier">target</span> = <span class="ruby-value">:all</span>
   <span class="ruby-identifier">target</span> = <span class="ruby-identifier">target</span>.<span class="ruby-identifier">to_sym</span>
   <span class="ruby-keyword">return</span> <span class="ruby-constant">Point</span>.<span class="ruby-identifier">new</span>(
@@ -441,7 +444,7 @@
 
           
           <div class="method-source-code" id="get_corner-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 50</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 54</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_corner</span> <span class="ruby-identifier">side_x</span>, <span class="ruby-identifier">side_y</span>
   <span class="ruby-identifier">side_x</span> = <span class="ruby-identifier">side_x</span>.<span class="ruby-identifier">to_sym</span>
   <span class="ruby-identifier">side_y</span> = <span class="ruby-identifier">side_y</span>.<span class="ruby-identifier">to_sym</span>
@@ -494,7 +497,7 @@
 
           
           <div class="method-source-code" id="get_mask-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 32</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 36</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_mask</span>
   <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span>
 <span class="ruby-keyword">end</span></pre>
@@ -527,7 +530,7 @@
 
           
           <div class="method-source-code" id="get_origin-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 43</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 47</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_origin</span> <span class="ruby-identifier">target</span> = <span class="ruby-value">:all</span>
   <span class="ruby-identifier">target</span> = <span class="ruby-identifier">target</span>.<span class="ruby-identifier">to_sym</span>
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@origin</span>          <span class="ruby-keyword">if</span> (<span class="ruby-identifier">target</span> <span class="ruby-operator">==</span> <span class="ruby-value">:all</span>)
@@ -563,7 +566,7 @@
 
           
           <div class="method-source-code" id="get_side-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 74</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 78</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_side</span> <span class="ruby-identifier">side</span>
   <span class="ruby-identifier">side</span> = <span class="ruby-identifier">side</span>.<span class="ruby-identifier">to_sym</span>
   <span class="ruby-keyword">case</span> <span class="ruby-identifier">side</span>
@@ -608,7 +611,7 @@
 
           
           <div class="method-source-code" id="get_sides-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 90</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 94</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_sides</span>
   <span class="ruby-keyword">return</span> {
     <span class="ruby-value">left:</span>   <span class="ruby-identifier">get_side</span>(<span class="ruby-value">:left</span>),
@@ -646,7 +649,7 @@
 
           
           <div class="method-source-code" id="get_size-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 36</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Mask.rb, line 40</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_size</span> <span class="ruby-identifier">target</span> = <span class="ruby-value">:all</span>
   <span class="ruby-identifier">target</span> = <span class="ruby-identifier">target</span>.<span class="ruby-identifier">to_sym</span>
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@size</span>          <span class="ruby-keyword">if</span> (<span class="ruby-identifier">target</span> <span class="ruby-operator">==</span> <span class="ruby-value">:all</span>)

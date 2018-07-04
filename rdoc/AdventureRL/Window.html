@@ -86,6 +86,8 @@
     
     <li ><a href="#method-i-get_deltatime">#get_deltatime</a>
     
+    <li ><a href="#method-i-get_dt">#get_dt</a>
+    
     <li ><a href="#method-i-get_fps">#get_fps</a>
     
     <li ><a href="#method-i-get_target_fps">#get_target_fps</a>
@@ -130,7 +132,7 @@
         
         <div class="method-heading">
           <span class="method-name">new</span><span
-            class="method-args">(settings = {})</span>
+            class="method-args">(settings_arg = {})</span>
           
           <span class="method-click-advice">click to toggle source</span>
           
@@ -151,9 +153,12 @@
           
           <div class="method-source-code" id="new-source">
             <pre><span class="ruby-comment"># File lib/AdventureRL/Window.rb, line 5</span>
-<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span> <span class="ruby-identifier">settings</span> = {}
-  <span class="ruby-identifier">default_settings</span> = <span class="ruby-constant">DEFAULT_SETTINGS</span>.<span class="ruby-identifier">get</span> <span class="ruby-value">:window</span>
-  <span class="ruby-identifier">size</span> = <span class="ruby-identifier">settings</span>[<span class="ruby-value">:size</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">default_settings</span>[<span class="ruby-value">:size</span>]
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span> <span class="ruby-identifier">settings_arg</span> = {}
+  <span class="ruby-identifier">settings_arg</span> = {}  <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">settings_arg</span>)
+  <span class="ruby-identifier">settings</span>     = <span class="ruby-constant">Settings</span>.<span class="ruby-identifier">new</span>(
+    <span class="ruby-constant">DEFAULT_SETTINGS</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:window</span>)
+  ).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">settings_arg</span>)
+  <span class="ruby-identifier">size</span>         = <span class="ruby-identifier">settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:size</span>)
 
   <span class="ruby-constant">Mask</span>.<span class="ruby-identifier">new</span>(
     <span class="ruby-value">position:</span> <span class="ruby-constant">Point</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">0</span>, <span class="ruby-value">0</span>),
@@ -164,20 +169,16 @@
     <span class="ruby-value">assign_to:</span> <span class="ruby-keyword">self</span>
   )
 
-  <span class="ruby-comment">#AdventureRL::Helpers::PipeMethods.pipe_methods_from self, to: @_mask  # Calls any missing methods on @_mask</span>
-  <span class="ruby-ivar">@_last_update_at</span> = <span class="ruby-keyword">nil</span>
-  <span class="ruby-identifier">_set_last_update_at</span>
-  <span class="ruby-ivar">@_deltatime</span> = <span class="ruby-keyword">nil</span>
-  <span class="ruby-identifier">_set_deltatime</span>
-  <span class="ruby-ivar">@_tick</span> = <span class="ruby-value">0</span>
-  <span class="ruby-ivar">@_target_fps</span> = <span class="ruby-identifier">settings</span>[<span class="ruby-value">:fps</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">default_settings</span>[<span class="ruby-value">:fps</span>]
+  <span class="ruby-ivar">@_deltatime</span>  = <span class="ruby-constant">Deltatime</span>.<span class="ruby-identifier">new</span>
+  <span class="ruby-ivar">@_tick</span>       = <span class="ruby-value">0</span>
+  <span class="ruby-ivar">@_target_fps</span> = <span class="ruby-identifier">settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:fps</span>)
   <span class="ruby-keyword">super</span>(
     <span class="ruby-identifier">get_size</span>(<span class="ruby-value">:width</span>), <span class="ruby-identifier">get_size</span>(<span class="ruby-value">:height</span>),
-    <span class="ruby-value">fullscreen:</span>      <span class="ruby-operator">!</span><span class="ruby-operator">!</span>(<span class="ruby-identifier">settings</span>[<span class="ruby-value">:fullscreen</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">default_settings</span>[<span class="ruby-value">:fullscreen</span>]),
+    <span class="ruby-value">fullscreen:</span>      <span class="ruby-identifier">settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:fullscreen</span>),
     <span class="ruby-value">update_interval:</span> <span class="ruby-identifier">_get_update_inteval_from_fps</span>(<span class="ruby-ivar">@_target_fps</span>)
   )
-  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">caption</span> = <span class="ruby-identifier">settings</span>[<span class="ruby-value">:caption</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">default_settings</span>[<span class="ruby-value">:caption</span>]
-  <span class="ruby-identifier">_call_setup_method</span> <span class="ruby-identifier">settings</span>
+  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">caption</span> = <span class="ruby-identifier">settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:caption</span>)
+  <span class="ruby-identifier">_call_setup_method</span> <span class="ruby-identifier">settings_arg</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -210,22 +211,54 @@
 
         <div class="method-description">
           
-          
+          <p>Returns the value of the last calculated deltatime.</p>
           
           
 
           
           <div class="method-source-code" id="get_deltatime-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Window.rb, line 47</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Window.rb, line 52</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_deltatime</span>
-  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@_deltatime</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@_deltatime</span>.<span class="ruby-identifier">get_deltatime</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
         </div>
 
         
+        <div class="aliases">
+          Also aliased as: <a href="Window.html#method-i-get_dt">get_dt</a>
+        </div>
+        
 
+        
+      </div>
+
+    
+      <div id="method-i-get_dt" class="method-detail method-alias">
+        
+        <div class="method-heading">
+          <span class="method-name">get_dt</span><span
+            class="method-args">()</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+          
+
+          
+        </div>
+
+        
+
+        
+        <div class="aliases">
+          Alias for: <a href="Window.html#method-i-get_deltatime">get_deltatime</a>
+        </div>
         
       </div>
 
@@ -243,13 +276,15 @@
 
         <div class="method-description">
           
-          
+          <p>Returns the current FPS. This is just a wrapper method around
+<code>Gosu.fps</code> to maintain the design pattern with
+<code>get_*</code> methods.</p>
           
           
 
           
           <div class="method-source-code" id="get_fps-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Window.rb, line 39</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Window.rb, line 41</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_fps</span>
   <span class="ruby-keyword">return</span> <span class="ruby-constant">Gosu</span>.<span class="ruby-identifier">fps</span>
 <span class="ruby-keyword">end</span></pre>
@@ -276,13 +311,14 @@
 
         <div class="method-description">
           
-          
+          <p>Returns the expected FPS. These were passed to <code>#initialize</code> in
+the settings.</p>
           
           
 
           
           <div class="method-source-code" id="get_target_fps-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Window.rb, line 43</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Window.rb, line 47</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_target_fps</span>
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@_target_fps</span>
 <span class="ruby-keyword">end</span></pre>
@@ -315,7 +351,7 @@
 
           
           <div class="method-source-code" id="get_tick-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Window.rb, line 51</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Window.rb, line 57</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_tick</span>
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@_tick</span>
 <span class="ruby-keyword">end</span></pre>
@@ -342,16 +378,15 @@
 
         <div class="method-description">
           
-          
+          <p>This method can be overwritten by user, and will be called after
+<code>#initialize</code>.</p>
           
           
 
           
           <div class="method-source-code" id="setup-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Window.rb, line 34</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Window.rb, line 35</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">setup</span> <span class="ruby-identifier">args</span>
-  <span class="ruby-comment"># This method can be overwritten by user,</span>
-  <span class="ruby-comment"># and will be called after #initialize</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           

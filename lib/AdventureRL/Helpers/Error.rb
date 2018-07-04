@@ -2,15 +2,22 @@ module AdventureRL
   module Helpers
     module Error
       PADDING = '  '
+      STACK_TRACE_SIZE    = 20
+      STACK_TRACE_PADDING = 1
 
       def self.error *messages
         message = messages.join ?\n
         message.gsub! /^/, PADDING
+        stack_trace_lines = caller[STACK_TRACE_PADDING ... (STACK_TRACE_SIZE + STACK_TRACE_PADDING)].map do |line|
+          next "#{PADDING}#{line}"
+        end
         abort([
           "#{DIR[:entry].to_s} Error:",
           message,
-          "#{PADDING}Exiting."
-        ].join(?\n))
+          "#{PADDING}Exiting.",
+          "Stack traceback (newest first):",
+          stack_trace_lines
+        ].flatten.join(?\n))
       end
 
       def self.error_no_file file
