@@ -88,7 +88,11 @@
     
     <li ><a href="#method-i-draw">#draw</a>
     
+    <li ><a href="#method-i-get_active_clip">#get_active_clip</a>
+    
     <li ><a href="#method-i-get_clip">#get_clip</a>
+    
+    <li ><a href="#method-i-is_playing-3F">#is_playing?</a>
     
     <li ><a href="#method-i-load_clip">#load_clip</a>
     
@@ -170,16 +174,18 @@ superseded by settings passed to <code>#initialize</code>.</p>
 
           
           <div class="method-source-code" id="new-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 27</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 32</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span> <span class="ruby-identifier">settings</span> = {}
   <span class="ruby-ivar">@settings</span> = <span class="ruby-constant">DEFAULT_SETTINGS</span>.<span class="ruby-identifier">merge</span> <span class="ruby-identifier">settings</span>
   <span class="ruby-identifier">set_mask_from</span> <span class="ruby-ivar">@settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:mask</span>)
   <span class="ruby-ivar">@clips</span> = {}
   <span class="ruby-identifier">load_clips</span> <span class="ruby-operator">*</span><span class="ruby-ivar">@settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:clips</span>)  <span class="ruby-keyword">if</span> (<span class="ruby-ivar">@settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">:clips</span>))
-  <span class="ruby-ivar">@deltatime</span>   = <span class="ruby-constant">Deltatime</span>.<span class="ruby-identifier">new</span>
-  <span class="ruby-ivar">@image_index</span> = <span class="ruby-value">0</span>
-  <span class="ruby-ivar">@active_clip</span> = <span class="ruby-keyword">nil</span>
-  <span class="ruby-ivar">@playing</span>     = <span class="ruby-keyword">false</span>
+  <span class="ruby-ivar">@deltatime</span>      = <span class="ruby-constant">Deltatime</span>.<span class="ruby-identifier">new</span>
+  <span class="ruby-ivar">@image_index</span>    = <span class="ruby-value">0</span>
+  <span class="ruby-ivar">@active_clip</span>    = <span class="ruby-keyword">nil</span>
+  <span class="ruby-ivar">@active_image</span>   = <span class="ruby-keyword">nil</span>
+  <span class="ruby-ivar">@playing</span>        = <span class="ruby-keyword">false</span>
+  <span class="ruby-ivar">@accumulated_dt</span> = <span class="ruby-value">0.0</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -248,9 +254,46 @@ enough time passes.</p>
 
           
           <div class="method-source-code" id="draw-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 101</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 113</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">draw</span>
   <span class="ruby-ivar">@deltatime</span>.<span class="ruby-identifier">update</span>
+  <span class="ruby-ivar">@accumulated_dt</span> <span class="ruby-operator">+=</span> <span class="ruby-ivar">@deltatime</span>.<span class="ruby-identifier">dt</span>
+  <span class="ruby-identifier">next_image</span> <span class="ruby-identifier">get_next_image_amount</span>
+  <span class="ruby-comment">#next_image          if (next_image?)</span>
+  <span class="ruby-identifier">draw_current_image</span>  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">is_playing?</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-get_active_clip" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">get_active_clip</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns the currently active <a href="Clip.html">Clip</a>.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="get_active_clip-source">
+            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 69</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_active_clip</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@active_clip</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -282,9 +325,44 @@ enough time passes.</p>
 
           
           <div class="method-source-code" id="get_clip-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 57</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 64</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_clip</span> <span class="ruby-identifier">clipname</span>
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@clips</span>[<span class="ruby-identifier">clipname</span>]
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-is_playing-3F" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">is_playing?</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Returns <code>true</code> if the <a href="Clip.html">Clip</a> is currently
+<em>playing</em>, and <code>false</code> if it is <em>paused</em> or there
+is no active <a href="Clip.html">Clip</a>.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="is_playing-3F-source">
+            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 123</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">is_playing?</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@playing</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           
@@ -317,7 +395,7 @@ href="ClipPlayer.html">ClipPlayer</a>, so it can be played _(see
 
           
           <div class="method-source-code" id="load_clip-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 40</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 47</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">load_clip</span> <span class="ruby-identifier">clip</span>
   <span class="ruby-identifier">error</span>(
     <span class="ruby-node">&quot;Cannot load clip `#{clip.to_s}:#{clip.class.name}&#39;&quot;</span>,
@@ -358,7 +436,7 @@ href="ClipPlayer.html">ClipPlayer</a>, so it can be played _(see
 
           
           <div class="method-source-code" id="load_clips-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 50</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 57</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">load_clips</span> <span class="ruby-operator">*</span><span class="ruby-identifier">clips</span>
   <span class="ruby-identifier">clips</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">clip</span><span class="ruby-operator">|</span>
     <span class="ruby-identifier">load_clip</span> <span class="ruby-identifier">clip</span>
@@ -395,7 +473,7 @@ drawing the current <a href="Clip.html">Clip</a> image if
 
           
           <div class="method-source-code" id="pause-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 79</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 91</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pause</span>
   <span class="ruby-ivar">@playing</span> = <span class="ruby-keyword">false</span>
 <span class="ruby-keyword">end</span></pre>
@@ -432,7 +510,7 @@ href="Clip.html">Clip</a>, or an instance of
 
           
           <div class="method-source-code" id="play-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 65</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 77</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">play</span> <span class="ruby-identifier">clipname</span>
   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">clipname</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Clip</span>)
     <span class="ruby-identifier">load_clip</span> <span class="ruby-identifier">clipname</span>
@@ -472,7 +550,7 @@ href="Clip.html">Clip</a>, or an instance of
 
           
           <div class="method-source-code" id="resume-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 84</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 96</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">resume</span>
   <span class="ruby-identifier">error</span>(
     <span class="ruby-string">&#39;Cannot resume playing, there is no currently active Clip.&#39;</span>
@@ -509,7 +587,7 @@ href="Clip.html">Clip</a>, or an instance of
 
           
           <div class="method-source-code" id="stop-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 94</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/ClipPlayer.rb, line 106</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">stop</span>
   <span class="ruby-ivar">@active_clip</span> = <span class="ruby-keyword">nil</span>
   <span class="ruby-ivar">@playing</span>     = <span class="ruby-keyword">false</span>

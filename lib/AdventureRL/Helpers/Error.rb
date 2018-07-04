@@ -15,7 +15,7 @@ module AdventureRL
           "#{DIR[:entry].to_s} Error:",
           message,
           "#{PADDING}Exiting.",
-          "Stack traceback (newest first):",
+          "Stack traceback (most recent call first):",
           stack_trace_lines
         ].flatten.join(?\n))
       end

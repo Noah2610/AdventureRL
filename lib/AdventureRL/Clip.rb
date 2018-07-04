@@ -88,6 +88,11 @@ module AdventureRL
       return @image_files[index]
     end
 
+    # Returns true if <tt>index</tt> image exists.
+    def has_image_index? index
+      return index < @image_files.size
+    end
+
     private
 
     def get_settings_with custom_settings
