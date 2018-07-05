@@ -5,7 +5,7 @@ module AdventureRL
     # Default settings for ClipPlayer.
     # Are superseded by settings passed to <tt>#initialize</tt>.
     DEFAULT_SETTINGS = Settings.new({
-      speed: 1,
+      speed: 1.0,
       mask: {
         position: {
           x: 0,
@@ -112,7 +112,7 @@ module AdventureRL
     # Switch to the next image automatically when enough time passes.
     def draw
       @deltatime.update
-      @accumulated_dt += @deltatime.dt
+      @accumulated_dt += @deltatime.dt * @settings.get(:speed)
       next_image get_next_image_amount
       #next_image          if (next_image?)
       draw_current_image  if (is_playing?)
