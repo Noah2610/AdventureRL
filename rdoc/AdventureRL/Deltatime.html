@@ -79,6 +79,8 @@
     
     <li ><a href="#method-i-get_deltatime">#get_deltatime</a>
     
+    <li ><a href="#method-i-reset">#reset</a>
+    
     <li ><a href="#method-i-update">#update</a>
     
   </ul>
@@ -244,6 +246,41 @@
         <div class="aliases">
           Also aliased as: <a href="Deltatime.html#method-i-get">get</a>, <a href="Deltatime.html#method-i-dt">dt</a>
         </div>
+        
+
+        
+      </div>
+
+    
+      <div id="method-i-reset" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">reset</span><span
+            class="method-args">()</span>
+          
+          <span class="method-click-advice">click to toggle source</span>
+          
+        </div>
+        
+
+        <div class="method-description">
+          
+          <p>Resets last updated deltatime. Used when wanting to pause this
+deltatime&#39;s calculations, so when resumed, deltatime isn&#39;t a large
+number.</p>
+          
+          
+
+          
+          <div class="method-source-code" id="reset-source">
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Deltatime.rb, line 27</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">reset</span>
+  <span class="ruby-identifier">set_last_update_at</span>
+<span class="ruby-keyword">end</span></pre>
+          </div>
+          
+        </div>
+
         
 
         

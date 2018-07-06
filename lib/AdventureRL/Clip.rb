@@ -3,9 +3,10 @@ module AdventureRL
     include Helpers::Error
     IMAGE_FILENAME_REGEX = /\A\d+\.(png|jpe?g)\z/i
     INTERNAL_DEFAULT_SETTINGS = Settings.new({
+      name:      :clip_name,
       directory: nil,
       fps:       24,
-      name:      :clip_name
+      loop:      true
     })
     @@default_settings = nil
     @@root_directory   = Pathname.new($0).dirname
@@ -90,7 +91,7 @@ module AdventureRL
 
     # Returns true if <tt>index</tt> image exists.
     def has_image_index? index
-      return index < @image_files.size
+      return index < @image_files.size && index >= 0
     end
 
     private

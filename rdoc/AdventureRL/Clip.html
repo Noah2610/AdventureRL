@@ -208,7 +208,7 @@
 
           
           <div class="method-source-code" id="get_root_directory-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 25</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 26</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_root_directory</span>
   <span class="ruby-keyword">return</span> <span class="ruby-identifier">@@root_directory</span>
 <span class="ruby-keyword">end</span></pre>
@@ -246,7 +246,7 @@ href="../Hash.html">Hash</a> containing your settings.</p>
 
           
           <div class="method-source-code" id="new-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 53</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 54</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span> <span class="ruby-identifier">settings_arg</span>
   <span class="ruby-identifier">settings</span>   = <span class="ruby-constant">Settings</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">settings_arg</span>
   <span class="ruby-ivar">@settings</span>  = <span class="ruby-identifier">get_settings_with</span> <span class="ruby-identifier">settings</span>
@@ -342,7 +342,7 @@ default settings.</p>
 
           
           <div class="method-source-code" id="set_default_settings-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 33</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 34</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_default_settings</span> <span class="ruby-identifier">settings</span>
   <span class="ruby-identifier">default_settings</span> = <span class="ruby-keyword">nil</span>
   <span class="ruby-keyword">if</span>    ([<span class="ruby-constant">String</span>, <span class="ruby-constant">Pathname</span>].<span class="ruby-identifier">include?</span> <span class="ruby-identifier">settings</span>.<span class="ruby-identifier">class</span>)
@@ -394,7 +394,7 @@ either a String with the directory path, or an instance of Pathname.</p>
 
           
           <div class="method-source-code" id="set_root_directory-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 18</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 19</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_root_directory</span> <span class="ruby-identifier">directory</span>
   <span class="ruby-identifier">directory</span> = <span class="ruby-constant">Pathname</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">directory</span>  <span class="ruby-keyword">unless</span> (<span class="ruby-identifier">directory</span>.<span class="ruby-identifier">is_a?</span> <span class="ruby-constant">Pathname</span>)
   <span class="ruby-identifier">@@root_directory</span> = <span class="ruby-constant">Pathname</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">directory</span>
@@ -468,7 +468,7 @@ either a String with the directory path, or an instance of Pathname.</p>
 
           
           <div class="method-source-code" id="get_image-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 87</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 88</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_image</span> <span class="ruby-identifier">index</span>
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@image_files</span>[<span class="ruby-identifier">index</span>]
 <span class="ruby-keyword">end</span></pre>
@@ -501,7 +501,7 @@ either a String with the directory path, or an instance of Pathname.</p>
 
           
           <div class="method-source-code" id="get_image_directory-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 76</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 77</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_image_directory</span>
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@directory</span>
 <span class="ruby-keyword">end</span></pre>
@@ -538,7 +538,7 @@ either a String with the directory path, or an instance of Pathname.</p>
 
           
           <div class="method-source-code" id="get_images-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 82</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 83</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_images</span>
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@image_files</span>
 <span class="ruby-keyword">end</span></pre>
@@ -571,7 +571,7 @@ either a String with the directory path, or an instance of Pathname.</p>
 
           
           <div class="method-source-code" id="get_name-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 71</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 72</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_name</span>
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@name</span>
 <span class="ruby-keyword">end</span></pre>
@@ -606,7 +606,7 @@ unless <code>*keys</code> are given, then it returns the value of
 
           
           <div class="method-source-code" id="get_settings-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 65</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 66</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_settings</span> <span class="ruby-operator">*</span><span class="ruby-identifier">keys</span>
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@settings</span>  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">empty?</span>)
   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@settings</span>.<span class="ruby-identifier">get</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">keys</span>)
@@ -640,9 +640,9 @@ unless <code>*keys</code> are given, then it returns the value of
 
           
           <div class="method-source-code" id="has_image_index-3F-source">
-            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 92</span>
+            <pre><span class="ruby-comment"># File lib/AdventureRL/Clip.rb, line 93</span>
 <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">has_image_index?</span> <span class="ruby-identifier">index</span>
-  <span class="ruby-keyword">return</span> <span class="ruby-identifier">index</span> <span class="ruby-operator">&lt;</span> <span class="ruby-ivar">@image_files</span>.<span class="ruby-identifier">size</span>
+  <span class="ruby-keyword">return</span> <span class="ruby-identifier">index</span> <span class="ruby-operator">&lt;</span> <span class="ruby-ivar">@image_files</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">index</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">0</span>
 <span class="ruby-keyword">end</span></pre>
           </div>
           

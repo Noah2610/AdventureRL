@@ -21,6 +21,13 @@ module AdventureRL
       set_last_update_at
     end
 
+    # Resets last updated deltatime.
+    # Used when wanting to pause this deltatime's calculations,
+    # so when resumed, deltatime isn't a large number.
+    def reset
+      set_last_update_at
+    end
+
     private
 
     def set_deltatime
