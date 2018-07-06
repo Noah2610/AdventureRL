@@ -214,7 +214,7 @@ module AdventureRL
       return  unless (image)
       scale = get_scale_for_image image
       image.draw(
-        x, y, @settings.get(:z_index),
+        get_side(:left), get_side(:top), @settings.get(:z_index),
         scale[:x], scale[:y],
         @settings.get(:color)
       )
