@@ -30,17 +30,17 @@ module AdventureRL
 
     private
 
-    def set_deltatime
-      diff_in_secs = get_elapsed_seconds - @last_update_at
-      @deltatime = diff_in_secs
-    end
+      def set_deltatime
+        diff_in_secs = get_elapsed_seconds - @last_update_at
+        @deltatime = diff_in_secs
+      end
 
-    def set_last_update_at
-      @last_update_at = get_elapsed_seconds
-    end
+      def set_last_update_at
+        @last_update_at = get_elapsed_seconds
+      end
 
-    def get_elapsed_seconds
-      return Gosu.milliseconds.to_f / 1000.0
-    end
+      def get_elapsed_seconds
+        return Gosu.milliseconds.to_f / 1000.0
+      end
   end
 end

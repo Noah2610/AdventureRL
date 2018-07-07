@@ -93,13 +93,14 @@ module AdventureRL
     end
 
     # Increment (or decrement) the speed value by <tt>amount</tt>.
-    def increment_speed_by amount
+    def increment_speed amount
       error(
         'Argument passed to #increment_speed must be a Float or Integer, but got',
         "#{seconds.to_s}:#{amount.class.name}"
       )  unless ([Float, Integer].include? amount.class)
       @speed += amount
     end
+    alias_method :increase_speed, :increment_speed
 
     # Start playing loaded Clip with the name <tt>clipname</tt>.
     # <tt>clipname</tt> can either be the name
@@ -188,84 +189,84 @@ module AdventureRL
 
     private
 
-    def has_active_clip?
-      return !!get_active_clip
-    end
+      def has_active_clip?
+        return !!get_active_clip
+      end
 
-    def set_image_index
-      target_frame_delay = 1.0 / get_active_clip.get_settings(:fps).to_f
-      previous_index = @image_index
-      index = (get_current_time / target_frame_delay).floor
-      return  if (previous_index == index)
-      @image_index = index
-      unless (get_active_clip.has_image_index? @image_index)
-        if (get_active_clip.get_settings(:loop))
-          reset
-        else
-          stop
+      def set_image_index
+        target_frame_delay = 1.0 / get_active_clip.get_settings(:fps).to_f
+        previous_index = @image_index
+        index = (get_current_time / target_frame_delay).floor
+        return  if (previous_index == index)
+        @image_index = index
+        unless (get_active_clip.has_image_index? @image_index)
+          if (get_active_clip.get_settings(:loop))
+            reset
+          else
+            stop
+          end
+          return
         end
-        return
+        set_active_image
       end
-      set_active_image
-    end
 
-    def draw_current_image
-      image = get_active_image
-      return  unless (image)
-      scale = get_scale_for_image image
-      image.draw(
-        get_side(:left), get_side(:top), @settings.get(:z_index),
-        scale[:x], scale[:y],
-        @settings.get(:color)
-      )
-    end
-
-    def get_active_image
-      return @active_image
-    end
-
-    def get_scale_for_image image = get_active_image
-      return {
-        x: (get_size(:width).to_f  / image.width.to_f),
-        y: (get_size(:height).to_f / image.height.to_f)
-      }
-    end
-
-    def set_active_image
-      clip = get_active_clip
-      return  if (
-        !clip ||
-        !clip.has_image_index?(@image_index)
-      )
-      image_file = clip.get_image(@image_index).to_s
-      if (@active_image.is_a? Gosu::Image)
-        @active_image.insert image_file, 0, 0
-      else
-        @active_image = Gosu::Image.new(
-          image_file,
-          @settings.get(:image_options)
+      def draw_current_image
+        image = get_active_image
+        return  unless (image)
+        scale = get_scale_for_image image
+        image.draw(
+          get_side(:left), get_side(:top), @settings.get(:z_index),
+          scale[:x], scale[:y],
+          @settings.get(:color)
         )
       end
-    end
 
-    def set_mask_from mask
-      if    (mask.is_a?(Mask))
-        mask.assign_to self
-      elsif (mask.is_a?(Hash))
-        Mask.new(
-          mask.merge(
-            assign_to: self
+      def get_active_image
+        return @active_image
+      end
+
+      def get_scale_for_image image = get_active_image
+        return {
+          x: (get_size(:width).to_f  / image.width.to_f),
+          y: (get_size(:height).to_f / image.height.to_f)
+        }
+      end
+
+      def set_active_image
+        clip = get_active_clip
+        return  if (
+          !clip ||
+          !clip.has_image_index?(@image_index)
+        )
+        image_file = clip.get_image(@image_index).to_s
+        if (@active_image.is_a? Gosu::Image)
+          @active_image.insert image_file, 0, 0
+        else
+          @active_image = Gosu::Image.new(
+            image_file,
+            @settings.get(:image_options)
           )
-        )
-      else
-        error "Cannot set Point as `#{mask.to_s}:#{mask.class.name}' for ClipPlayer."
+        end
       end
-    end
 
-    def set_active_clip clip
-      @image_index = 0
-      @active_clip = clip
-      set_active_image
-    end
+      def set_mask_from mask
+        if    (mask.is_a?(Mask))
+          mask.assign_to self
+        elsif (mask.is_a?(Hash))
+          Mask.new(
+            mask.merge(
+              assign_to: self
+            )
+          )
+        else
+          error "Cannot set Point as `#{mask.to_s}:#{mask.class.name}' for ClipPlayer."
+        end
+      end
+
+      def set_active_clip clip
+        @image_index = 0
+        @active_clip = clip
+        set_active_image
+      end
   end
 end

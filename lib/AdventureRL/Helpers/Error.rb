@@ -10,12 +10,12 @@ module AdventureRL
         message.gsub! /^/, PADDING
         stack_trace_lines = caller[STACK_TRACE_PADDING ... (STACK_TRACE_SIZE + STACK_TRACE_PADDING)].map do |line|
           next "#{PADDING}#{line}"
-        end
+        end .reverse
         abort([
           "#{DIR[:entry].to_s} Error:",
           message,
           "#{PADDING}Exiting.",
-          "Stack traceback (most recent call first):",
+          "Stack traceback (most recent call last):",
           stack_trace_lines
         ].flatten.join(?\n))
       end
@@ -44,25 +44,25 @@ module AdventureRL
 
       private
 
-      def error *messages
-        AdventureRL::Helpers::Error.error *messages
-      end
+        def error *messages
+          AdventureRL::Helpers::Error.error *messages
+        end
 
-      def error_no_file file
-        AdventureRL::Helpers::Error.error_no_file file
-      end
+        def error_no_file file
+          AdventureRL::Helpers::Error.error_no_file file
+        end
 
-      def error_no_directory directory
-        AdventureRL::Helpers::Error.error_no_directory directory
-      end
+        def error_no_directory directory
+          AdventureRL::Helpers::Error.error_no_directory directory
+        end
 
-      def file_exists? file
-        return AdventureRL::Helpers::Error.file_exists? file
-      end
+        def file_exists? file
+          return AdventureRL::Helpers::Error.file_exists? file
+        end
 
-      def directory_exists? directory
-        return AdventureRL::Helpers::Error.directory_exists? directory
-      end
+        def directory_exists? directory
+          return AdventureRL::Helpers::Error.directory_exists? directory
+        end
     end
   end
 end

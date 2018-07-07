@@ -130,16 +130,16 @@ module AdventureRL
       return (
         (
           (
-              other_sides[:left] >= this_sides[:left] &&
-              other_sides[:left] <= this_sides[:right]
+            other_sides[:left] >= this_sides[:left] &&
+            other_sides[:left] <= this_sides[:right]
           ) || (
-             other_sides[:right] >= this_sides[:left] &&
-             other_sides[:right] <= this_sides[:right]
+            other_sides[:right] >= this_sides[:left] &&
+            other_sides[:right] <= this_sides[:right]
           )
         ) && (
           (
-               other_sides[:top] >= this_sides[:top]  &&
-               other_sides[:top] <= this_sides[:bottom]
+            other_sides[:top] >= this_sides[:top]  &&
+            other_sides[:top] <= this_sides[:bottom]
           ) || (
             other_sides[:bottom] >= this_sides[:top]  &&
             other_sides[:bottom] <= this_sides[:bottom]
@@ -158,92 +158,92 @@ module AdventureRL
 
     private
 
-    def set_position_from position
-      if    (position.is_a?(Point))
-        position.assign_to self
-      elsif (position.is_a?(Hash))
-        Point.new(
-          position[:x],
-          position[:y],
-          assign_to: self
-        )
-      else
-        Helpers::Error.error "Cannot set Point as `#{position.to_s}:#{position.class.name}' for Mask."
+      def set_position_from position
+        if    (position.is_a?(Point))
+          position.assign_to self
+        elsif (position.is_a?(Hash))
+          Point.new(
+            position[:x],
+            position[:y],
+            assign_to: self
+          )
+        else
+          Helpers::Error.error "Cannot set Point as `#{position.to_s}:#{position.class.name}' for Mask."
+        end
       end
-    end
 
-    def get_side_left
-      case get_origin(:x)
-      when :left
-        return get_position(:x)
-      when :right
-        return get_position(:x) - get_size(:width)
-      when :center
-        return get_position(:x) - (get_size(:width) * 0.5)
-      else
-        return nil
+      def get_side_left
+        case get_origin(:x)
+        when :left
+          return get_position(:x)
+        when :right
+          return get_position(:x) - get_size(:width)
+        when :center
+          return get_position(:x) - (get_size(:width) * 0.5)
+        else
+          return nil
+        end
       end
-    end
 
-    def get_side_right
-      case get_origin(:x)
-      when :left
-        return get_position(:x) + get_size(:width)
-      when :right
-        return get_position(:x)
-      when :center
-        return get_position(:x) + (get_size(:width) * 0.5)
-      else
-        return nil
+      def get_side_right
+        case get_origin(:x)
+        when :left
+          return get_position(:x) + get_size(:width)
+        when :right
+          return get_position(:x)
+        when :center
+          return get_position(:x) + (get_size(:width) * 0.5)
+        else
+          return nil
+        end
       end
-    end
 
-    def get_side_top
-      case get_origin(:y)
-      when :top
-        return get_position(:y)
-      when :bottom
-        return get_position(:y) - get_size(:height)
-      when :center
-        return get_position(:y) - (get_size(:height) * 0.5)
-      else
-        return nil
+      def get_side_top
+        case get_origin(:y)
+        when :top
+          return get_position(:y)
+        when :bottom
+          return get_position(:y) - get_size(:height)
+        when :center
+          return get_position(:y) - (get_size(:height) * 0.5)
+        else
+          return nil
+        end
       end
-    end
 
-    def get_side_bottom
-      case get_origin(:y)
-      when :top
-        return get_position(:y) + get_size(:height)
-      when :bottom
-        return get_position(:y)
-      when :center
-        return get_position(:y) + (get_size(:height) * 0.5)
-      else
-        return nil
+      def get_side_bottom
+        case get_origin(:y)
+        when :top
+          return get_position(:y) + get_size(:height)
+        when :bottom
+          return get_position(:y)
+        when :center
+          return get_position(:y) + (get_size(:height) * 0.5)
+        else
+          return nil
+        end
       end
-    end
 
-    def get_center_x
-      case get_origin(:x)
-      when :left
-        return get_position(:x) + (get_size(:width) * 0.5)
-      when :right
-        return get_position(:x) - (get_size(:width) * 0.5)
-      when :center
-        return get_position(:x)
+      def get_center_x
+        case get_origin(:x)
+        when :left
+          return get_position(:x) + (get_size(:width) * 0.5)
+        when :right
+          return get_position(:x) - (get_size(:width) * 0.5)
+        when :center
+          return get_position(:x)
+        end
       end
-    end
 
-    def get_center_y
-      case get_origin(:y)
-      when :top
-        return get_position(:y) + (get_size(:height) * 0.5)
-      when :bottom
-        return get_position(:y) - (get_size(:height) * 0.5)
-      when :center
-        return get_position(:y)
+      def get_center_y
+        case get_origin(:y)
+        when :top
+          return get_position(:y) + (get_size(:height) * 0.5)
+        when :bottom
+          return get_position(:y) - (get_size(:height) * 0.5)
+        when :center
+          return get_position(:y)
+        end
       end
-    end
   end
 end

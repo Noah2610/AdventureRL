@@ -96,34 +96,34 @@ module AdventureRL
 
     private
 
-    def get_settings_with custom_settings
-      return get_default_settings.merge custom_settings
-    end
-
-    def get_default_settings
-      return INTERNAL_DEFAULT_SETTINGS.merge @@default_settings  if (@@default_settings)
-      return INTERNAL_DEFAULT_SETTINGS
-    end
-
-    def get_image_directory_from_settings settings = @settings
-      directory = settings.get(:directory)
-      directory = directory.to_path  if (directory.is_a? Pathname)
-      return Pathname.new File.join(self.class.get_root_directory, directory)
-    end
-
-    def validate_directory directory = get_directory
-      error_no_directory directory  unless (directory_exists? directory)
-    end
-
-    def get_image_paths
-      return get_directory.each_child.select do |file|
-        next false  unless (file.file?)
-        next file.basename.to_path.match? IMAGE_FILENAME_REGEX
-      end .sort do |file_one, file_two|
-        number_one = file_one.basename.to_path.match(/\A(\d+)\..+\z/)[1].to_i
-        number_two = file_two.basename.to_path.match(/\A(\d+)\..+\z/)[1].to_i
-        next number_one <=> number_two
+      def get_settings_with custom_settings
+        return get_default_settings.merge custom_settings
       end
-    end
+
+      def get_default_settings
+        return INTERNAL_DEFAULT_SETTINGS.merge @@default_settings  if (@@default_settings)
+        return INTERNAL_DEFAULT_SETTINGS
+      end
+
+      def get_image_directory_from_settings settings = @settings
+        directory = settings.get(:directory)
+        directory = directory.to_path  if (directory.is_a? Pathname)
+        return Pathname.new File.join(self.class.get_root_directory, directory)
+      end
+
+      def validate_directory directory = get_directory
+        error_no_directory directory  unless (directory_exists? directory)
+      end
+
+      def get_image_paths
+        return get_directory.each_child.select do |file|
+          next false  unless (file.file?)
+          next file.basename.to_path.match? IMAGE_FILENAME_REGEX
+        end .sort do |file_one, file_two|
+          number_one = file_one.basename.to_path.match(/\A(\d+)\..+\z/)[1].to_i
+          number_two = file_two.basename.to_path.match(/\A(\d+)\..+\z/)[1].to_i
+          next number_one <=> number_two
+        end
+      end
   end
 end

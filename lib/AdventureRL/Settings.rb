@@ -56,16 +56,16 @@ module AdventureRL
 
     private
 
-    def validate_file_exists file = @file
-      error_no_file file  unless (file_exists? file)
-    end
-
-    def get_file_content file = @file
-      begin
-        return YAML.load_file(file.to_path) || {}
-      rescue
-        error "Couldn't load settings file: '#{file.to_path}'", 'Is it a valid YAML file?'
+      def validate_file_exists file = @file
+        error_no_file file  unless (file_exists? file)
       end
-    end
+
+      def get_file_content file = @file
+        begin
+          return YAML.load_file(file.to_path) || {}
+        rescue
+          error "Couldn't load settings file: '#{file.to_path}'", 'Is it a valid YAML file?'
+        end
+      end
   end
 end
