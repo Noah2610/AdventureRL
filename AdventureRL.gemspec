@@ -40,8 +40,7 @@ Written in Ruby with the Gosu gem.
   spec.add_development_dependency 'minitest', '~> 5.0'
   spec.add_development_dependency 'rake',     '~> 10.0'
   spec.add_development_dependency 'rdoc',     '~> 6.0'
-
-  spec.add_development_dependency 'simple-benchmark'
+  spec.add_development_dependency 'virb'
 
   spec.add_dependency             'gosu',     '~> 0.13.3'
 end

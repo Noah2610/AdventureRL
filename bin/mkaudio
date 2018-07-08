@@ -1,0 +1,196 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'argument_parser'
+
+class AudioGenerator
+  DEFAULTS = {
+    fps:        10,
+    extension:  'flac'
+  }
+  HELP_TEXT = <<-EOT
+  USAGE
+    #{$0} [options...] AUDIO_FILEPATH
+
+  AUDIO_FILEPATH
+    The path to a audio or video file,
+    from which to extract the audio into multiple
+    smaller audio files..
+    This argument is mandatory.
+
+  OPTIONS
+    --help, -h
+      Print this text and exit.
+
+    --base-directory, --directory, --dir, -d BASE_DIRECTORY
+      The path and base name of the directory
+      where the files will be put. The full directory
+      name will be created with the following format:
+        {BASE_DIRECTORY}.{FPS}F.{EXTENSION}
+      This option is mandatory.
+
+    --fps, -f FPS
+      The frames per second to use, as an integer.
+      Default: '#{DEFAULTS[:fps]}'
+
+    --extension, --ext, -e EXTENSION
+      The extension and audio format to use for the audio files.
+      Default: '#{DEFAULTS[:extension]}'
+  EOT
+  VALID_ARGUMENTS = {
+    single: {
+      help: [
+        [?h],
+        false
+      ],
+      directory: [
+        [?d],
+        true
+      ],
+      fps: [
+        [?f],
+        true
+      ],
+      extension: [
+        [?e],
+        true
+      ]
+    },
+    double: {
+      help: [
+        ['help'],
+        false
+      ],
+      directory: [
+        ['base-directory', 'directory', 'dir'],
+        true
+      ],
+      fps: [
+        ['fps'],
+        true
+      ],
+      extension: [
+        ['extension', 'ext'],
+        true
+      ]
+    },
+    keywords: {
+      input: [:INPUT]
+    }
+  }
+  MESSAGE_PADDING        = '  '
+  AUDIO_FILE_REGEX       = /\A[\/\w\-]+?\.(flac|mp3|wav|ogg|mp4|mkv|webm)\z/i
+  BASE_DIRECTORY_REGEX   = /\A[\/\w\-]+\z/
+  PERCENT_DECIMAL_POINTS = 2
+
+  def initialize
+    validate_dependencies
+    @arguments      = ArgumentParser.get_arguments VALID_ARGUMENTS
+    @input_file     = nil
+    @base_directory = nil
+    @fps            = DEFAULTS[:fps]
+    @extension      = DEFAULTS[:extension]
+    handle_arguments
+    validate_arguments
+    @directory = get_directory
+  end
+
+  def run
+    input_file_duration = `ffprobe -show_entries format=duration -v error -of default=noprint_wrappers=1:nokey=1 -i #{@input_file}`.strip.to_f
+    segment_duration    = 1.0 / @fps.to_f
+    segments_amount     = (input_file_duration / segment_duration).ceil
+    segments_amount.times do |n|
+      filename  = "#{n.to_s.rjust 4, ?0}.#{@extension}"
+      seek_time = segment_duration * n
+      cmd       = "ffmpeg -y -ss #{seek_time} -i #{@input_file} -t #{segment_duration} #{@directory}/#{filename} &> /dev/null"
+      n_human   = n + 1
+      percent   = ((n_human.to_f / segments_amount.to_f) * 100.0).round(PERCENT_DECIMAL_POINTS)
+      msg(
+        "Executing:",
+        "`#{cmd}'",
+        "#{n_human}/#{segments_amount} -- #{percent.to_s}% done."
+      )
+      error(
+        "ffmpeg exited with an error code!"
+      )  unless (system cmd)
+    end
+    msg "Done!", "Generated files in #{@directory}."
+  end
+
+  private
+
+    def error *messages
+      message = messages.flatten.join(?\n).gsub(/^/,"#{MESSAGE_PADDING}")
+      abort([
+        "#{$0} ERROR",
+        message,
+        "#{MESSAGE_PADDING}Exiting."
+      ].flatten.join(?\n))
+    end
+
+    def msg *messages
+      message = messages.flatten.join(?\n).gsub(/^/,"#{MESSAGE_PADDING}")
+      puts([
+        "#{$0}",
+        message
+      ].flatten.join(?\n))
+    end
+
+    def validate_dependencies
+      error(
+        "`ffmpeg' is not available."
+      )  unless (system('which ffmpeg &> /dev/null'))
+    end
+
+    def handle_arguments
+      if (@arguments[:options][:help])
+        puts HELP_TEXT
+        exit
+      end
+      @input_file     = (@arguments[:keywords][:input] || []).first
+      @base_directory = @arguments[:options][:directory]   if (@arguments[:options][:directory])
+      @fps            = @arguments[:options][:fps]         if (@arguments[:options][:fps])
+      @extension      = @arguments[:options][:extension]   if (@arguments[:options][:extension])
+    end
+
+    def validate_arguments
+      error(
+        "AUDIO_FILEPATH must be a valid audio or video file.",
+        "It must match `#{AUDIO_FILE_REGEX.inspect}'",
+        "Got `#{@input_file}'."
+      )  unless (valid_audio_file? @input_file)
+      error(
+        "BASE_DIRECTORY must be in a valid parent directory.",
+        "It must match `#{BASE_DIRECTORY_REGEX.inspect}`",
+        "Got `#{@base_directory}'."
+      )  unless (valid_base_directory? @base_directory)
+      # TODO: Validate other options.
+    end
+
+    def valid_audio_file? audio_file
+      return (
+        audio_file             &&
+        File.file?(audio_file) &&
+        audio_file.match?(AUDIO_FILE_REGEX)
+      )
+    end
+
+    def valid_base_directory? base_directory
+      return (
+        base_directory                                &&
+        File.directory?(File.dirname(base_directory)) &&
+        base_directory.match?(BASE_DIRECTORY_REGEX)
+      )
+    end
+
+    def get_directory
+      directory = "#{@base_directory}.#{@fps.to_s}F.#{@extension}"
+      Dir.mkdir directory  unless (File.directory? directory)
+      return directory
+    end
+end
+
+if ($0 == __FILE__)
+  generator = AudioGenerator.new
+  generator.run
+end

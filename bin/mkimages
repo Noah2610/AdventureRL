@@ -1,0 +1,200 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'argument_parser'
+
+class ImageGenerator
+  DEFAULTS = {
+    resolution: '960x540',
+    fps:        24,
+    extension:  'png'
+  }
+  HELP_TEXT = <<-EOT
+  USAGE
+    #{$0} [options...] VIDEO_FILEPATH
+
+  VIDEO_FILEPATH
+    The path to a video file.
+    This argument is mandatory.
+
+  OPTIONS
+    --help, -h
+      Print this text and exit.
+
+    --base-directory, --directory, --dir, -d BASE_DIRECTORY
+      The path and base name of the directory
+      where the files will be put. The full directory
+      name will be created with the following format:
+        {BASE_DIRECTORY}.{RESOLUTION}.{FPS}F.{EXTENSION}
+      This option is mandatory.
+
+    --resolution, --res, -r RESOLUTION
+      The resolution to use for the images.
+      The images will be scaled to fit the resolution.
+      See `$ man ffmpeg' for formatting options.
+      Default: '#{DEFAULTS[:resolution]}'
+
+    --fps, -f FPS
+      The frames per second to use, as an integer.
+      Default: '#{DEFAULTS[:fps]}'
+
+    --extension, --ext, -e EXTENSION
+      The extension and image format to use for the images.
+      Default: '#{DEFAULTS[:extension]}'
+  EOT
+  VALID_ARGUMENTS = {
+    single: {
+      help: [
+        [?h],
+        false
+      ],
+      directory: [
+        [?d],
+        true
+      ],
+      resolution: [
+        [?r],
+        true
+      ],
+      fps: [
+        [?f],
+        true
+      ],
+      extension: [
+        [?e],
+        true
+      ]
+    },
+    double: {
+      help: [
+        ['help'],
+        false
+      ],
+      directory: [
+        ['base-directory', 'directory', 'dir'],
+        true
+      ],
+      resolution: [
+        ['resolution', 'res'],
+        true
+      ],
+      fps: [
+        ['fps'],
+        true
+      ],
+      extension: [
+        ['extension', 'ext'],
+        true
+      ]
+    },
+    keywords: {
+      input: [:INPUT]
+    }
+  }
+  MESSAGE_PADDING        = '  '
+  VIDEO_FILE_REGEX     = /\A[\/\w\-]+?\.(mp4|mkv|webm)\z/i
+  BASE_DIRECTORY_REGEX = /\A[\/\w\-]+\z/
+
+  def initialize
+    validate_dependencies
+    @arguments      = ArgumentParser.get_arguments VALID_ARGUMENTS
+    @input_file     = nil
+    @base_directory = nil
+    @resolution     = DEFAULTS[:resolution]
+    @fps            = DEFAULTS[:fps]
+    @extension      = DEFAULTS[:extension]
+    handle_arguments
+    validate_arguments
+    @directory = get_directory
+  end
+
+  def run
+    cmd = "ffmpeg -y -i #{@input_file} -vn -filter:v scale=#{@resolution} -r #{@fps} #{@directory}/%4d.#{@extension}"
+    msg(
+      "Executing:",
+      "`#{cmd}'"
+    )
+    error(
+      "ffmpeg exited with an error code!"
+    )  unless (system cmd)
+    msg "Done!", "Generated files in #{@directory}."
+  end
+
+  private
+
+    def error *messages
+      message = messages.flatten.join(?\n).gsub(/^/,"#{MESSAGE_PADDING}")
+      abort([
+        "#{$0} ERROR",
+        message,
+        "#{MESSAGE_PADDING}Exiting."
+      ].flatten.join(?\n))
+    end
+
+    def msg *messages
+      message = messages.flatten.join(?\n).gsub(/^/,"#{MESSAGE_PADDING}")
+      puts([
+        "#{$0}",
+        message
+      ].flatten.join(?\n))
+    end
+
+    def validate_dependencies
+      error(
+        "`ffmpeg' is not available."
+      )  unless (system('which ffmpeg &> /dev/null'))
+    end
+
+    def handle_arguments
+      if (@arguments[:options][:help])
+        puts HELP_TEXT
+        exit
+      end
+      @input_file     = (@arguments[:keywords][:input] || []).first
+      @base_directory = @arguments[:options][:directory]   if (@arguments[:options][:directory])
+      @resolution     = @arguments[:options][:resolution]  if (@arguments[:options][:resolution])
+      @fps            = @arguments[:options][:fps]         if (@arguments[:options][:fps])
+      @extension      = @arguments[:options][:extension]   if (@arguments[:options][:extension])
+    end
+
+    def validate_arguments
+      error(
+        "VIDEO_FILEPATH must be a valid video file.",
+        "It must match `#{VIDEO_FILE_REGEX.inspect}'",
+        "Got `#{@input_file}'."
+      )  unless (valid_video_file? @input_file)
+      error(
+        "BASE_DIRECTORY must be in a valid parent directory.",
+        "It must match `#{BASE_DIRECTORY_REGEX.inspect}`",
+        "Got `#{@base_directory}'."
+      )  unless (valid_base_directory? @base_directory)
+      # TODO: Validate other options.
+    end
+
+    def valid_video_file? video_file
+      return (
+        video_file             &&
+        File.file?(video_file) &&
+        video_file.match?(VIDEO_FILE_REGEX)
+      )
+    end
+
+    def valid_base_directory? base_directory
+      return (
+        base_directory                                &&
+        File.directory?(File.dirname(base_directory)) &&
+        base_directory.match?(BASE_DIRECTORY_REGEX)
+      )
+    end
+
+    def get_directory
+      directory = "#{@base_directory}.#{@resolution}.#{@fps.to_s}F.#{@extension}"
+      Dir.mkdir directory  unless (File.directory? directory)
+      return directory
+    end
+end
+
+if ($0 == __FILE__)
+  generator = ImageGenerator.new
+  generator.run
+end
