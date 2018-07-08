@@ -1,17 +1,17 @@
 module AdventureRL
-  class Clip < FileGroup
-    IMAGE_FILENAME_REGEX = /\A\d+\.(png|jpe?g)\z/i
+  class Audio < FileGroup
+    AUDIO_FILENAME_REGEX = /\A\d+\.(flac|wav|ogg)\z/i
     INTERNAL_DEFAULT_SETTINGS = Settings.new({
-      name:      :clip_name,
+      name:      :audio_name,
       directory: nil,
       fps:       24,
-      audio:     false
+      volume:    1.0
     })
     @@default_settings = nil
     @@root_directory   = Pathname.new($0).dirname
 
     class << self
-      # Set the root directory for the images directory.
+      # Set the root directory for the audio files directory.
       # All settings 'directory' values will be relative to this.
       # Defaults to the entry scripts (the script that was called, <tt>$0</tt>) directory.
       # Pass either a String with the directory path, or an instance of Pathname.
@@ -21,7 +21,7 @@ module AdventureRL
       end
       alias_method :root=, :set_root_directory
 
-      # Returns the currently set root images directory.
+      # Returns the currently set root audio files directory.
       def get_root_directory
         return @@root_directory
       end
@@ -48,6 +48,7 @@ module AdventureRL
       alias_method :default_settings=, :set_default_settings
     end
 
+
     # Initialize with either a path to a YAML settings file as a String,
     # or a Hash containing your settings.
     def initialize settings
@@ -64,7 +65,7 @@ module AdventureRL
 
       # Should return the regex which must match the filenames.
       def get_filename_regex
-        return IMAGE_FILENAME_REGEX
+        return AUDIO_FILENAME_REGEX
       end
   end
 end

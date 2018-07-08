@@ -23,7 +23,7 @@ module AdventureRL
       current_content = @content
       keys.each do |key|
         key = key.to_sym  if (key.is_a? String)
-        if (current_content.is_a?(Hash) && current_content[key])
+        if (current_content.is_a?(Hash) && !current_content[key].nil?)
           current_content = current_content[key]
         else
           current_content = nil
