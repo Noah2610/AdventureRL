@@ -52,9 +52,26 @@ module AdventureRL
     # or a Hash containing your settings.
     def initialize settings
       super
+      audio_settings = get_settings :audio
+      @audio = load_audio audio_settings  if (audio_settings)
+    end
+
+    # Returns this Clip's Audio, if one was provided at #new.
+    def get_audio
+      return @audio
+    end
+
+    # Returns true if this Clip has Audio.
+    def has_audio?
+      return !!get_audio
     end
 
     private
+
+      # Loads Audio, if one was provided
+      def load_audio audio_settings
+        return Audio.new audio_settings
+      end
 
       # Returns this class' specific INTERNAL_DEFAULT_SETTINGS.
       def get_default_settings

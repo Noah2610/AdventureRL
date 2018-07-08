@@ -41,6 +41,27 @@ module AdventureRL
     end
     alias_method :get_time, :get_current_time
 
+    # Set a new current playback time in seconds.
+    def set_current_time seconds
+      error(
+        "Passed seconds must be an Integer or Float,",
+        "but got #{seconds.inspect}:#{seconds.class.name}"
+      )  unless ([Integer, Float].include? seconds.class)
+      @current_time = seconds
+    end
+    alias_method :set_time, :set_current_time
+
+    # Increase (or decrease) current_time.
+    def increase_current_time seconds
+      error(
+        "Passed seconds must be an Integer or Float,",
+        "but got #{seconds.inspect}:#{seconds.class.name}"
+      )  unless ([Integer, Float].include? seconds.class)
+      @current_time += seconds
+    end
+    alias_method :increase_time, :increase_current_time
+    alias_method :seek,          :increase_current_time
+
     # Returns the current playback speed multiplier.
     def get_speed
       return @speed
@@ -56,25 +77,29 @@ module AdventureRL
     end
 
     # Increment (or decrement) the speed value by <tt>amount</tt>.
-    def increment_speed amount
+    def increase_speed amount
       error(
         "Argument passed to #increment_speed must be a Float or Integer, but got",
         "#{seconds.inspect}:#{amount.class.name}"
       )  unless ([Float, Integer].include? amount.class)
       @speed += amount
     end
-    alias_method :increase_speed, :increment_speed
 
     # Start playing FileGroup <tt>filegroup</tt>.
     def play filegroup
+      load_filegroup filegroup
+      @playing = true
+      @deltatime.reset
+    end
+
+    # Load a FileGroup as active FileGroup.
+    def load_filegroup filegroup
       error(
         "Passed argument must be an instance of FileGroup, but got",
         "#{filegroup.inspect}:#{filegroup.class.name}."
       )  unless (filegroup.is_a? FileGroup)
       set_filegroup filegroup
       @target_frame_delay = 1.0 / get_filegroup.get_settings(:fps).to_f
-      @playing            = true
-      @deltatime.reset
     end
 
     # Pause the currently playing FileGroup.
@@ -104,24 +129,9 @@ module AdventureRL
     def toggle
       if    (is_playing?)
         pause
-      elsif (has_clip?)
+      elsif (has_filegroup?)
         resume
       end
-    end
-
-    # Returns <tt>true</tt> if is currently _playing_,
-    # and <tt>false</tt> if is _paused_ or _stopped_.
-    def is_playing?
-      return @playing
-    end
-
-    # Seek forwards or backwards <tt>seconds</tt> seconds.
-    def seek seconds
-      error(
-        'Argument passed to #seek must be a Float or Integer, but got',
-        "#{seconds.inspect}:#{seconds.class.name}"
-      )  unless ([Float, Integer].include? seconds.class)
-      @current_time += seconds
     end
 
     # Reset the current playback.
@@ -130,6 +140,12 @@ module AdventureRL
       @current_time    = 0.0
       @filegroup_index = 0
       set_file
+    end
+
+    # Returns <tt>true</tt> if is currently _playing_,
+    # and <tt>false</tt> if is _paused_ or _stopped_.
+    def is_playing?
+      return @playing
     end
 
     # Check which file from FileGroup is supposed to be played.
