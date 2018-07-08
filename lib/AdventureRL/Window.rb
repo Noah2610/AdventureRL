@@ -77,13 +77,13 @@ module AdventureRL
     end
 
     # Wrapper method for TimingHandler#set_timeout
-    def set_timeout *args
-      @_timing_handler.set_timeout *args
+    def set_timeout *args, &block
+      @_timing_handler.set_timeout *args, &block
     end
 
     # Wrapper method for TimingHandler#set_interval
-    def set_interval *args
-      @_timing_handler.set_interval *args
+    def set_interval *args, &block
+      @_timing_handler.set_interval *args, &block
     end
 
     # Wrapper method for TimingHandler#remove_timeout

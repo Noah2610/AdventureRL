@@ -3,8 +3,9 @@ module AdventureRL
     # Default settings for AudioPlayer.
     # Are superseded by settings passed to #new.
     DEFAULT_SETTINGS = Settings.new({
-      speed:  1.0,
-      loop:   false
+      speed:     1.0,
+      loop:      false,
+      max_speed: 10.0
     })
 
     # Pass settings Hash or Settings as argument.
@@ -17,19 +18,33 @@ module AdventureRL
     # Wrapper for FileGroupPlayer#get_filegroup
     alias_method :get_audio, :get_filegroup
 
+    # Overwrite FileGroupPlayer#update to set
+    # a max speed limit. Don't play anymore once
+    # it it greater than the max speed.
+    # <tt>:max_speed</tt> can be passed to #new,
+    # to overwrite the default.
+    def update
+      return  if (above_max_speed?)
+      super
+    end
+
     private
+
+      # Returns true if the current playback speed is
+      # above the max speed limit.
+      def above_max_speed?
+        return get_speed > get_settings(:max_speed)
+      end
 
       # (Stops the last audio file,) -- Gosu cannot stop a Gosu::Sample, and that's what we're using.  
       # Loads the new audio file <tt>file</tt>,
       # and play it right away.
       def load_file file
-        # NOTE: Before loading and playing a new Gosu::Sample,
-        #       the previous one should be stopped, but Gosu::Sample cannot do this.
-        #       Ideally, it should have finished playing when this method is called, anyway.
-        set_current_audio Gosu::Sample.new(file)
-        get_current_audio.play(
+        get_current_channel.stop  if (get_current_channel)
+        sample = Gosu::Sample.new(file)
+        set_current_channel sample.play(
           get_audio.get_settings(:volume),
-          get_settings(:speed),
+          @speed,
           !:loop
         )
       end
@@ -39,12 +54,12 @@ module AdventureRL
         return DEFAULT_SETTINGS
       end
 
-      # Returns the current audio file.
+      # Returns the current Gosu::Channel.
       # Wrapper for FileGroupPlayer#get_current_file
-      alias_method :get_current_audio, :get_current_file
+      alias_method :get_current_channel, :get_current_file
 
-      # Set a new current audio.
+      # Set a new current Gosu::Channel.
       # Wrapper for FileGroupPlayer#set_current_file
-      alias_method :set_current_audio, :set_current_file
+      alias_method :set_current_channel, :set_current_file
   end
 end

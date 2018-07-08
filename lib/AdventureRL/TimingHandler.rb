@@ -29,9 +29,11 @@ module AdventureRL
     # <tt>:seconds</tt> _or_ <tt>:secs</tt>::   Integer or Float. The time to wait in seconds, before calling the method.
     # <tt>:arguments</tt> _or_ <tt>:args</tt>:: Optional Array of arguments, which will be passed to the target method.
     # <tt>:id</tt>::                            Optional value which can be used to remove the timeout afterwards. See #remove_timeout.
-    def set_timeout args = {}
-      validate_args args
-      _args = get_unified_args args
+    # You can also pass a block to the method,
+    # which will be used instead of the <tt>:method</tt> key's value.
+    def set_timeout args = {}, &block
+      validate_args args, !!block
+      _args = get_unified_args args, &block
       at    = get_time_in _args[:seconds]
       @queue[:timeouts] << {
         method:    _args[:method],
@@ -51,9 +53,11 @@ module AdventureRL
     # <tt>:seconds</tt> _or_ <tt>:secs</tt>::   Integer or Float. The time to wait in seconds, before calling the method.
     # <tt>:arguments</tt> _or_ <tt>:args</tt>:: Optional Array of arguments, which will be passed to the target method.
     # <tt>:id</tt>::                            Optional value which can be used to remove the interval afterwards. See #remove_interval.
-    def set_interval args = {}
-      validate_args args
-      _args = get_unified_args args
+    # You can also pass a block to the method,
+    # which will be used instead of the <tt>:method</tt> key's value.
+    def set_interval args = {}, &block
+      validate_args args, !!block
+      _args = get_unified_args args, &block
       at    = get_time_in _args[:seconds]
       @queue[:intervals] << {
         method:    _args[:method],
@@ -105,17 +109,19 @@ module AdventureRL
         end
       end
 
-      def validate_args args
+      def validate_args args, block_given = false
         error(
           "Passed argument must be a Hash."
         )  unless (args.is_a? Hash)
-        error(
-          "Passed args Hash must include the key `:method'."
-        )  unless (args.key? :method)
-        method_class = args[:method].class
-        error(
-          "Key `:method' must be a Method, Proc, or Symbol, but is a `#{method_class.name}'"
-        )  unless ([Method, Proc, Symbol].include? method_class)
+        unless (block_given)
+          error(
+            "Passed args Hash must include the key `:method'."
+          )  unless (args.key? :method)
+          method_class = args[:method].class
+          error(
+            "Key `:method' must be a Method, Proc, or Symbol, but is a `#{method_class.name}'"
+          )  unless ([Method, Proc, Symbol].include? method_class)
+        end
         error(
           "Passed args Hash must include the key `:seconds' or `:secs'."
         )  unless (args.key?(:seconds) || args.key?(:secs))
@@ -135,8 +141,8 @@ module AdventureRL
         end
       end
 
-      def get_unified_args args
-        prc = get_proc_from args[:method]
+      def get_unified_args args, &block
+        prc = get_proc_from(block || args[:method])
         return {
           method:    prc,
           seconds:   args[:seconds]   || args[:secs],
