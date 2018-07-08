@@ -38,34 +38,37 @@ module AdventureRL
       :update
     ]
 
-    # Returns the method names of all methods aliased to method <tt>method_name</tt>.
-    def self.get_aliased_methods method_name
-      real_method = instance_method method_name
-      return instance_methods.select do |instance_method_name|
-        next (
-          real_method == instance_method(instance_method_name) &&
-          method_name != instance_method_name
-        )
+    class << self
+      # Returns the method names of all methods aliased to method <tt>method_name</tt>.
+      def get_aliased_methods method_name
+        real_method = instance_method method_name
+        return instance_methods.select do |instance_method_name|
+          next (
+            real_method == instance_method(instance_method_name) &&
+            method_name != instance_method_name
+          )
+        end
       end
-    end
 
-    # Overwrite a bunch of FileGroupPlayer methods,
-    # so they also handle Audio, if Clip has one.
-    # See AUDIO_PLAYER_METHODS for the list of methods.
-    def self.define_audio_player_methods
-      AUDIO_PLAYER_METHODS.each do |real_method_name|
-        [real_method_name, get_aliased_methods(real_method_name)].flatten.each do |method_name|
-          define_method(method_name) do |*args|
-            super *args
-            get_audio_player.method(method_name).call(*args)  if (has_audio_player?)
-            # NOTE: Write #sync_audio_player method, maybe?
-            #       Should be unnecessarilty doubled work,
-            #       but it would garantee that both Players are synced.
-            # sync_audio_player
+      # Overwrite a bunch of FileGroupPlayer methods,
+      # so they also handle Audio, if Clip has one.
+      # See AUDIO_PLAYER_METHODS for the list of methods.
+      def define_audio_player_methods
+        AUDIO_PLAYER_METHODS.each do |real_method_name|
+          [real_method_name, get_aliased_methods(real_method_name)].flatten.each do |method_name|
+            define_method(method_name) do |*args|
+              super *args
+              get_audio_player.method(method_name).call(*args)  if (has_audio_player?)
+              # NOTE: Write #sync_audio_player method, maybe?
+              #       Should be unnecessarilty doubled work,
+              #       but it would garantee that both Players are synced.
+              # sync_audio_player
+            end
           end
         end
       end
     end
+
     define_audio_player_methods
 
     # Pass settings Hash or Settings as argument.

@@ -5,8 +5,8 @@ module AdventureRL
       # to the target object. It defines the <tt>method_missing</tt> method
       # on the origin object which calls the wanted method on the target object,
       # if it exists.
-      def self.pipe_methods_from object_origin, args = {}
-        object_target = args[:to]
+      def self.pipe_methods_from object_origin, pipe_args = {}
+        object_target = pipe_args[:to]
         Error.error(
           "AdventureRL::Helpers::PipeMethods#pipe_methods_from requires a hash with the key :to and the value of the target object, where the methods should be piped to."
         )  unless (object_target)
