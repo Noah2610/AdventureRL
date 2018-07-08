@@ -59,6 +59,23 @@ module AdventureRL
       return @_tick
     end
 
+    # Wrapper method around Gosu::Window#fullscreen?,
+    # just to follow the design pattern.
+    def is_fullscreen?
+      return fullscreen?
+    end
+
+    # Wrapper method around Gosu::Window#fullscreen=,
+    # just to follow the design pattern.
+    def set_fullscreen state
+      self.fullscreen = !!state
+    end
+
+    # Toggle beteween fullscreen and windowed states.
+    def toggle_fullscreen
+      set_fullscreen !is_fullscreen?
+    end
+
     # Wrapper method for TimingHandler#set_timeout
     def set_timeout *args
       @_timing_handler.set_timeout *args
