@@ -130,7 +130,7 @@ module AdventureRL
             )
           )
         else
-          error "Cannot set Point as #{mask.inspect}:#{mask.class.name} for ClipPlayer."
+          error "Cannot set Mask as #{mask.inspect}:#{mask.class.name} for ClipPlayer."
         end
       end
 

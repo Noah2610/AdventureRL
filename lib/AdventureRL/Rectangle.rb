@@ -1,9 +1,10 @@
 module AdventureRL
   class Rectangle
+    include Helpers::Error
+
     def initialize mask, args = {}
       default_settings = DEFAULT_SETTINGS.get :rectangle
-      Helpers::Error.error "AdventureRL::Rectangle received '#{mask.class}' instead of AdventureRL::Mask"  unless (mask.is_a? Mask)
-      mask.assign_to self
+      set_mask_from mask
       @color_original = args[:color]   || default_settings[:color]
       @z_index        = args[:z_index] || default_settings[:z_index]
     end
@@ -29,5 +30,21 @@ module AdventureRL
         @z_index
       )
     end
+
+    private
+
+      def set_mask_from mask
+        if    (mask.is_a?(Mask))
+          mask.assign_to self
+        elsif (mask.is_a?(Hash))
+          Mask.new(
+            mask.merge(
+              assign_to: self
+            )
+          )
+        else
+          error "Cannot set Mask as #{mask.inspect}:#{mask.class.name} for Layer."
+        end
+      end
   end
 end

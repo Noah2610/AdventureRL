@@ -2,23 +2,35 @@ module AdventureRL
   class Window < Gosu::Window
     include Helpers::MethodHelper
 
+    @@WINDOW = nil
+
+    class << self
+      # This returns the current Window.
+      # As there should always only be one instance of Window,
+      # this should be fine.
+      def get_window
+        return @@WINDOW
+      end
+    end
+
     def initialize settings_arg = {}
+      @@WINDOW = self
       settings_arg = {}  unless (settings_arg)
-      settings     = Settings.new(
+      settings = Settings.new(
         DEFAULT_SETTINGS.get(:window)
       ).merge(settings_arg)
-      size         = settings.get(:size)
-      Mask.new(
+      size = settings.get(:size)
+      mask = Mask.new(
         position: Point.new(0, 0),
         size:     size,
         origin: {
           x: :left, y: :top
-        },
-        assign_to: self
+        }
       )
+      @_layer = Layer.new mask
+      Helpers::PipeMethods.pipe_methods_from self, to: @_layer
       @_deltatime      = Deltatime.new
       @_timing_handler = TimingHandler.new
-      @_tick           = 0
       @_target_fps     = settings.get(:fps)
       super(
         get_size(:width), get_size(:height),
@@ -51,13 +63,13 @@ module AdventureRL
     def get_deltatime
       return @_deltatime.get_deltatime
     end
-    alias_method :get_dt,  :get_deltatime
+    alias_method :get_dt, :get_deltatime
 
-    # Returns the current game tick.
-    # The tick is updated every time #update is called.
-    def get_tick
-      return @_tick
+    # Resets Deltatime.
+    def reset_deltatime
+      @_deltatime.reset
     end
+    alias_method :reset_dt, :get_deltatime
 
     # Wrapper method around Gosu::Window#fullscreen?,
     # just to follow the design pattern.
@@ -98,17 +110,23 @@ module AdventureRL
     end
     alias_method :clear_interval, :remove_interval
 
+    # Default #update method.
+    # If you overwrite this, be sure to call <tt>super</tt>
+    # in your method.
+    def update
+      @_layer.update
+      @_timing_handler.update
+      @_deltatime.update
+    end
+
+    # Default #draw method.
+    # You might want to call <tt>super</tt>
+    # if you overwrite this method.
+    def draw
+      @_layer.draw
+    end
+
     private
-
-      def update
-        @_timing_handler.update
-        _increment_tick
-        @_deltatime.update
-      end
-
-      def _increment_tick
-        @_tick += 1
-      end
 
       def _get_update_inteval_from_fps fps
         return (1.0 / fps.to_f) * 1000
