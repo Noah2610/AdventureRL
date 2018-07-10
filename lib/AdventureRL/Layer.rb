@@ -15,6 +15,7 @@ module AdventureRL
         x: 1,
         y: 1
       }
+      @angle = 0
     end
 
     # Add any object to this Layer.
@@ -28,8 +29,56 @@ module AdventureRL
       return @children
     end
 
+    # Set the layer scaling.
+    # Pass an <tt>axis</tt>, either <tt>:x</tt> or <tt>:y</tt>,
+    # and an <tt>amount</tt> as an Integer or Float.
+    def set_scale axis, amount
+      error(
+        "Passed argument `axis' needs to be one of the following:",
+        "  #{@scale.keys.map(&:inspect).join(', ')}"
+      )  unless (@scale.key? axis)
+      error(
+        "Passed argument `amount' needs to be an Integer or Float, but got",
+        "  #{amount.inspect}.#{amount.class.name}"
+      )  unless ([Integer, Float].include? amount.class)
+      @scale[axis] = amount
+    end
+
+    # Increase (or decrease) the layer scaling by an <tt>amount</tt>.
+    # Pass an <tt>axis</tt>, either <tt>:x</tt> or <tt>:y</tt>,
+    # and an <tt>amount</tt> as an Integer or Float.
     def increase_scale axis, amount
+      error(
+        "Passed argument `axis' needs to be one of the following:",
+        "  #{@scale.keys.map(&:inspect).join(', ')}"
+      )  unless (@scale.key? axis)
+      error(
+        "Passed argument `amount' needs to be an Integer or Float, but got",
+        "  #{amount.inspect}.#{amount.class.name}"
+      )  unless ([Integer, Float].include? amount.class)
       @scale[axis] += amount  if (@scale.key? axis)
+    end
+
+    # Set the layer rotation.
+    # Pass an <tt>angle</tt> as an Integer or Float.
+    def set_rotation angle
+      error(
+        "Passed argument `angle' needs to be an Integer or Float, but got",
+        "  #{angle.inspect}.#{angle.class.name}"
+      )  unless ([Integer, Float].include? angle.class)
+      @angle = angle
+      handle_angle_overflow
+    end
+
+    # Increase (or decrease) the layer rotation.
+    # Pass an <tt>angle</tt> as an Integer or Float.
+    def increase_rotation angle
+      error(
+        "Passed argument `angle' needs to be an Integer or Float, but got",
+        "  #{angle.inspect}.#{angle.class.name}"
+      )  unless ([Integer, Float].include? angle.class)
+      @angle += angle
+      handle_angle_overflow
     end
 
     # Call this every frame.
@@ -46,7 +95,9 @@ module AdventureRL
       #scale = get_scale
       Gosu.translate(*get_corner(:left, :top).get_position.values) do
         Gosu.scale(@scale[:x], @scale[:y]) do
-          call_method_on_children :draw
+          Gosu.rotate(@angle, *get_center.values) do
+            call_method_on_children :draw
+          end
         end
       end
       draw_debug
@@ -97,12 +148,11 @@ module AdventureRL
         end
       end
 
-      def get_scale
-        window = Window.get_window
-        return {
-          x: (get_size(:width).to_f  / window.get_size(:width).to_f),
-          y: (get_size(:height).to_f / window.get_size(:height).to_f),
-        }
+      def handle_angle_overflow
+        return  if ((0 ... 360).include? @angle)
+        @angle -= 360  if (@angle >= 360)
+        @angle += 360  if (@angle <  0)
+        handle_angle_overflow
       end
   end
 end
