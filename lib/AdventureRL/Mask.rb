@@ -2,6 +2,8 @@ module AdventureRL
   # The Mask is basically a bounding box or rectangle.
   # It has a position (Point) and a size.
   class Mask
+    MASKS = []
+
     # Default settings for Mask.
     # Are superseded by settings passed to <tt>#initialize</tt>.
     DEFAULT_SETTINGS = Settings.new({
@@ -41,6 +43,7 @@ module AdventureRL
     # Pass settings Hash or <tt>AdventureRL::Settings</tt> as argument.
     # Supersedes <tt>DEFAULT_SETTINGS</tt>.
     def initialize settings_arg = {}
+      MASKS << self
       settings = DEFAULT_SETTINGS.merge settings_arg
       set_position_from settings.get(:position)
       @size             = settings.get(:size)
@@ -244,7 +247,7 @@ module AdventureRL
             assign_to: self
           )
         else
-          Helpers::Error.error "Cannot set Point as `#{position.to_s}:#{position.class.name}' for Mask."
+          Helpers::Error.error "Cannot set Point as #{position.to_s}:#{position.class.name} for Mask."
         end
       end
 

@@ -3,12 +3,18 @@
 ---
 # Window settings
 window:
-  size:
-    width:  960
-    height: 540
   caption:    'AdventureRL Window Caption!'
   fps:        30
   fullscreen: false
+  size:
+    width:  960
+    height: 540
+  position:
+    x: 0
+    y: 0
+  origin:
+    x: :left
+    y: :top
 rectangle:
   color:   0xff_ffffff
   z_index: 0

@@ -1,15 +1,20 @@
 module AdventureRL
   class Point
+    POINTS = []
+
     def initialize x, y, args = {}
+      POINTS << self
       @position = {
         x: x,
         y: y
       }
+      @assigned_to = []
       assign_to args[:assign_to]  if (args[:assign_to])
     end
 
     def assign_to object
       Helpers::PipeMethods.pipe_methods_from object, to: self
+      @assigned_to << object
     end
 
     def get_point

@@ -7,26 +7,57 @@ module AdventureRL
   class Layer
     include Helpers::Error
 
-    # Initialize Layer with a Mask.
-    def initialize mask
-      set_mask_from mask
-      @children = []
-      @scale = {
+    # Default settings.
+    # <tt>settings</tt> passed to #new take precedence.
+    DEFAULT_SETTINGS = Settings.new(
+      mask: {
+        position: {
+          x: 0,
+          y: 0
+        },
+        size: {
+          width:  360,
+          height: 360
+        },
+        origin: {
+          x: :left,
+          y: :top
+        }
+      },
+      scale: {
         x: 1,
         y: 1
-      }
-      @angle = 0
+      },
+      rotation: 0
+    )
+
+    # Initialize Layer with a <tt>settings</tt> Hash.
+    # See DEFAULT_SETTINGS for valid keys.
+    def initialize settings = {}
+      @settings = DEFAULT_SETTINGS.merge settings
+      set_mask_from @settings.get(:mask)
+      @scale    = @settings.get :scale
+      @rotation = @settings.get :rotation
+      @children = []
     end
 
     # Add any object to this Layer.
     def add object
       @children << object
     end
-    alias_method :<<, :add
+    #alias_method :<<, :add
 
     # Returns all its children objects.
     def get_children
       return @children
+    end
+
+    # Returns the current scale.
+    # <tt>target</tt> can be either <tt>:x</tt>, <tt>:y</tt>, or <tt>:all</tt>.
+    def get_scale target = :all
+      return @scale[target]  if (@scale.key? target)
+      return @scale          if (target == :all)
+      return nil
     end
 
     # Set the layer scaling.
@@ -59,6 +90,11 @@ module AdventureRL
       @scale[axis] += amount  if (@scale.key? axis)
     end
 
+    # Returns the current rotation.
+    def get_rotation
+      return @rotation
+    end
+
     # Set the layer rotation.
     # Pass an <tt>angle</tt> as an Integer or Float.
     def set_rotation angle
@@ -66,8 +102,8 @@ module AdventureRL
         "Passed argument `angle' needs to be an Integer or Float, but got",
         "  #{angle.inspect}.#{angle.class.name}"
       )  unless ([Integer, Float].include? angle.class)
-      @angle = angle
-      handle_angle_overflow
+      @rotation = angle
+      handle_rotation_overflow
     end
 
     # Increase (or decrease) the layer rotation.
@@ -77,8 +113,8 @@ module AdventureRL
         "Passed argument `angle' needs to be an Integer or Float, but got",
         "  #{angle.inspect}.#{angle.class.name}"
       )  unless ([Integer, Float].include? angle.class)
-      @angle += angle
-      handle_angle_overflow
+      @rotation += angle
+      handle_rotation_overflow
     end
 
     # Call this every frame.
@@ -92,15 +128,15 @@ module AdventureRL
     # This draws all its <tt>@children</tt>,
     # if they have a #draw method.
     def draw
-      #scale = get_scale
-      Gosu.translate(*get_corner(:left, :top).get_position.values) do
-        Gosu.scale(@scale[:x], @scale[:y]) do
-          Gosu.rotate(@angle, *get_center.values) do
+      Gosu.scale(@scale[:x], @scale[:y], x, y) do
+        Gosu.rotate(@rotation, *get_center.values) do
+          Gosu.translate(*get_corner(:left, :top).get_position.values) do
             call_method_on_children :draw
           end
+          draw_debug
         end
       end
-      draw_debug
+
     end
 
     private
@@ -148,11 +184,11 @@ module AdventureRL
         end
       end
 
-      def handle_angle_overflow
-        return  if ((0 ... 360).include? @angle)
-        @angle -= 360  if (@angle >= 360)
-        @angle += 360  if (@angle <  0)
-        handle_angle_overflow
+      def handle_rotation_overflow
+        return  if ((0 ... 360).include? @rotation)
+        @rotation -= 360  if (@rotation >= 360)
+        @rotation += 360  if (@rotation <  0)
+        handle_rotation_overflow
       end
   end
 end
