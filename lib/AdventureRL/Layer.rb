@@ -61,6 +61,19 @@ module AdventureRL
       return nil
     end
 
+    # Returns the real scale of this Layer.
+    # That is, this Layer's scale multiplied by all
+    # parent Layer's scales.
+    def get_real_scale target = :all
+      return get_scale target  unless (has_layer?)
+      return get_layer.get_real_scale(target) * get_scale(target)  if (@scale.key? target)
+      return {
+        x: (get_layer.get_real_scale(:x) * get_scale(:x)),
+        y: (get_layer.get_real_scale(:y) * get_scale(:y))
+      }  if (target == :all)
+      return nil
+    end
+
     # Set the layer scaling.
     # Pass an <tt>axis</tt>, either <tt>:x</tt> or <tt>:y</tt>,
     # and an <tt>amount</tt> as an Integer or Float.
@@ -134,11 +147,13 @@ module AdventureRL
 
     # Returns a new Point with this Layers real window position.
     def get_real_point
-      return get_corner :left, :top  unless (has_layer?)
+      pos_x = x * get_scale(:x)
+      pos_y = y * get_scale(:y)
+      return Point.new(pos_x, pos_y)  unless (has_layer?)
       real_point = get_layer.get_real_point
       return Point.new(
-        (real_point.x + get_side(:left)),
-        (real_point.y + get_side(:top))
+        (real_point.x + pos_x),
+        (real_point.y + pos_y)
       )
     end
 

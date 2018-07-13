@@ -135,7 +135,33 @@ module AdventureRL
       return nil
     end
 
-    # Returns the position Integer of a specifi side.
+    # Returns the real window position of the corner.
+    # See #get_corner for usage.
+    def get_real_corner side_x, side_y
+      side_x = side_x.to_sym
+      side_y = side_y.to_sym
+      return Point.new(
+        get_real_side(side_x),
+        get_real_side(side_y)
+      )  unless ([side_x, side_y].include? :center)
+      if    (side_x == side_y)
+        center = get_real_center.values
+        return Point.new(*center)
+      elsif (side_x == :center)
+        return Point.new(
+          get_real_center(:x),
+          get_real_side(side_y)
+        )
+      elsif (side_y == :center)
+        return Point.new(
+          get_real_side(side_x),
+          get_real_center(:y)
+        )
+      end
+      return nil
+    end
+
+    # Returns the position Integer of a specific side.
     # Takes one mandatory argument, <tt>side</tt>,
     # which can be one of the following:
     # <tt>:left</tt> or <tt>:right</tt>::
@@ -158,16 +184,18 @@ module AdventureRL
       end
     end
 
-    # Returns the real window position of side.
+    # Returns the real window position of <tt>side</tt>.
     # See #get_side for usage.
     def get_real_side side
-      real_point = get_real_point
-      side_pos   = get_side side
+      axis = :x  if ([:left, :right].include? side)
+      axis = :y  if ([:top, :bottom].include? side)
+      side_pos  = get_side(side) * get_scale(axis)
+      return side_pos  unless (has_layer?)
       case side
       when :left, :right
-        return real_point.x + side_pos
+        return get_layer.get_real_side(:left) + side_pos
       when :top, :bottom
-        return real_point.y + side_pos
+        return get_layer.get_real_side(:top) + side_pos
       else
         return nil
       end
@@ -204,6 +232,23 @@ module AdventureRL
         get_center_y
       )  if (target == :all)
       return method("get_center_#{target.to_s}".to_sym).call  if (get_point.keys.include? target)
+      return nil
+    end
+
+    # Returns the real window position of this center.
+    # See #get_center for usage.
+    def get_real_center target = :all
+      scale = get_scale
+      side = :left  if (target == :x)
+      side = :top   if (target == :y)
+      return Point.new(
+        (get_real_side(:left) + (get_center_x * scale[:x])),
+        (get_real_side(:top)  + (get_center_y * scale[:y]))
+      )  if (target == :all)
+      return (
+        get_real_side(side) + (method("get_center_#{target.to_s}".to_sym).call * scale[target])
+      )  if (get_point.keys.include? target)
+      return nil
     end
 
     # Returns true if this Mask collides with <tt>other</tt> ...
@@ -348,6 +393,15 @@ module AdventureRL
         else
           Helpers::Error.error "Cannot set Point as #{position.to_s}:#{position.class.name} for Mask."
         end
+      end
+
+      # Returns this Masks Layer scale, if it has one.
+      def get_scale target = :all
+        return get_layer.get_real_scale target  if (has_layer?)
+        scale = { x: 1.0, y: 1.0 }
+        return scale[target]  if (scale.key? target)
+        return scale          if (target == :all)
+        return nil
       end
 
       def get_side_left

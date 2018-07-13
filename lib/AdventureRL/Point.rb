@@ -152,10 +152,10 @@ module AdventureRL
     def get_real_point
       return self         unless (has_layer?)
       return @real_point  if (@real_point)
-      real_point  = get_layer.get_real_point
+      layer_point = get_layer.get_real_corner :left, :top
       @real_point = Point.new(
-        (real_point.x + x),
-        (real_point.y + y)
+        (layer_point.x + x),
+        (layer_point.y + y)
       )
       return @real_point
     end
