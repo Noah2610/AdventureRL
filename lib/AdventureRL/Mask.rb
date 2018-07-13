@@ -361,11 +361,25 @@ module AdventureRL
       # #on_mouse_press:: Is continuously called if any mouse button is held down on the Mask.
       # These methods should be defined on the instance which has a Mask assigned.
       def update_mouse_events
-        #puts get_mouse_point.get_position
+        return  unless ((btnids = get_pressed_mouse_buttons) && collides_with_mouse?)
+        btnids.each do |btnid|
+          call_method_on_assigned :on_mouse_press, btnid
+        end
       end
 
       def collides_with_mouse?
         return collides_with? get_mouse_point
+      end
+
+      def get_mouse_point
+        window = Window.get_window
+        return Point.new(window.mouse_x, window.mouse_y)
+      end
+
+      def get_pressed_mouse_buttons
+        return MOUSE_BUTTON_IDS.select do |btnid|
+          next Gosu.button_down? btnid
+        end
       end
 
       def call_method_on_assigned method_name, *args
@@ -374,11 +388,6 @@ module AdventureRL
           meth = assigned_to.method(method_name)  if (assigned_to.methods.include?(method_name))
           meth.call(*args)                        if (meth)
         end
-      end
-
-      def get_mouse_point
-        window = Window.get_window
-        return Point.new(window.mouse_x, window.mouse_y)
       end
 
       def set_position_from position
