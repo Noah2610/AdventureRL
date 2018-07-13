@@ -2,6 +2,9 @@ module AdventureRL
   # The Mask is basically a bounding box or rectangle.
   # It has a position (Point) and a size.
   class Mask
+    # This array will be filled with any created Masks.
+    # Just so they won't get garbage collected
+    # <em>(not sure how garbage collection works)</em>.
     MASKS = []
 
     # Default settings for Mask.
@@ -23,22 +26,17 @@ module AdventureRL
       assign_to:    nil,
       mouse_events: false
     })
-    # This class variable will be filled with Mask s,
-    # which are passed <tt>mouse_events: true</tt> on #new.
-    # They will be updated by Window every so often,
-    # to check for mouse collisions, and trigger mouse event methods, such as:
-    # #on_mouse_down::  Is called when any mouse button is pressed down on the Mask.
-    # #on_mouse_up::    Is called when any mouse button is released on the Mask.
-    # #on_mouse_press:: Is continuously called if any mouse button is held down on the Mask.
-    # These methods should be defined on the instance which has a Mask assigned.
-    @@masks_for_mouse_events = []
 
-    class << self
-      # Returns all Masks, which have <tt>mouse_events</tt> enabled.
-      def get_masks_for_mouse_events
-        return @@masks_for_mouse_events
-      end
-    end
+    # This constant contains the ID of all mouse buttons.
+    MOUSE_BUTTON_IDS = [
+      Gosu::MS_LEFT,
+      Gosu::MS_MIDDLE,
+      Gosu::MS_RIGHT,
+      Gosu::MS_WHEEL_DOWN,
+      Gosu::MS_WHEEL_UP
+    ] .concat((0 .. 7).map do |n|
+      next Gosu.const_get "MS_OTHER_#{n.to_s}"
+    end)
 
     # Pass settings Hash or <tt>AdventureRL::Settings</tt> as argument.
     # Supersedes <tt>DEFAULT_SETTINGS</tt>.
@@ -51,6 +49,7 @@ module AdventureRL
       @has_mouse_events = settings.get(:mouse_events)
       @assigned_to      = []
       assign_to settings.get(:assign_to)  if (settings.get(:assign_to))
+      @layer            = nil
     end
 
     # Assign this Mask to an instance.
@@ -78,6 +77,12 @@ module AdventureRL
     # Used to get an instance's mask when it has been assigned to it.
     def get_mask
       return self
+    end
+
+    # Returns <tt>true</tt>.
+    # Used to verify if an instance has a Mask assigned to it.
+    def has_mask?
+      return true
     end
 
     # Returns the size of the Mask.
@@ -153,6 +158,21 @@ module AdventureRL
       end
     end
 
+    # Returns the real window position of side.
+    # See #get_side for usage.
+    def get_real_side side
+      real_point = get_real_point
+      side_pos   = get_side side
+      case side
+      when :left, :right
+        return real_point.x + side_pos
+      when :top, :bottom
+        return real_point.y + side_pos
+      else
+        return nil
+      end
+    end
+
     # Returns the positions of all four sides.
     def get_sides
       return {
@@ -160,6 +180,16 @@ module AdventureRL
         right:  get_side(:right),
         top:    get_side(:top),
         bottom: get_side(:bottom)
+      }
+    end
+
+    # Returns the real window positions of all four sides.
+    def get_real_sides
+      return {
+        left:   get_real_side(:left),
+        right:  get_real_side(:right),
+        top:    get_real_side(:top),
+        bottom: get_real_side(:bottom)
       }
     end
 
@@ -181,25 +211,15 @@ module AdventureRL
     # - Point,
     # - or Hash with keys <tt>:x</tt> and <tt>:y</tt>.
     def collides_with? other
-      return collides_with_mask?  other  if (defined? other.get_mask)
-      return collides_with_point? other  if (defined? other.get_point)
+      return collides_with_mask?  other  if (defined? other.has_mask?)
+      return collides_with_point? other  if (defined? other.has_point?)
       return collides_with_hash?  other  if (other.is_a?(Hash))
-    end
-
-    # Returns true if this Mask collides with <tt>other</tt> Point.
-    def collides_with_point? point
-      return (
-        point.x >= get_side(:left)  &&
-        point.x <  get_side(:right) &&
-        point.y >= get_side(:top)   &&
-        point.y <  get_side(:bottom)
-      )
     end
 
     # Returns true if this Mask collides with <tt>other</tt> Mask.
     def collides_with_mask? mask
-      this_sides  = get_sides
-      other_sides = mask.get_sides
+      this_sides  = get_real_sides
+      other_sides = mask.get_real_sides
       return (
         (
           (
@@ -221,6 +241,18 @@ module AdventureRL
       )
     end
 
+    # Returns true if this Mask collides with <tt>other</tt> Point.
+    def collides_with_point? point
+      real_point = point.get_real_point
+      real_sides = get_real_sides
+      return (
+        real_point.x >= real_sides[:left]  &&
+        real_point.x <  real_sides[:right] &&
+        real_point.y >= real_sides[:top]   &&
+        real_point.y <  real_sides[:bottom]
+      )
+    end
+
     # Returns true if this Mask collides with <tt>other</tt> Hash.
     def collides_with_hash? other_hash
       if (hash.keys.include_all?(:x, :y))
@@ -235,7 +267,74 @@ module AdventureRL
       return @has_mouse_events
     end
 
+    # Set the parent Layer.
+    def set_layer layer
+      error(
+        "Passed argument `layer' must be an instance of `Layer', but got",
+        "`#{layer.inspect}:#{layer.class.name}'."
+      )  unless (layer.is_a? Layer)
+      @layer = layer
+      get_point.set_layer @layer
+    end
+
+    # Returns the parent Layer.
+    def get_layer
+      return @layer
+    end
+
+    # Returns true if this Mask has a parent Layer.
+    def has_layer?
+      return !!@layer
+    end
+
+    # Is called (usually every frame) by this Mask's parent Layer.
+    def update_mask
+      update_mouse_events  if (has_mouse_events?)
+    end
+
+    # This method is called when any button is pressed down.
+    # We use it for mouse events.
+    def button_down btnid
+      return  unless (has_mouse_events? && MOUSE_BUTTON_IDS.include?(btnid))
+      call_method_on_assigned :on_mouse_down, btnid  if (collides_with_mouse?)
+    end
+
+    # This method is called when any button is released.
+    # We use it for mouse events.
+    def button_up btnid
+      return  unless (has_mouse_events? && MOUSE_BUTTON_IDS.include?(btnid))
+      call_method_on_assigned :on_mouse_up, btnid    if (collides_with_mouse?)
+    end
+
     private
+
+      # Masks, which are passed <tt>mouse_events: true</tt> on #new,
+      # will be updated by their parent Layer every so often,
+      # to check for mouse collisions, and trigger mouse event methods, such as:
+      # #on_mouse_down::  Is called when any mouse button is pressed down on the Mask.
+      # #on_mouse_up::    Is called when any mouse button is released on the Mask.
+      # #on_mouse_press:: Is continuously called if any mouse button is held down on the Mask.
+      # These methods should be defined on the instance which has a Mask assigned.
+      def update_mouse_events
+        #puts get_mouse_point.get_position
+      end
+
+      def collides_with_mouse?
+        return collides_with? get_mouse_point
+      end
+
+      def call_method_on_assigned method_name, *args
+        get_assigned.each do |assigned_to|
+          meth = nil
+          meth = assigned_to.method(method_name)  if (assigned_to.methods.include?(method_name))
+          meth.call(*args)                        if (meth)
+        end
+      end
+
+      def get_mouse_point
+        window = Window.get_window
+        return Point.new(window.mouse_x, window.mouse_y)
+      end
 
       def set_position_from position
         if    (position.is_a?(Point))

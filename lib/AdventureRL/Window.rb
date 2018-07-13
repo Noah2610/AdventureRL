@@ -107,6 +107,20 @@ module AdventureRL
     end
     alias_method :clear_interval, :remove_interval
 
+    # If you use #button_down in your game,
+    # be sure to call <tt>super</tt> at the beginning of the method,
+    # to take advantage of the framework's button events.
+    def button_down btnid
+      @_layer.button_down btnid
+    end
+
+    # If you use #button_up in your game,
+    # be sure to call <tt>super</tt> at the beginning of the method,
+    # to take advantage of the framework's button events.
+    def button_up btnid
+      @_layer.button_up btnid
+    end
+
     # Default #update method.
     # If you overwrite this, be sure to call <tt>super</tt>
     # in your method.

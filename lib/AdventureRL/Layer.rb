@@ -44,8 +44,9 @@ module AdventureRL
     # Add any object to this Layer.
     def add object
       @children << object
+      object.set_layer self  if (object.methods.include?(:set_layer) || object_mask_has_method?(object, :set_layer))
     end
-    #alias_method :<<, :add
+    alias_method :<<, :add
 
     # Returns all its children objects.
     def get_children
@@ -117,11 +118,36 @@ module AdventureRL
       handle_rotation_overflow
     end
 
+    # This method is called if any button is pressed down.
+    # The passed argument <tt>btnid</tt> is the numerical id of the button.
+    # See Window#button_down and Gosu::Window#button_down methods.
+    def button_down btnid
+      call_method_on_children :button_down, btnid
+    end
+
+    # This method is called if any button is released.
+    # The passed argument <tt>btnid</tt> is the numerical id of the button.
+    # See Window#button_up and Gosu::Window#button_up methods.
+    def button_up btnid
+      call_method_on_children :button_up, btnid
+    end
+
+    # Returns a new Point with this Layers real window position.
+    def get_real_point
+      return get_corner :left, :top  unless (has_layer?)
+      real_point = get_layer.get_real_point
+      return Point.new(
+        (real_point.x + get_side(:left)),
+        (real_point.y + get_side(:top))
+      )
+    end
+
     # Call this every frame.
     # This updates all its <tt>@children</tt>,
     # if they have an #update method.
     def update
       call_method_on_children :update
+      call_method_on_children :update_mask
     end
 
     # Call this every frame.
@@ -133,10 +159,9 @@ module AdventureRL
           Gosu.translate(*get_corner(:left, :top).get_position.values) do
             call_method_on_children :draw
           end
-          draw_debug
+          #draw_debug  # TODO: Clean up
         end
       end
-
     end
 
     private
@@ -178,10 +203,32 @@ module AdventureRL
         end
       end
 
-      def call_method_on_children method_name
+      def call_method_on_children method_name, *args
         get_children.each do |child|
-          child.method(method_name).call  if (child.methods.include? method_name)
+          meth = nil
+          if    (child.methods.include?(method_name))
+            meth = child.method(method_name)
+          elsif (object_mask_has_method?(child, method_name))
+            meth = child.get_mask.method(method_name)
+          end
+          meth.call(*args)  if (meth)
         end
+      end
+
+      def object_mask_has_method? object, method_name
+        return (
+          object_has_mask?(object) &&
+          object.get_mask.methods.include?(method_name)
+        )
+      end
+
+      def object_has_mask? object
+        begin
+          object.has_mask?
+        rescue NoMethodError
+          return false
+        end
+        return true
       end
 
       def handle_rotation_overflow

@@ -15,7 +15,4 @@ window:
   origin:
     x: :left
     y: :top
-rectangle:
-  color:   0xff_ffffff
-  z_index: 0
 ...

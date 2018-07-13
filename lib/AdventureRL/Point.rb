@@ -1,5 +1,8 @@
 module AdventureRL
   class Point
+    # This array will be filled with any created Points.
+    # Just so they won't get garbage collected
+    # <em>(not sure how garbage collection works)</em>.
     POINTS = []
 
     def initialize x, y, args = {}
@@ -10,6 +13,8 @@ module AdventureRL
       }
       @assigned_to = []
       assign_to args[:assign_to]  if (args[:assign_to])
+      @layer      = nil
+      @real_point = nil
     end
 
     def assign_to object
@@ -19,6 +24,10 @@ module AdventureRL
 
     def get_point
       return self
+    end
+
+    def has_point?
+      return true
     end
 
     def x
@@ -37,6 +46,7 @@ module AdventureRL
     end
 
     def set_position *args
+      @real_point = nil
       case args.size
       when 2
         @position[:x] = args[0]
@@ -62,6 +72,7 @@ module AdventureRL
     alias_method :move_to, :set_position
 
     def move_by *args
+      @real_point = nil
       case args.size
       when 2
         @position[:x] += args[0]
@@ -86,17 +97,17 @@ module AdventureRL
     end
 
     def collides_with? other
-      return collides_with_point? other  if (other.is_a?(Point))
-      return collides_with_mask?  other  if (other.is_a?(Mask) || other.is_a?(Rectangle))
+      return collides_with_mask?  other  if (defined? other.has_mask?)
+      return collides_with_point? other  if (defined? other.has_point?)
       return collides_with_hash?  other  if (other.is_a?(Hash))
-    end
-
-    def collides_with_point? point
-      return get_position == point.get_position
     end
 
     def collides_with_mask? mask
       return mask.collides_with_point? self
+    end
+
+    def collides_with_point? point
+      return get_real_position == point.get_real_position
     end
 
     def collides_with_hash? hash
@@ -116,6 +127,42 @@ module AdventureRL
 
     def values
       return @position.sort_by_keys(keys).values
+    end
+
+    # Set the parent Layer.
+    def set_layer layer
+      error(
+        "Passed argument `layer' must be an instance of `Layer', but got",
+        "`#{layer.inspect}:#{layer.class.name}'."
+      )  unless (layer.is_a? Layer)
+      @layer = layer
+    end
+
+    # Returns the parent Layer.
+    def get_layer
+      return @layer
+    end
+
+    # Returns true if this Point has a parent Layer.
+    def has_layer?
+      return !!@layer
+    end
+
+    # Returns a new Point with the real window position of this Point.
+    def get_real_point
+      return self         unless (has_layer?)
+      return @real_point  if (@real_point)
+      real_point  = get_layer.get_real_point
+      @real_point = Point.new(
+        (real_point.x + x),
+        (real_point.y + y)
+      )
+      return @real_point
+    end
+
+    # Returns the real window position of this Point as a Hash.
+    def get_real_position
+      return get_real_point.get_position
     end
   end
 end

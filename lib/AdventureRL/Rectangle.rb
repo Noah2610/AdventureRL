@@ -2,11 +2,21 @@ module AdventureRL
   class Rectangle
     include Helpers::Error
 
-    def initialize mask, args = {}
-      default_settings = DEFAULT_SETTINGS.get :rectangle
-      set_mask_from mask
-      @color_original = args[:color]   || default_settings[:color]
-      @z_index        = args[:z_index] || default_settings[:z_index]
+    # Default settings for Rectangle.
+    # <tt>settings</tt> passed to #new take precedence.
+    DEFAULT_SETTINGS = Settings.new(
+      color:   0xff_ffffff,
+      z_index: 0
+    )
+
+    # Initialize with a Settings object <tt>settings</tt>.
+    # This must include a <tt>:mask</tt> key with a Mask object.
+    def initialize settings = {}
+      @settings = DEFAULT_SETTINGS.merge settings
+      set_mask_from @settings.get(:mask)
+      @color          = nil
+      @color_original = @settings.get(:color)
+      @z_index        = @settings.get(:z_index)
     end
 
     def set_color color
