@@ -109,7 +109,7 @@ class ImageGenerator
   end
 
   def run
-    cmd = "ffmpeg -y -i #{@input_file} -vn -filter:v scale=#{@resolution} -r #{@fps} #{@directory}/%4d.#{@extension}"
+    cmd = "ffmpeg -y -i #{@input_file} -filter:v scale=#{@resolution} -r #{@fps} #{@directory}/%4d.#{@extension}"
     msg(
       "Executing:",
       "`#{cmd}'"
