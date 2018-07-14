@@ -89,7 +89,7 @@ module AdventureRL
     def play filegroup
       load_filegroup filegroup
       @playing = true
-      @deltatime.reset
+      reset
     end
 
     # Load a FileGroup as active FileGroup.
@@ -137,6 +137,7 @@ module AdventureRL
     # Reset the current playback.
     # Start playing from the start again.
     def reset
+      @deltatime.reset
       @current_time    = 0.0
       @filegroup_index = 0
       set_file
@@ -146,6 +147,10 @@ module AdventureRL
     # and <tt>false</tt> if is _paused_ or _stopped_.
     def is_playing?
       return @playing
+    end
+
+    def has_filegroup?
+      return !!get_filegroup
     end
 
     # Check which file from FileGroup is supposed to be played.
@@ -182,10 +187,6 @@ module AdventureRL
       # This method should be overwritten by the child class.
       # It is passed the filepath <tt>file</tt>.
       def load_file file
-      end
-
-      def has_filegroup?
-        return !!get_filegroup
       end
 
       def get_filegroup_index
