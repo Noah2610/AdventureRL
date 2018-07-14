@@ -107,60 +107,6 @@ module AdventureRL
       return nil
     end
 
-    # Returns a Point with the position of a specific corner.
-    # Takes two mandatory arguments:
-    # <tt>side_x</tt>:: Either <tt>:left</tt> or <tt>:right</tt>.
-    # <tt>side_y</tt>:: Either <tt>:top</tt> or <tt>:bottom</tt>.
-    def get_corner side_x, side_y
-      side_x = side_x.to_sym
-      side_y = side_y.to_sym
-      return Point.new(
-        get_side(side_x),
-        get_side(side_y)
-      )  unless ([side_x, side_y].include? :center)
-      if    (side_x == side_y)
-        center = get_center.values
-        return Point.new(*center)
-      elsif (side_x == :center)
-        return Point.new(
-          get_center(:x),
-          get_side(side_y)
-        )
-      elsif (side_y == :center)
-        return Point.new(
-          get_side(side_x),
-          get_center(:y)
-        )
-      end
-      return nil
-    end
-
-    # Returns the real window position of the corner.
-    # See #get_corner for usage.
-    def get_real_corner side_x, side_y
-      side_x = side_x.to_sym
-      side_y = side_y.to_sym
-      return Point.new(
-        get_real_side(side_x),
-        get_real_side(side_y)
-      )  unless ([side_x, side_y].include? :center)
-      if    (side_x == side_y)
-        center = get_real_center.values
-        return Point.new(*center)
-      elsif (side_x == :center)
-        return Point.new(
-          get_real_center(:x),
-          get_real_side(side_y)
-        )
-      elsif (side_y == :center)
-        return Point.new(
-          get_real_side(side_x),
-          get_real_center(:y)
-        )
-      end
-      return nil
-    end
-
     # Returns the position Integer of a specific side.
     # Takes one mandatory argument, <tt>side</tt>,
     # which can be one of the following:
@@ -219,6 +165,60 @@ module AdventureRL
         top:    get_real_side(:top),
         bottom: get_real_side(:bottom)
       }
+    end
+
+    # Returns a Point with the position of a specific corner.
+    # Takes two mandatory arguments:
+    # <tt>side_x</tt>:: Either <tt>:left</tt> or <tt>:right</tt>.
+    # <tt>side_y</tt>:: Either <tt>:top</tt> or <tt>:bottom</tt>.
+    def get_corner side_x, side_y
+      side_x = side_x.to_sym
+      side_y = side_y.to_sym
+      return Point.new(
+        get_side(side_x),
+        get_side(side_y)
+      )  unless ([side_x, side_y].include? :center)
+      if    (side_x == side_y)
+        center = get_center.values
+        return Point.new(*center)
+      elsif (side_x == :center)
+        return Point.new(
+          get_center(:x),
+          get_side(side_y)
+        )
+      elsif (side_y == :center)
+        return Point.new(
+          get_side(side_x),
+          get_center(:y)
+        )
+      end
+      return nil
+    end
+
+    # Returns the real window position of the corner.
+    # See #get_corner for usage.
+    def get_real_corner side_x, side_y
+      side_x = side_x.to_sym
+      side_y = side_y.to_sym
+      return Point.new(
+        get_real_side(side_x),
+        get_real_side(side_y)
+      )  unless ([side_x, side_y].include? :center)
+      if    (side_x == side_y)
+        center = get_real_center.values
+        return Point.new(*center)
+      elsif (side_x == :center)
+        return Point.new(
+          get_real_center(:x),
+          get_real_side(side_y)
+        )
+      elsif (side_y == :center)
+        return Point.new(
+          get_real_side(side_x),
+          get_real_center(:y)
+        )
+      end
+      return nil
     end
 
     # Returns the center Point of the Mask.
@@ -292,17 +292,17 @@ module AdventureRL
       real_sides = get_real_sides
       return (
         real_point.x >= real_sides[:left]  &&
-        real_point.x <  real_sides[:right] &&
+        real_point.x <= real_sides[:right] &&
         real_point.y >= real_sides[:top]   &&
-        real_point.y <  real_sides[:bottom]
+        real_point.y <= real_sides[:bottom]
       )
     end
 
     # Returns true if this Mask collides with <tt>other</tt> Hash.
-    def collides_with_hash? other_hash
+    def collides_with_hash? hash
       if (hash.keys.include_all?(:x, :y))
-        other_point = Point.new hash[:x], hash[:y]
-        return collides_with_point? other_point
+        point = Point.new hash[:x], hash[:y]
+        return collides_with_point? point
       end
       return nil
     end

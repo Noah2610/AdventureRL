@@ -26,7 +26,6 @@ module AdventureRL
       }
     })
     AUDIO_PLAYER_METHODS = [
-      :play,
       :pause,
       :resume,
       :stop,
@@ -93,6 +92,10 @@ module AdventureRL
     # Wrapper for FileGroupPlayer#get_filegroup
     alias_method :get_clip, :get_filegroup
 
+    # Returns true if there is a currently active Clip.
+    # Wrapper for FileGroupPlayer#has_filegroup?
+    alias_method :has_clip?, :has_filegroup?
+
     # Overwrite FileGroupPlayer#play separately from above,
     # because it should call #handle_play_for_audio_player
     # to create a new AudioPlayer, if necessary.
@@ -100,7 +103,6 @@ module AdventureRL
       super
       if (get_clip.has_audio?)
         handle_play_for_audio_player
-        # sync_audio_player
       end
     end
 

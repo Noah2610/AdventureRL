@@ -5,6 +5,12 @@ module AdventureRL
     # <em>(not sure how garbage collection works)</em>.
     POINTS = []
 
+    # Initialize with two arguments:
+    # <tt>x</tt>:: x position
+    # <tt>y</tt>:: y position
+    # <tt>args = {}</tt>:: Optional hash with extra options.
+    #                      Currently, the only valid hash key is <tt>:assign_to</tt>,
+    #                      to assign this Point to an object upon initialization.
     def initialize x, y, args = {}
       POINTS << self
       @position = {
@@ -22,6 +28,18 @@ module AdventureRL
       @assigned_to << object
     end
 
+    # Returns all objects this Point was assigned to.
+    def get_assigned
+      return @assigned_to
+    end
+
+    # Returns true if the Point has been
+    # assigned to the passed <tt>object</tt>.
+    def assigned_to? object
+      return @assigned_to.include? object
+    end
+
+    # Returns self.
     def get_point
       return self
     end

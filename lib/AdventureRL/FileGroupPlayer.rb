@@ -109,11 +109,14 @@ module AdventureRL
 
     # Resumes playing paused FileGroup.
     def resume
-      error(
-        'Cannot resume playing, there is no currently active FileGroup.'
-      )  unless (has_filegroup?)
+      return  unless (has_filegroup?)
       @playing = true
       @deltatime.reset
+    end
+
+    # Returns true if there is a currently active FileGroup.
+    def has_filegroup?
+      return !!get_filegroup
     end
 
     # Stop playing and clear active FileGroup.
@@ -147,10 +150,6 @@ module AdventureRL
     # and <tt>false</tt> if is _paused_ or _stopped_.
     def is_playing?
       return @playing
-    end
-
-    def has_filegroup?
-      return !!get_filegroup
     end
 
     # Check which file from FileGroup is supposed to be played.
