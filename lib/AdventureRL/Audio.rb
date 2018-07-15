@@ -33,12 +33,16 @@ module AdventureRL
       def set_default_settings settings
         default_settings = nil
         if    ([String, Pathname].include? settings.class)
-          directory = settings
-          directory = Pathname.new directory  unless (directory.is_a? Pathname)
-          if (directory.absolute?)
-            default_settings = Settings.new directory
+          filepath = settings
+          filepath = Pathname.new filepath  unless (filepath.is_a? Pathname)
+          if (filepath.absolute?)
+            default_settings = Settings.new filepath
           else
-            default_settings = Settings.new get_root_directory.join(directory)
+            if (File.file?(filepath))
+              default_settings = Settings.new filepath
+            else
+              default_settings = Settings.new get_root_directory.join(filepath)
+            end
           end
         elsif (settings.is_a? Hash)
           default_settings = Settings.new settings
