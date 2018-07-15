@@ -7,7 +7,8 @@ class ImageGenerator
   DEFAULTS = {
     resolution: '960x540',
     fps:        24,
-    extension:  'png'
+    extension:  'png',
+    quality:    5
   }
   HELP_TEXT = <<-EOT
   USAGE
@@ -26,6 +27,8 @@ class ImageGenerator
       where the files will be put. The full directory
       name will be created with the following format:
         {BASE_DIRECTORY}.{RESOLUTION}.{FPS}F.{EXTENSION}
+          If the EXTENSION is a JPEG format, then the QUALITY will be included:
+        {BASE_DIRECTORY}.{RESOLUTION}.{FPS}F.{QUALITY}Q.{EXTENSION}
       This option is mandatory.
 
     --resolution, --res, -r RESOLUTION
@@ -41,6 +44,12 @@ class ImageGenerator
     --extension, --ext, -e EXTENSION
       The extension and image format to use for the images.
       Default: '#{DEFAULTS[:extension]}'
+
+    --quality, -q QUALITY
+      The quality to use for JPEG compression, as an integer.
+      The higher the value is, the better the quality is.
+      This will only have an effect on compression formats that take a quality option.
+      Default: '#{DEFAULTS[:quality]}'
   EOT
   VALID_ARGUMENTS = {
     single: {
@@ -62,6 +71,10 @@ class ImageGenerator
       ],
       extension: [
         [?e],
+        true
+      ],
+      quality: [
+        [?q],
         true
       ]
     },
@@ -85,6 +98,10 @@ class ImageGenerator
       extension: [
         ['extension', 'ext'],
         true
+      ],
+      quality: [
+        ['quality'],
+        true
       ]
     },
     keywords: {
@@ -103,13 +120,14 @@ class ImageGenerator
     @resolution     = DEFAULTS[:resolution]
     @fps            = DEFAULTS[:fps]
     @extension      = DEFAULTS[:extension]
+    @quality        = DEFAULTS[:quality]
     handle_arguments
     validate_arguments
     @directory = get_directory
   end
 
   def run
-    cmd = "ffmpeg -y -i #{@input_file} -filter:v scale=#{@resolution} -r #{@fps} #{@directory}/%4d.#{@extension}"
+    cmd = "ffmpeg -y -i #{@input_file} -filter:v scale=#{@resolution} -r #{@fps} -qscale:v #{@quality} #{@directory}/%4d.#{@extension}"
     msg(
       "Executing:",
       "`#{cmd}'"
@@ -155,6 +173,7 @@ class ImageGenerator
       @resolution     = @arguments[:options][:resolution]  if (@arguments[:options][:resolution])
       @fps            = @arguments[:options][:fps]         if (@arguments[:options][:fps])
       @extension      = @arguments[:options][:extension]   if (@arguments[:options][:extension])
+      @quality        = @arguments[:options][:quality]     if (@arguments[:options][:quality])
     end
 
     def validate_arguments
@@ -188,9 +207,13 @@ class ImageGenerator
     end
 
     def get_directory
-      directory = "#{@base_directory}.#{@resolution}.#{@fps.to_s}F.#{@extension}"
+      directory = "#{@base_directory}.#{@resolution}.#{@fps.to_s}F#{is_jpeg? ? ".#{@quality}Q" : ""}.#{@extension}"
       Dir.mkdir directory  unless (File.directory? directory)
       return directory
+    end
+
+    def is_jpeg?
+      return @extension.match?(/\Ajpe?g\z/i)
     end
 end
 

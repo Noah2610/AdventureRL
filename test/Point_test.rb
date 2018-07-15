@@ -80,7 +80,7 @@ class PointTest < Minitest::Test
   end
 
   def test_can_set_position
-    @point.set_position @pos_nocoll
+    @point.set_position *@pos_nocoll.values
 
     assert_equal @pos_nocoll, @point.get_position, "Point's position should have changed."
 

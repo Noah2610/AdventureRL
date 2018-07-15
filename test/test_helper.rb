@@ -1,5 +1,12 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'awesome_print'
+require 'simplecov'
+
+# NOTE: Call this _before_ requiring any gem code.
+SimpleCov.start do
+  add_filter /\/test\//
+end  if (ENV['COVERAGE'])
+
 require 'AdventureRL'
 include AdventureRL
 

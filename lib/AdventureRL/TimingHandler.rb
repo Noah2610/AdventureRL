@@ -5,7 +5,7 @@ module AdventureRL
     include Helpers::Error
 
     def initialize
-      @queue     = {
+      @queue = {
         timeouts:  [],
         intervals: []
       }
