@@ -1,6 +1,4 @@
-class PointTest < Minitest::Test
-  include TestHelper
-
+class PointTest < UnitTest
   def setup
     reset
   end

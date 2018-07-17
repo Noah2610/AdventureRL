@@ -31,6 +31,11 @@ module AdventureRL
       rotation: 0
     )
 
+    # The unnamed child <tt>id</tt>.
+    # This <tt>id</tt> will be used for children which aren't given an <tt>id</tt>.
+    CHILD_UNNAMED_ID = :NO_NAME
+
+
     # Initialize Layer with a <tt>settings</tt> Hash.
     # See DEFAULT_SETTINGS for valid keys.
     def initialize settings = {}
@@ -38,20 +43,69 @@ module AdventureRL
       set_mask_from @settings.get(:mask)
       @scale    = @settings.get :scale
       @rotation = @settings.get :rotation
-      @children = []
+      @children = {}
     end
 
     # Add any object to this Layer.
-    def add object
-      @children << object
+    # Pass an optional <tt>id</tt>, which can be used to
+    # access or remove the object afterwards.
+    def add_child object, id = CHILD_UNNAMED_ID
+      @children[id] = []  unless (@children[id])
+      @children[id] << object
       object.set_layer self  if (object.methods.include?(:set_layer) || object_mask_has_method?(object, :set_layer))
     end
-    alias_method :<<, :add
+    alias_method :add, :add_child
+    alias_method :<<,  :add_child
+
+    # Returns true, if child with <tt>id</tt> has been added to this Layer.
+    # <tt>id</tt> can also be the object itself.
+    def added_child? id
+      return (
+        @children.key?(id) ||
+        get_children.include?(id)
+      )
+    end
+    alias_method :added?, :added_child?
+    alias_method :has?,   :added_child?
 
     # Returns all its children objects.
-    def get_children
-      return @children
+    # If optional argument <tt>id</tt> is passed,
+    # then return all children with that <tt>id</tt>.
+    def get_children id = nil
+      return @children.values.flatten  unless (id)
+      return @children[id]
     end
+
+    # Returns the _last_ child with the given <tt>id</tt>.
+    # If no <tt>id</tt> is passed, return the last child with the unnamed <tt>id</tt>.
+    def get_child id = CHILD_UNNAMED_ID
+      return @children[id].last
+    end
+    alias_method :get, :get_child
+
+    # Removes all children with the given <tt>id</tt>.
+    # <tt>id</tt> can also be an added object itself;
+    # all objects with the same <tt>id</tt> will be removed.
+    # If no <tt>id</tt> is given, remove _all_ children.
+    def remove_children id = nil
+      return @children.clear      unless (id)
+      return @children.delete id  if     (@children.key? id)
+      return @children.delete((@children.detect do |key, val|
+        next id == val
+      end || []).first)
+    end
+
+    # Removes the _last_ child with the given <tt>id</tt>.
+    # <tt>id</tt> can also be the object to be removed itself.
+    # If no <tt>id</tt> is given, remove the _last_ child with the unnamed <tt>id</tt>.
+    def remove_child id = CHILD_UNNAMED_ID
+      return @children[id].delete_at -1  if (@children.key? id)
+      key = (@children.detect do |key, val|
+        next id == val
+      end || []) .first
+      return @children[key].delete id
+    end
+    alias_method :remove, :remove_child
 
     # Returns the current scale.
     # <tt>target</tt> can be either <tt>:x</tt>, <tt>:y</tt>, or <tt>:all</tt>.

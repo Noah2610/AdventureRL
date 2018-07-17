@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AdventureRLTest < Minitest::Test
+class AdventureRLTest < UnitTest
   def test_that_it_has_a_version_number
     refute_nil VERSION
   end

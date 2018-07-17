@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'awesome_print'
 require 'simplecov'
+require 'minitest'
 
 # NOTE: Call this _before_ requiring any gem code.
 SimpleCov.start do
@@ -8,7 +9,6 @@ SimpleCov.start do
 end  if (ENV['COVERAGE'])
 
 require 'AdventureRL'
-include AdventureRL
 
 module TestHelper
   AP_OPTIONS = {
@@ -21,4 +21,9 @@ module TestHelper
   end
 end
 
-require 'minitest/autorun'
+class UnitTest < Minitest::Test
+  include AdventureRL
+  include TestHelper
+end
+
+Minitest.autorun

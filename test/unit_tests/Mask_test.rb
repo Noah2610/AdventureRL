@@ -1,6 +1,4 @@
-class MaskTest < Minitest::Test
-  include TestHelper
-
+class MaskTest < UnitTest
   def setup
     reset
   end
