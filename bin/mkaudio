@@ -102,7 +102,7 @@ class AudioGenerator
     segments_amount.times do |n|
       filename  = "#{n.to_s.rjust 4, ?0}.#{@extension}"
       seek_time = segment_duration * n
-      cmd       = "ffmpeg -y -ss #{seek_time} -i #{@input_file} -vn -t #{segment_duration} #{@directory}/#{filename} &> /dev/null"
+      cmd       = "ffmpeg -y -ss #{seek_time} -i #{@input_file} -t #{segment_duration} -vn #{@directory}/#{filename} &> /dev/null"
       n_human   = n + 1
       percent   = ((n_human.to_f / segments_amount.to_f) * 100.0).round(PERCENT_DECIMAL_POINTS)
       msg(
