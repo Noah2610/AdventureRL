@@ -19,12 +19,11 @@ module AdventureRL
       settings = Settings.new(
         DEFAULT_SETTINGS.get(:window)
       ).merge(settings_arg)
-      mask = Mask.new(
+      @_layer = Layer.new(
         position: settings.get(:position),
         size:     settings.get(:size),
         origin:   settings.get(:origin)
       )
-      @_layer = Layer.new mask: mask
       Helpers::PipeMethods.pipe_methods_from self, to: @_layer
       @_deltatime      = Deltatime.new
       @_timing_handler = TimingHandler.new

@@ -1,5 +1,5 @@
 module AdventureRL
-  class Rectangle
+  class Rectangle < Mask
     include Helpers::Error
 
     # Default settings for Rectangle.
@@ -13,7 +13,7 @@ module AdventureRL
     # This must include a <tt>:mask</tt> key with a Mask object.
     def initialize settings = {}
       @settings = DEFAULT_SETTINGS.merge settings
-      set_mask_from @settings.get(:mask)
+      super @settings
       @color          = nil
       @color_original = @settings.get(:color)
       @z_index        = @settings.get(:z_index)
@@ -41,20 +41,5 @@ module AdventureRL
       )
     end
 
-    private
-
-      def set_mask_from mask
-        if    (mask.is_a?(Mask))
-          mask.assign_to self
-        elsif (mask.is_a?(Hash))
-          Mask.new(
-            mask.merge(
-              assign_to: self
-            )
-          )
-        else
-          error "Cannot set Mask as #{mask.inspect}:#{mask.class.name} for Layer."
-        end
-      end
   end
 end

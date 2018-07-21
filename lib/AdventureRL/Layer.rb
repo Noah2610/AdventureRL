@@ -4,25 +4,23 @@ module AdventureRL
   # It can manipulate any drawing operations, which will
   # effect all Mask s contained. See Gosu methods.
   # Layer also has a Mask.
-  class Layer
+  class Layer < Mask
     include Helpers::Error
 
     # Default settings.
     # <tt>settings</tt> passed to #new take precedence.
     DEFAULT_SETTINGS = Settings.new(
-      mask: {
-        position: {
-          x: 0,
-          y: 0
-        },
-        size: {
-          width:  360,
-          height: 360
-        },
-        origin: {
-          x: :left,
-          y: :top
-        }
+      position: {
+        x: 0,
+        y: 0
+      },
+      size: {
+        width:  360,
+        height: 360
+      },
+      origin: {
+        x: :left,
+        y: :top
       },
       scale: {
         x: 1,
@@ -35,12 +33,11 @@ module AdventureRL
     # This <tt>id</tt> will be used for children which aren't given an <tt>id</tt>.
     CHILD_UNNAMED_ID = :NO_NAME
 
-
     # Initialize Layer with a <tt>settings</tt> Hash.
     # See DEFAULT_SETTINGS for valid keys.
     def initialize settings = {}
       @settings = DEFAULT_SETTINGS.merge settings
-      set_mask_from @settings.get(:mask)
+      super @settings.get.reject { |key,val| next key == :assign_to }
       @scale    = @settings.get :scale
       @rotation = @settings.get :rotation
       @children = {}
@@ -256,20 +253,6 @@ module AdventureRL
           *get_corner(:left, :bottom).values, 0xff_ff0000,
           *get_corner(:left, :top).values,    0xff_ff0000,
         )
-      end
-
-      def set_mask_from mask
-        if    (mask.is_a?(Mask))
-          mask.assign_to self
-        elsif (mask.is_a?(Hash))
-          Mask.new(
-            mask.merge(
-              assign_to: self
-            )
-          )
-        else
-          error "Cannot set Mask as #{mask.inspect}:#{mask.class.name} for Layer."
-        end
       end
 
       def call_method_on_children method_name, *args

@@ -1,7 +1,7 @@
 module AdventureRL
   # The Mask is basically a bounding box or rectangle.
   # It has a position (Point) and a size.
-  class Mask
+  class Mask < Point
     # This array will be filled with any created Masks.
     # Just so they won't get garbage collected
     # <em>(not sure how garbage collection works)</em>.
@@ -10,7 +10,6 @@ module AdventureRL
     # Default settings for Mask.
     # Are superseded by settings passed to <tt>#initialize</tt>.
     DEFAULT_SETTINGS = Settings.new({
-      #position: Point.new(0, 0),
       position: {
         x: 0,
         y: 0
@@ -43,11 +42,11 @@ module AdventureRL
     def initialize settings_arg = {}
       MASKS << self
       settings = DEFAULT_SETTINGS.merge settings_arg
-      set_position_from settings.get(:position)
+      super *settings.get(:position).values
       @size             = settings.get(:size)
       @origin           = settings.get(:origin)
       @has_mouse_events = settings.get(:mouse_events)
-      @assigned_to      = []
+      @assigned_to    = []
       assign_to settings.get(:assign_to)  if (settings.get(:assign_to))
       @layer            = nil
     end
@@ -319,7 +318,7 @@ module AdventureRL
         "`#{layer.inspect}:#{layer.class.name}'."
       )  unless (layer.is_a? Layer)
       @layer = layer
-      get_point.set_layer @layer
+      #get_point.set_layer @layer
     end
 
     # Returns the parent Layer.
@@ -387,20 +386,6 @@ module AdventureRL
           meth = nil
           meth = assigned_to.method(method_name)  if (assigned_to.methods.include?(method_name))
           meth.call(*args)                        if (meth)
-        end
-      end
-
-      def set_position_from position
-        if    (position.is_a?(Point))
-          position.assign_to self
-        elsif (position.is_a?(Hash))
-          Point.new(
-            position[:x],
-            position[:y],
-            assign_to: self
-          )
-        else
-          Helpers::Error.error "Cannot set Point as #{position.to_s}:#{position.class.name} for Mask."
         end
       end
 
