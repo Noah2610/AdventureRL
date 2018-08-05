@@ -25,9 +25,10 @@ module AdventureRL
         origin:   settings.get(:origin)
       )
       Helpers::PipeMethods.pipe_methods_from self, to: @_layer
-      @_deltatime      = Deltatime.new
-      @_timing_handler = TimingHandler.new
-      @_target_fps     = settings.get(:fps)
+      @_deltatime                   = Deltatime.new
+      @_timing_handler              = TimingHandler.new
+      @_mouse_buttons_event_handler = EventHandlers::MouseButtons.new
+      @_target_fps                  = settings.get(:fps)
       super(
         get_size(:width), get_size(:height),
         fullscreen:      settings.get(:fullscreen),
@@ -60,6 +61,11 @@ module AdventureRL
       return @_deltatime.get_deltatime
     end
     alias_method :get_dt, :get_deltatime
+
+    # Returns EventHandlers::MouseButtons.
+    def get_mouse_buttons_event_handler
+      return @_mouse_buttons_event_handler
+    end
 
     # Resets Deltatime.
     def reset_deltatime
@@ -110,14 +116,14 @@ module AdventureRL
     # be sure to call <tt>super</tt> at the beginning of the method,
     # to take advantage of the framework's button events.
     def button_down btnid
-      @_layer.button_down btnid
+      @_mouse_buttons_event_handler.button_down btnid
     end
 
     # If you use #button_up in your game,
     # be sure to call <tt>super</tt> at the beginning of the method,
     # to take advantage of the framework's button events.
     def button_up btnid
-      @_layer.button_up btnid
+      @_mouse_buttons_event_handler.button_up btnid
     end
 
     # Default #update method.
@@ -125,6 +131,7 @@ module AdventureRL
     # in your method.
     def update
       @_layer.update
+      @_mouse_buttons_event_handler.update
       @_timing_handler.update
       @_deltatime.update
     end

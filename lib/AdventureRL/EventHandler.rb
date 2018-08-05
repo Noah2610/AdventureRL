@@ -42,7 +42,7 @@ module AdventureRL
     # which will be passed to the trigger methods on the Event s.
     def trigger event_name, *args
       event = @events.detect do |evnt|
-        evnt.get_name == name
+        evnt.get_name == event_name
       end
       event.trigger *args  if (event)
       return !!event

@@ -37,7 +37,7 @@ module AdventureRL
     # See DEFAULT_SETTINGS for valid keys.
     def initialize settings = {}
       @settings = DEFAULT_SETTINGS.merge settings
-      super @settings.get.reject { |key,val| next key == :assign_to }
+      super @settings #.get.reject { |key,val| next key == :assign_to }
       @scale    = @settings.get :scale
       @rotation = @settings.get :rotation
       @children = {}
@@ -182,20 +182,6 @@ module AdventureRL
       handle_rotation_overflow
     end
 
-    # This method is called if any button is pressed down.
-    # The passed argument <tt>btnid</tt> is the numerical id of the button.
-    # See Window#button_down and Gosu::Window#button_down methods.
-    def button_down btnid
-      call_method_on_children :button_down, btnid
-    end
-
-    # This method is called if any button is released.
-    # The passed argument <tt>btnid</tt> is the numerical id of the button.
-    # See Window#button_up and Gosu::Window#button_up methods.
-    def button_up btnid
-      call_method_on_children :button_up, btnid
-    end
-
     # Returns a new Point with this Layers real window position.
     def get_real_point
       pos_x = x * get_scale(:x)
@@ -213,7 +199,6 @@ module AdventureRL
     # if they have an #update method.
     def update
       call_method_on_children :update
-      call_method_on_children :update_mask
     end
 
     # Call this every frame.

@@ -22,20 +22,8 @@ module AdventureRL
         x: :left,
         y: :top
       },
-      assign_to:    nil,
-      mouse_events: false
+      assign_to: nil
     })
-
-    # This constant contains the ID of all mouse buttons.
-    MOUSE_BUTTON_IDS = [
-      Gosu::MS_LEFT,
-      Gosu::MS_MIDDLE,
-      Gosu::MS_RIGHT,
-      Gosu::MS_WHEEL_DOWN,
-      Gosu::MS_WHEEL_UP
-    ] .concat((0 .. 7).map do |n|
-      next Gosu.const_get "MS_OTHER_#{n.to_s}"
-    end)
 
     # Pass settings Hash or <tt>AdventureRL::Settings</tt> as argument.
     # Supersedes <tt>DEFAULT_SETTINGS</tt>.
@@ -45,7 +33,6 @@ module AdventureRL
       super *settings.get(:position).values
       @size             = settings.get(:size)
       @origin           = settings.get(:origin)
-      @has_mouse_events = settings.get(:mouse_events)
       @assigned_to    = []
       assign_to settings.get(:assign_to)  if (settings.get(:assign_to))
       @layer            = nil
@@ -306,11 +293,6 @@ module AdventureRL
       return nil
     end
 
-    # Returns true if this Mask can have mouse events.
-    def has_mouse_events?
-      return @has_mouse_events
-    end
-
     # Set the parent Layer.
     def set_layer layer
       error(
@@ -331,55 +313,7 @@ module AdventureRL
       return !!@layer
     end
 
-    # Is called (usually every frame) by this Mask's parent Layer.
-    def update_mask
-      update_mouse_events  if (has_mouse_events?)
-    end
-
-    # This method is called when any button is pressed down.
-    # We use it for mouse events.
-    def button_down btnid
-      return  unless (has_mouse_events? && MOUSE_BUTTON_IDS.include?(btnid))
-      call_method_on_assigned :on_mouse_down, btnid  if (collides_with_mouse?)
-    end
-
-    # This method is called when any button is released.
-    # We use it for mouse events.
-    def button_up btnid
-      return  unless (has_mouse_events? && MOUSE_BUTTON_IDS.include?(btnid))
-      call_method_on_assigned :on_mouse_up, btnid    if (collides_with_mouse?)
-    end
-
     private
-
-      # Masks, which are passed <tt>mouse_events: true</tt> on #new,
-      # will be updated by their parent Layer every so often,
-      # to check for mouse collisions, and trigger mouse event methods, such as:
-      # #on_mouse_down::  Is called when any mouse button is pressed down on the Mask.
-      # #on_mouse_up::    Is called when any mouse button is released on the Mask.
-      # #on_mouse_press:: Is continuously called if any mouse button is held down on the Mask.
-      # These methods should be defined on the instance which has a Mask assigned.
-      def update_mouse_events
-        return  unless ((btnids = get_pressed_mouse_buttons) && collides_with_mouse?)
-        btnids.each do |btnid|
-          call_method_on_assigned :on_mouse_press, btnid
-        end
-      end
-
-      def collides_with_mouse?
-        return collides_with? get_mouse_point
-      end
-
-      def get_mouse_point
-        window = Window.get_window
-        return Point.new(window.mouse_x, window.mouse_y)
-      end
-
-      def get_pressed_mouse_buttons
-        return MOUSE_BUTTON_IDS.select do |btnid|
-          next Gosu.button_down? btnid
-        end
-      end
 
       def call_method_on_assigned method_name, *args
         get_assigned.each do |assigned_to|
