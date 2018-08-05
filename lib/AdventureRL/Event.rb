@@ -43,9 +43,11 @@ module AdventureRL
 
     # The block defined with #on_trigger will be called
     # for every subscribed object.
-    def trigger
+    # Optionally, additional <tt>args</tt> arguments can be passed,
+    # which will be passed to the trigger method.
+    def trigger *args
       get_objects.each do |object|
-        @trigger_method.call object
+        @trigger_method.call object, *args
       end
     end
 

@@ -38,11 +38,13 @@ module AdventureRL
 
     # Trigger the Event with the name <tt>event_name</tt>.
     # Returns <tt>true</tt> if the Event was found and <tt>false</tt> if not.
-    def trigger event_name
+    # Optionally, additional <tt>args</tt> arguments can be passed,
+    # which will be passed to the trigger methods on the Event s.
+    def trigger event_name, *args
       event = @events.detect do |evnt|
         evnt.get_name == name
       end
-      event.trigger  if (event)
+      event.trigger *args  if (event)
       return !!event
     end
 
