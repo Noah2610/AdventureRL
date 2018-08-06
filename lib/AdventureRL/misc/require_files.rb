@@ -21,6 +21,7 @@ module AdventureRL
   require DIR[:src].join     'Point'
   require DIR[:src].join     'Mask'
   require DIR[:src].join     'Rectangle'
+  require DIR[:src].join     'Image'
   require DIR[:src].join     'Layer'
   require DIR[:src].join     'FileGroup'
   require DIR[:src].join     'FileGroupPlayer'
