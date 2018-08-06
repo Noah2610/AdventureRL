@@ -7,20 +7,23 @@ module AdventureRL
         @events = get_events
       end
 
-      # Add a button character <tt>btn_char</tt>,
+      # Add one or multiple button character <tt>btn_chars</tt>,
       # which will trigger the #on_button_press methods on subscribed objects,
       # when the given button is being pressed.
       # Case-sensitive.
-      def add_pressable_button btn_char
-        btnid = Gosu.char_to_button_id btn_char
-        Helpers::Error.error(
-          "Passed invalid btn_char. Expected a printable alphanumeric, but got",
-          "`#{btn_char.inspect}:#{btn_char.class.name}'."
-        )  unless (btnid)
-        @pressable_button_ids << {
-          id:    btnid,
-          shift: shift_button_pressed?
-        }
+      def add_pressable_button *btn_chars
+        btn_chars.flatten.each do |btn_char|
+          btnid = Gosu.char_to_button_id btn_char
+          Helpers::Error.error(
+            "Passed invalid btn_char. Expected a printable alphanumeric, but got",
+            "`#{btn_char.inspect}:#{btn_char.class.name}'."
+          )  unless (btnid)
+          pressable_button = {
+            id:    btnid,
+            shift: btn_char.upper?
+          }
+          @pressable_button_ids << pressable_button  unless (@pressable_button_ids.include? pressable_button)
+        end
       end
 
       def button_down btnid
@@ -32,12 +35,13 @@ module AdventureRL
       end
 
       def update
-        pressed_btnids = get_pressable_button_ids.map do |btnid, shift|
-          next btnid  if (
-            Gosu.button_down?(btnid) &&
-            (!shift || (shift && shift_button_pressed?))
+        pressed_btnids = get_pressable_button_ids.map do |pressable_button|
+          next pressable_button[:id]  if (
+            Gosu.button_down?(pressable_button[:id]) &&
+            (!pressable_button[:shift] || (pressable_button[:shift] && shift_button_pressed?))
           )
-        end
+          next nil
+        end .compact.uniq
         return  unless (pressed_btnids.any?)
         pressed_btnids.each do |btnid|
           trigger :button_press, get_semantic_button_name(btnid)
@@ -95,7 +99,11 @@ module AdventureRL
         def get_semantic_constant_button_name btnid
           return Gosu.constants.map do |constant_name|
             constant = Gosu.const_get constant_name
-            next constant_name.to_s.sub(/^(KB_|MS_|GP_)/,'').downcase.to_sym  if (constant == btnid && constant_name.match?(/_/))
+            if (constant == btnid && constant_name.match?(/_/))
+              name = constant_name.to_s.sub(/^(KB_|MS_|GP_)/,'').downcase
+              name.upcase!  if (shift_button_pressed?)
+              next name.to_sym
+            end
             next nil
           end .compact.first
         end

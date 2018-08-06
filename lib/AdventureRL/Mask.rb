@@ -2,6 +2,8 @@ module AdventureRL
   # The Mask is basically a bounding box or rectangle.
   # It has a position (Point) and a size.
   class Mask < Point
+    include Helpers::MethodHelper
+
     # This array will be filled with any created Masks.
     # Just so they won't get garbage collected
     # <em>(not sure how garbage collection works)</em>.
@@ -36,6 +38,7 @@ module AdventureRL
       @assigned_to    = []
       assign_to settings.get(:assign_to)  if (settings.get(:assign_to))
       @layer            = nil
+      call_setup_method settings_arg
     end
 
     # Assign this Mask to an instance.
@@ -314,6 +317,15 @@ module AdventureRL
     end
 
     private
+
+      def call_setup_method args
+        return  unless (method_exists?(:setup))
+        if (method_takes_arguments?(:setup))
+          setup args
+        else
+          setup
+        end
+      end
 
       def call_method_on_assigned method_name, *args
         get_assigned.each do |assigned_to|

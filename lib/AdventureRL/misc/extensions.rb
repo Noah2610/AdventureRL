@@ -44,3 +44,18 @@ end
 class Range
   include AdventureRL::Extensions::RangeExtension
 end
+
+module AdventureRL::Extensions::StringAndSymbolExtension
+  def upper?
+    return self == self.upcase
+  end
+  def lower?
+    return self == self.downcase
+  end
+end
+class String
+  include AdventureRL::Extensions::StringAndSymbolExtension
+end
+class Symbol
+  include AdventureRL::Extensions::StringAndSymbolExtension
+end
