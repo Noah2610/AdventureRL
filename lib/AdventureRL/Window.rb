@@ -27,6 +27,7 @@ module AdventureRL
       Helpers::PipeMethods.pipe_methods_from self, to: @_layer
       @_deltatime                   = Deltatime.new
       @_timing_handler              = TimingHandler.new
+      @_buttons_event_handler       = EventHandlers::Buttons.new
       @_mouse_buttons_event_handler = EventHandlers::MouseButtons.new
       @_target_fps                  = settings.get(:fps)
       super(
@@ -61,6 +62,16 @@ module AdventureRL
       return @_deltatime.get_deltatime
     end
     alias_method :get_dt, :get_deltatime
+
+    # Returns EventHandlers::Buttons.
+    def get_buttons_event_handler
+      return @_buttons_event_handler
+    end
+
+    # Wrapper method for EventHandlers::Buttons#add_pressable_button.
+    def add_pressable_button btn_char
+      get_buttons_event_handler.add_pressable_button btn_char
+    end
 
     # Returns EventHandlers::MouseButtons.
     def get_mouse_buttons_event_handler
@@ -116,6 +127,7 @@ module AdventureRL
     # be sure to call <tt>super</tt> at the beginning of the method,
     # to take advantage of the framework's button events.
     def button_down btnid
+      @_buttons_event_handler.button_down       btnid
       @_mouse_buttons_event_handler.button_down btnid
     end
 
@@ -123,6 +135,7 @@ module AdventureRL
     # be sure to call <tt>super</tt> at the beginning of the method,
     # to take advantage of the framework's button events.
     def button_up btnid
+      @_buttons_event_handler.button_up       btnid
       @_mouse_buttons_event_handler.button_up btnid
     end
 
@@ -131,6 +144,7 @@ module AdventureRL
     # in your method.
     def update
       @_layer.update
+      @_buttons_event_handler.update
       @_mouse_buttons_event_handler.update
       @_timing_handler.update
       @_deltatime.update

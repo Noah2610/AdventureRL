@@ -19,8 +19,7 @@ module AdventureRL
 
       def button_down btnid
         return  unless (MOUSE_BUTTON_IDS.include? btnid)
-        btn_name = get_semantic_button_name(btnid)
-        trigger :mouse_down, btn_name
+        trigger :mouse_down, get_semantic_button_name(btnid)
       end
 
       def button_up btnid
@@ -29,7 +28,7 @@ module AdventureRL
       end
 
       def update
-        pressed_btnids = MOUSE_BUTTON_IDS.map do |btnid|
+        pressed_btnids = MOUSE_BUTTON_IDS.select do |btnid|
           next Gosu.button_down?(btnid)
         end
         return  unless (pressed_btnids.any?)
@@ -50,27 +49,27 @@ module AdventureRL
 
         def get_event_mouse_down
           event = Event.new(:mouse_down)
-          event.on_trigger do |object, btnid|
+          event.on_trigger do |object, btn_name|
             next  unless (object.methods.include? :on_mouse_down)
-            object.on_mouse_down btnid  if (object.collides_with? get_mouse_point)
+            object.on_mouse_down btn_name  if (object.collides_with? get_mouse_point)
           end
           return event
         end
 
         def get_event_mouse_up
           event = Event.new(:mouse_up)
-          event.on_trigger do |object, btnid|
+          event.on_trigger do |object, btn_name|
             next  unless (object.methods.include? :on_mouse_up)
-            object.on_mouse_up btnid  if (object.collides_with? get_mouse_point)
+            object.on_mouse_up btn_name  if (object.collides_with? get_mouse_point)
           end
           return event
         end
 
         def get_event_mouse_press
           event = Event.new(:mouse_press)
-          event.on_trigger do |object, btnid|
+          event.on_trigger do |object, btn_name|
             next  unless (object.methods.include? :on_mouse_press)
-            object.on_mouse_press btnid  if (object.collides_with? get_mouse_point)
+            object.on_mouse_press btn_name  if (object.collides_with? get_mouse_point)
           end
           return event
         end
@@ -83,7 +82,7 @@ module AdventureRL
         def get_semantic_button_name btnid
           return Gosu.constants.map do |constant_name|
             constant = Gosu.const_get constant_name
-            next constant_name.to_s.sub(/^MS_/,'').downcase.to_sym  if (constant == btnid)  if (constant_name.match?(/_/))
+            next constant_name.to_s.sub(/^MS_/,'').downcase.to_sym  if (constant == btnid && constant_name.match?(/_/))
             next nil
           end .compact.first
         end
