@@ -19,20 +19,29 @@ module AdventureRL
       # They are used for collision checking with other Solid Mask objects
       # that have a mutual solid tag.
       def initialize settings = {}
-        solid_settings = DEFAULT_SOLID_SETTINGS.merge settings
-        @solid_tags    = [solid_settings.get(:solid_tag)].flatten.sort
+        solid_settings  = DEFAULT_SOLID_SETTINGS.merge settings
+        @solid_tags     = [solid_settings.get(:solid_tag)].flatten.sort
+        @solids_manager = Window.get_window.get_solids_manager
         super
-        Window.get_window.get_solids_manager.add_object self, @solid_tags
+        @solids_manager.add_object self, @solid_tags
       end
 
       # Overwrite #move_by method, so that collision checking with other objects
       # with a mutual solid tag is done, and movement prevented if necessary.
       def move_by *args
-        previous_position = get_position
-        # Check collision with other objects with a mutual solid tag,
-        # via SolidsManager.
-        #
-        # Update SolidsManager with @solid_tags, if this Mask was moved.
+        previous_position = get_position.dup
+        super
+
+        if (@solids_manager.collides? self, @solid_tags)
+          set_position previous_position
+
+          # Check collision with other objects with a mutual solid tag,
+          # via SolidsManager.
+          #
+          # Update SolidsManager with @solid_tags, if this Mask was moved.
+        else
+          #@solids_manager.reset_for @solid_tags
+        end
       end
     end
   end

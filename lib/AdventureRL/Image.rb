@@ -3,6 +3,7 @@ module AdventureRL
     include Helpers::Error
 
     DEFAULT_SETTINGS = Settings.new(
+      file:    'DEFAULT_IMAGE_FILE.png',
       retro:   true,
       z_index: 0,
       position: {
@@ -26,18 +27,19 @@ module AdventureRL
       :rect
     ]
 
-    # Pass the <tt>filepath</tt> to the image as the first parameter.
-    def initialize filepath, settings = {}
+    # Pass the filepath to the image as the value of the key <tt>:file</tt>
+    # in your passed Settings instance or hash.
+    def initialize settings = {}
       @settings = DEFAULT_SETTINGS.merge settings
       super @settings
       @z_index       = @settings.get :z_index
       @image_options = get_image_options_from @settings
-      @image         = get_image_from filepath
+      @image         = get_image_from @settings.get(:file)
     end
 
     def draw
       corner = get_corner :left, :top
-      scale  = get_scale
+      scale  = get_image_scale
       @image.draw(
         corner.x, corner.y,
         @z_index,
@@ -64,7 +66,7 @@ module AdventureRL
         )
       end
 
-      def get_scale
+      def get_image_scale
         return {
           x: (get_size(:width).to_f  / @image.width.to_f),
           y: (get_size(:height).to_f / @image.height.to_f)

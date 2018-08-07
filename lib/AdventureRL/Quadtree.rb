@@ -33,18 +33,49 @@ module AdventureRL
       }
     end
 
-    # Add the given Mask <tt>object</tt> into the Quadtree,
+    # Add the given Mask <tt>object</tt>(s) into the Quadtree,
     # and split into smaller quadtrees if necessary.
     def add_object object
-      validate_object_has_mask object
-      add_object_to_quadtree object
+      objects = [object].flatten
+      objects.each do |obj|
+        validate_object_has_mask obj
+        add_object_to_quadtree obj
+      end
     end
     alias_method :add, :add_object
 
+    def add_object_to_quadtree object
+      return false  unless (collides_with? object)
+
+      if (@objects.size < @max_objects)
+        @objects << object
+        return true
+      end
+
+      create_quadtrees  unless (has_quadtrees?)
+
+      return @quadtrees.values.map do |quadtree|
+        next quadtree.add_object_to_quadtree(object)
+      end .any?
+    end
+
     # Returns all objects, that collide with <tt>object</tt>.
-    def get_objects_colliding_with object
+    def get_colliding_objects object
       validate_object_has_mask object
       return query_for(object)
+    end
+
+    def query_for object
+      colliding_objects = []
+      return colliding_objects  unless (collides_with? object)
+      colliding_objects.concat(@objects.select do |obj|
+        next obj.collides_with?(object)  unless (obj == object)
+        next false
+      end)
+      @quadtrees.values.each do |quadtree|
+        colliding_objects.concat quadtree.query_for(object)
+      end  if (has_quadtrees?)
+      return colliding_objects
     end
 
     # Reset this and all child Quadtrees.
@@ -52,6 +83,35 @@ module AdventureRL
     def reset
       @objects.clear
       @quadtrees.values.each &:reset  if (has_quadtrees?)
+    end
+
+    # TODO
+    def draw
+      # Top
+      Gosu.draw_line(
+        *get_real_corner(:left, :top).values,  0xff_ff0000,
+        *get_real_corner(:right, :top).values, 0xff_ff0000,
+        100
+      )
+      # Right
+      Gosu.draw_line(
+        *get_real_corner(:right, :top).values,    0xff_ff0000,
+        *get_real_corner(:right, :bottom).values, 0xff_ff0000,
+        100
+      )
+      # Bottom
+      Gosu.draw_line(
+        *get_real_corner(:right, :bottom).values, 0xff_ff0000,
+        *get_real_corner(:left, :bottom).values,  0xff_ff0000,
+        100
+      )
+      # Left
+      Gosu.draw_line(
+        *get_real_corner(:left, :bottom).values, 0xff_ff0000,
+        *get_real_corner(:left, :top).values,    0xff_ff0000,
+        100
+      )
+      @quadtrees.values.each &:draw  if (has_quadtrees?)
     end
 
     private
@@ -63,25 +123,10 @@ module AdventureRL
         )
       end
 
-      def add_object_to_quadtree object
-        return false  unless (collides_with? object)
-
-        if (@objects.size < @max_objects)
-          @objects << object
-          return true
-        end
-
-        create_quadtrees  unless (has_quadtrees?)
-
-        return !!@quadtrees.values.detect do |quadtree|
-          next quadtree.add_object_to_quadtree(object)
-        end
-      end
-
-      # Returns true if this Quadtree has already been split
+      # Returns <tt>true</tt> if this Quadtree has already been split
       # and has children Quadtrees.
       def has_quadtrees?
-        return @quadtrees.values.none?
+        return @quadtrees.values.all?
       end
 
       def create_quadtrees
@@ -164,18 +209,6 @@ module AdventureRL
           end
         end
         @objects.clear
-      end
-
-      def query_for object
-        colliding_objects = []
-        return colliding_objects  unless (collides_with? object)
-        collides_with.concat @objects.select do |obj|
-          next obj.collides_with?(object)
-        end
-        @quadtrees.values.each do |quadtree|
-          collides_with.concat quadtree.query_for(object)
-        end  if (has_quadtrees?)
-        return collides_with
       end
   end
 end

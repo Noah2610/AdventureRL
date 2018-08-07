@@ -150,6 +150,7 @@ module AdventureRL
     # in your method.
     def update
       @_layer.update
+      @_solids_manager.update
       @_buttons_event_handler.update
       @_mouse_buttons_event_handler.update
       @_timing_handler.update
@@ -161,6 +162,8 @@ module AdventureRL
     # if you overwrite this method.
     def draw
       @_layer.draw
+      # TODO
+      @_solids_manager.draw
     end
 
     private
