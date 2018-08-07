@@ -6,6 +6,7 @@ module AdventureRL
       @quadtrees     = {}
       @objects       = {}
       @has_reset_for = []
+      @has_reset = false  # TODO
     end
 
     # Add one (or multiple) <tt>object</tt>(s)
@@ -45,8 +46,8 @@ module AdventureRL
     # Resets all Quadtrees for all Mask objects
     # with given <tt>solid_tag</tt>(s).
     def reset_for solid_tag = DEFAULT_SOLID_TAG
-      return  # TODO
       solid_tags = [solid_tag].flatten
+      return  if (solid_tags.all? { |tag| @has_reset_for.include?(tag) })
       @quadtrees.map do |quadtree_tag, quadtree|
         if (solid_tags.include?(quadtree_tag) && !@has_reset_for.include?(quadtree_tag))
           @has_reset_for << quadtree_tag
@@ -55,18 +56,29 @@ module AdventureRL
         next nil
       end .compact.each(&:reset)
       @has_reset_for.each do |reset_tag|
+        @quadtrees[reset_tag].reset
         @quadtrees[reset_tag].add_object @objects[reset_tag]
       end
     end
 
+    def reset
+      return  if (@has_reset)
+      @objects.each do |tag, objects|
+        @quadtrees[tag].reset
+        @quadtrees[tag].add_object objects
+      end
+      @has_reset = true
+    end
+
     # Called once every frame by Window.
     def update
+      @has_reset = false
       @has_reset_for = []
     end
 
     # TODO
     def draw
-      @quadtrees.values.each &:draw
+      #@quadtrees.values.each &:draw
     end
   end
 end

@@ -2,28 +2,34 @@ module AdventureRL
   class Quadtree < Mask
     include Helpers::MethodHelper
 
-    window = Window.get_window
     DEFAULT_SETTINGS = Settings.new(
-      objects:     [],
       max_objects: 1,
-      position: (window ? window.get_position : DEFAULT_SETTINGS.get(:window, :position) || {
+      position: {
         x: 0,
         y: 0
-      }),
-      size:     (window ? window.get_size     : DEFAULT_SETTINGS.get(:window, :size) || {
+      },
+      size: {
         width:  960,
         height: 540
-      }),
-      origin:   (window ? window.get_origin   : DEFAULT_SETTINGS.get(:window, :origin) || {
+      },
+      origin: {
         x: :left,
         y: :top
-      }),
+      },
     )
 
+    def self.get_default_settings
+      window = Window.get_window
+      return Settings.new(
+        position: (window ? window.get_position : DEFAULT_SETTINGS.get(:window, :position) || DEFAULT_SETTINGS[:position]),
+        size:     (window ? window.get_size     : DEFAULT_SETTINGS.get(:window, :size)     || DEFAULT_SETTINGS[:size]),
+        origin:   (window ? window.get_origin   : DEFAULT_SETTINGS.get(:window, :origin)   || DEFAULT_SETTINGS[:origin]),
+      )
+    end
+
     def initialize settings = {}
-      @settings = DEFAULT_SETTINGS.merge settings
+      @settings = DEFAULT_SETTINGS.merge(Quadtree.get_default_settings).merge(settings)
       super @settings
-      @objects     = [@settings.get(:objects)].flatten.compact
       @max_objects = @settings.get :max_objects
       @quadtrees   = {
         top_left:     nil,
@@ -31,6 +37,8 @@ module AdventureRL
         bottom_left:  nil,
         bottom_right: nil
       }
+      @objects = []
+      add_object [@settings.get(:objects)].flatten.compact
     end
 
     # Add the given Mask <tt>object</tt>(s) into the Quadtree,
@@ -82,6 +90,9 @@ module AdventureRL
     # Remove all added Mask objects.
     def reset
       @objects.clear
+      #@quadtrees = @quadtrees.map do |corner, quadtree|
+      #  next [corner, nil]
+      #end .to_h
       @quadtrees.values.each &:reset  if (has_quadtrees?)
     end
 

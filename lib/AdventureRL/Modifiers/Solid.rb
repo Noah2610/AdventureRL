@@ -32,15 +32,16 @@ module AdventureRL
         previous_position = get_position.dup
         super
 
+        # Check collision with other objects with a mutual solid tag,
+        # via SolidsManager.
         if (@solids_manager.collides? self, @solid_tags)
           set_position previous_position
 
-          # Check collision with other objects with a mutual solid tag,
-          # via SolidsManager.
-          #
           # Update SolidsManager with @solid_tags, if this Mask was moved.
+
         else
-          #@solids_manager.reset_for @solid_tags
+          #@solids_manager.reset
+          @solids_manager.reset_for @solid_tags
         end
       end
     end
