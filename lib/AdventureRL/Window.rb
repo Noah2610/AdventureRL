@@ -25,11 +25,12 @@ module AdventureRL
         origin:   settings.get(:origin)
       )
       Helpers::PipeMethods.pipe_methods_from self, to: @_layer
+      @_target_fps                  = settings.get(:fps)
       @_deltatime                   = Deltatime.new
       @_timing_handler              = TimingHandler.new
       @_buttons_event_handler       = EventHandlers::Buttons.new
       @_mouse_buttons_event_handler = EventHandlers::MouseButtons.new
-      @_target_fps                  = settings.get(:fps)
+      @_solids_manager              = SolidsManager.new
       super(
         get_size(:width), get_size(:height),
         fullscreen:      settings.get(:fullscreen),
@@ -76,6 +77,11 @@ module AdventureRL
     # Returns EventHandlers::MouseButtons.
     def get_mouse_buttons_event_handler
       return @_mouse_buttons_event_handler
+    end
+
+    # Returns SolidsManager.
+    def get_solids_manager
+      return @_solids_manager
     end
 
     # Resets Deltatime.

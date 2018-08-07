@@ -4,6 +4,7 @@ module AdventureRL
 
     window = Window.get_window
     DEFAULT_SETTINGS = Settings.new(
+      objects:     [],
       max_objects: 1,
       position: (window ? window.get_position : DEFAULT_SETTINGS.get(:window, :position) || {
         x: 0,
@@ -22,28 +23,21 @@ module AdventureRL
     def initialize settings = {}
       @settings = DEFAULT_SETTINGS.merge settings
       super @settings
+      @objects     = [@settings.get(:objects)].flatten.compact
       @max_objects = @settings.get :max_objects
-      @quadtrees = {
+      @quadtrees   = {
         top_left:     nil,
         top_right:    nil,
         bottom_left:  nil,
         bottom_right: nil
       }
-      @objects = []
     end
 
     # Add the given Mask <tt>object</tt> into the Quadtree,
     # and split into smaller quadtrees if necessary.
     def add_object object
       validate_object_has_mask object
-      return false  unless (collides_with? object)
-
-      if (@objects.size < @max_objects)
-        @objects << object
-        return true
-      end
-
-      create_quadtrees  unless (has_quadtrees?)
+      add_object_to_quadtree object
     end
     alias_method :add, :add_object
 
@@ -53,6 +47,13 @@ module AdventureRL
       return query_for(object)
     end
 
+    # Reset this and all child Quadtrees.
+    # Remove all added Mask objects.
+    def reset
+      @objects.clear
+      @quadtrees.values.each &:reset  if (has_quadtrees?)
+    end
+
     private
 
       def validate_object_has_mask object
@@ -60,6 +61,21 @@ module AdventureRL
           "Expected an instance of Mask or an object that has a Mask, but got",
           "`#{object.inspect}:#{object.class.name}'."
         )
+      end
+
+      def add_object_to_quadtree object
+        return false  unless (collides_with? object)
+
+        if (@objects.size < @max_objects)
+          @objects << object
+          return true
+        end
+
+        create_quadtrees  unless (has_quadtrees?)
+
+        return !!@quadtrees.values.detect do |quadtree|
+          next quadtree.add_object_to_quadtree(object)
+        end
       end
 
       # Returns true if this Quadtree has already been split
@@ -74,6 +90,7 @@ module AdventureRL
           next [corner, new_quadtree]  if (new_quadtree)
           next nil
         end .compact.to_h
+        #move_objects_to_quadtrees  if (@objects.any?)  # NOTE: Doing this will break stuff.
       end
 
       def get_split_quadtree_for_corner corner
@@ -135,6 +152,18 @@ module AdventureRL
           origin:      get_origin,
           max_objects: @max_objects
         ))
+      end
+
+      # NOTE: Shouldn't be used, breaks stuff currently.
+      #       Life is easier without this method.
+      def move_objects_to_quadtrees
+        return  if (@objects.empty?)
+        @objects.each do |object|
+          @quadtrees.values.detect do |quadtree|
+            next quadtree.add_object_to_quadtree(object)
+          end
+        end
+        @objects.clear
       end
 
       def query_for object

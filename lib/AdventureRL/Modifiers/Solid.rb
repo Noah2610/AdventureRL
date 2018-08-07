@@ -10,7 +10,7 @@ module AdventureRL
     # The default solid tag is <tt>:default</tt>.
     module Solid
       DEFAULT_SOLID_SETTINGS = Settings.new(
-        solid_tag: :default
+        solid_tag: SolidsManager::DEFAULT_SOLID_TAG
       )
 
       # Additionally to the Mask's settings Hash or Settings instance,
@@ -20,8 +20,9 @@ module AdventureRL
       # that have a mutual solid tag.
       def initialize settings = {}
         solid_settings = DEFAULT_SOLID_SETTINGS.merge settings
-        @solid_tags    = [solid_settings.get(:solid_tag)].flatten
+        @solid_tags    = [solid_settings.get(:solid_tag)].flatten.sort
         super
+        Window.get_window.get_solids_manager.add_object self, @solid_tags
       end
 
       # Overwrite #move_by method, so that collision checking with other objects
@@ -30,6 +31,8 @@ module AdventureRL
         previous_position = get_position
         # Check collision with other objects with a mutual solid tag,
         # via SolidsManager.
+        #
+        # Update SolidsManager with @solid_tags, if this Mask was moved.
       end
     end
   end
