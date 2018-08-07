@@ -4,7 +4,10 @@ module AdventureRL
       private
 
         def method_exists? method_name
-          return methods.include? method_name
+          return (
+            methods.include?(method_name) ||
+            private_methods.include?(method_name)
+          )
         end
 
         def method_takes_arguments? method_name

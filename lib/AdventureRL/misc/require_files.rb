@@ -32,4 +32,6 @@ module AdventureRL
   require DIR[:src].join     'Event'
   require DIR[:src].join     'EventHandler'
   require_dir DIR[:src].join('EventHandlers')
+  require DIR[:src].join     'SolidsManager'
+  require_dir DIR[:src].join('Modifiers')
 end
