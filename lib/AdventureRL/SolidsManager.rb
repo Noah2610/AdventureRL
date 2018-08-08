@@ -54,13 +54,18 @@ module AdventureRL
           next quadtree
         end
         next nil
-      end .compact.each(&:reset)
+      end #.compact.each do |quadtree|  #(&:reset)
+        # quadtree.reset
+        # quadtree.add_object @objects[reset_tag]
+      # end
       @has_reset_for.each do |reset_tag|
+        #@quadtrees[reset_tag] = Quadtree.new objects: @objects[reset_tag]
         @quadtrees[reset_tag].reset
         @quadtrees[reset_tag].add_object @objects[reset_tag]
       end
     end
 
+    # TODO
     def reset
       return  if (@has_reset)
       @objects.each do |tag, objects|
@@ -78,7 +83,7 @@ module AdventureRL
 
     # TODO
     def draw
-      #@quadtrees.values.each &:draw
+      @quadtrees.values.each &:draw
     end
   end
 end

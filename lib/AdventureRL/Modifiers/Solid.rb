@@ -34,7 +34,7 @@ module AdventureRL
 
         # Check collision with other objects with a mutual solid tag,
         # via SolidsManager.
-        if (@solids_manager.collides? self, @solid_tags)
+        if (in_collision?)
           set_position previous_position
 
           # Update SolidsManager with @solid_tags, if this Mask was moved.
@@ -43,6 +43,10 @@ module AdventureRL
           #@solids_manager.reset
           @solids_manager.reset_for @solid_tags
         end
+      end
+
+      def in_collision?
+        return @solids_manager.collides?(self, @solid_tags)
       end
     end
   end

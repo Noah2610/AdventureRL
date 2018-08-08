@@ -4,6 +4,7 @@ module AdventureRL
 
     DEFAULT_SETTINGS = Settings.new(
       max_objects: 1,
+      parent:      nil,
       position: {
         x: 0,
         y: 0
@@ -15,7 +16,7 @@ module AdventureRL
       origin: {
         x: :left,
         y: :top
-      },
+      }
     )
 
     def self.get_default_settings
@@ -30,8 +31,9 @@ module AdventureRL
     def initialize settings = {}
       @settings = DEFAULT_SETTINGS.merge(Quadtree.get_default_settings).merge(settings)
       super @settings
-      @max_objects = @settings.get :max_objects
-      @quadtrees   = {
+      @max_objects     = @settings.get :max_objects
+      @parent_quadtree = @settings.get :parent
+      @quadtrees = {
         top_left:     nil,
         top_right:    nil,
         bottom_left:  nil,
@@ -54,13 +56,14 @@ module AdventureRL
 
     def add_object_to_quadtree object
       return false  unless (collides_with? object)
+      return false  if     (@objects.include? object)
 
       if (@objects.size < @max_objects)
         @objects << object
         return true
       end
 
-      create_quadtrees  unless (has_quadtrees?)
+      split_quadtrees  unless (has_quadtrees?)
 
       return @quadtrees.values.map do |quadtree|
         next quadtree.add_object_to_quadtree(object)
@@ -76,6 +79,10 @@ module AdventureRL
     def query_for object
       colliding_objects = []
       return colliding_objects  unless (collides_with? object)
+
+      # TODO
+      @queried = true
+
       colliding_objects.concat(@objects.select do |obj|
         next obj.collides_with?(object)  unless (obj == object)
         next false
@@ -87,17 +94,38 @@ module AdventureRL
     end
 
     # Reset this and all child Quadtrees.
-    # Remove all added Mask objects.
+    # (Recalculate in which Quadtree each object is supposed to be.)
     def reset
+      # @objects.each do |object|
+      #   reset_object object
+      # end
+
       @objects.clear
+      @quadtrees.values.each &:reset  if (has_quadtrees?)
+
       #@quadtrees = @quadtrees.map do |corner, quadtree|
       #  next [corner, nil]
       #end .to_h
-      @quadtrees.values.each &:reset  if (has_quadtrees?)
+    end
+
+    # TODO
+    def reset_object object
+      return  if (add_object_to_quadtree object)
+      @parent_quadtree.reset_object object  if (@parent_quadtree)
     end
 
     # TODO
     def draw
+      Gosu.draw_rect(
+        *get_real_corner(:left, :top).values,
+        *get_size.values,
+        (@queried ? 0xff_00ff00 : 0xff_ff0000),
+        -1
+      )
+      @queried = false
+      @quadtrees.values.each &:draw  if (has_quadtrees?)
+
+      return
       # Top
       Gosu.draw_line(
         *get_real_corner(:left, :top).values,  0xff_ff0000,
@@ -140,7 +168,7 @@ module AdventureRL
         return @quadtrees.values.all?
       end
 
-      def create_quadtrees
+      def split_quadtrees
         @quadtrees = @quadtrees.keys.map do |corner|
           new_quadtree = get_split_quadtree_for_corner corner
           next [corner, new_quadtree]  if (new_quadtree)
@@ -159,6 +187,7 @@ module AdventureRL
 
       def get_split_quadtree_top_left
         return Quadtree.new(Settings.new(
+          parent:      self,
           position:    get_position,
           size:        get_size.map do |side, size|
             next [side, (size.to_f * 0.5).round]
@@ -170,6 +199,7 @@ module AdventureRL
 
       def get_split_quadtree_top_right
         return Quadtree.new(Settings.new(
+          parent:      self,
           position:    get_position.map do |axis, pos|
             next [axis, pos + (get_size(:width).to_f * 0.5).round]  if (axis == :x)
             next [axis, pos]
@@ -184,6 +214,7 @@ module AdventureRL
 
       def get_split_quadtree_bottom_left
         return Quadtree.new(Settings.new(
+          parent:      self,
           position:    get_position.map do |axis, pos|
             next [axis, pos + (get_size(:height).to_f * 0.5).round]  if (axis == :y)
             next [axis, pos]
@@ -198,6 +229,7 @@ module AdventureRL
 
       def get_split_quadtree_bottom_right
         return Quadtree.new(Settings.new(
+          parent:      self,
           position:    get_position.map do |axis, pos|
             next [axis, pos + (get_size(:width).to_f  * 0.5).round]  if (axis == :x)
             next [axis, pos + (get_size(:height).to_f * 0.5).round]  if (axis == :y)

@@ -163,7 +163,7 @@ module AdventureRL
     def draw
       @_layer.draw
       # TODO
-      @_solids_manager.draw
+      #@_solids_manager.draw
     end
 
     private

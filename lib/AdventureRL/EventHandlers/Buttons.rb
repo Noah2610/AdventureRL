@@ -139,6 +139,10 @@ module AdventureRL
         end
 
         def get_semantic_button_name btnid
+          pressable_button = get_pressable_buttons.detect do |pressable_button|
+            next pressable_button[:ids].include?(btnid)
+          end
+          return pressable_button[:name]  if (pressable_button)
           btn_char = Gosu.button_id_to_char btnid
           return get_semantic_constant_button_name btnid  if (btn_char.empty?)
           return btn_char.to_sym

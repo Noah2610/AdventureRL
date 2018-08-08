@@ -89,6 +89,22 @@ module AdventureRL
     end
     alias_method :clear_interval, :remove_interval
 
+    # Returns <tt>true</tt> if the given <tt>id</tt> exists as a timeout,
+    # and <tt>false</tt> if not.
+    def has_timeout? id
+      return @queue[:timeouts].any? do |timeout|
+        next timeout[:id] == id
+      end
+    end
+
+    # Returns <tt>true</tt> if the given <tt>id</tt> exists as an interval,
+    # and <tt>false</tt> if not.
+    def has_interval? id
+      return @queue[:intervals].any? do |interval|
+        next interval[:id] == id
+      end
+    end
+
     private
 
       def handle_timeouts

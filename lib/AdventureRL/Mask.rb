@@ -245,13 +245,13 @@ module AdventureRL
     # - Point,
     # - or Hash with keys <tt>:x</tt> and <tt>:y</tt>.
     def collides_with? other
-      return collides_with_mask?  other  if (defined? other.has_mask?)
-      return collides_with_point? other  if (defined? other.has_point?)
+      return collides_with_mask?  other  if (other.has_mask?  rescue false)
+      return collides_with_point? other  if (other.has_point? rescue false)
       return collides_with_hash?  other  if (other.is_a?(Hash))
     end
 
     # Returns true if this Mask collides with <tt>other</tt> Mask.
-    def collides_with_mask? mask
+    def collides_with_mask? mask, checked = false
       this_sides  = get_real_sides
       other_sides = mask.get_real_sides
       return (
@@ -265,14 +265,14 @@ module AdventureRL
           )
         ) && (
           (
-            other_sides[:top] >= this_sides[:top]  &&
+            other_sides[:top] >= this_sides[:top] &&
             other_sides[:top] <= this_sides[:bottom]
           ) || (
-            other_sides[:bottom] >= this_sides[:top]  &&
+            other_sides[:bottom] >= this_sides[:top] &&
             other_sides[:bottom] <= this_sides[:bottom]
           )
         )
-      )
+      ) || (!checked && mask.collides_with_mask?(self, true))
     end
 
     # Returns true if this Mask collides with <tt>other</tt> Point.
