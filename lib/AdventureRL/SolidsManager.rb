@@ -6,7 +6,7 @@ module AdventureRL
       @quadtrees     = {}
       @objects       = {}
       @has_reset_for = []
-      @has_reset = false  # TODO
+      @reset_queue = {}
     end
 
     # Add one (or multiple) <tt>object</tt>(s)
@@ -65,19 +65,31 @@ module AdventureRL
       end
     end
 
-    # TODO
-    def reset
-      return  if (@has_reset)
-      @objects.each do |tag, objects|
-        @quadtrees[tag].reset
-        @quadtrees[tag].add_object objects
+    def reset_object object, solid_tag = DEFAULT_SOLID_TAG
+      objects = [object].flatten
+      solid_tags = [solid_tag].flatten
+      solid_tags.each do |tag|
+        @reset_queue[tag] ||= []
+        @reset_queue[tag].concat objects
       end
-      @has_reset = true
+    end
+
+    # Resets for every object in <tt>@reset_queue</tt>.
+    def reset
+      @reset_queue.each do |solid_tag, objects|
+        @quadtrees.map do |quadtree_tag, quadtree|
+          next quadtree  if (solid_tag == quadtree_tag)
+          next nil
+        end .compact.each do |quadtree|
+          quadtree.reset_object objects
+        end
+        @reset_queue[solid_tag] = []
+      end
     end
 
     # Called once every frame by Window.
     def update
-      @has_reset = false
+      reset
       @has_reset_for = []
     end
 

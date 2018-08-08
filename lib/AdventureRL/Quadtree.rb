@@ -110,6 +110,14 @@ module AdventureRL
 
     # TODO
     def reset_object object
+      objects = [object].flatten
+      objects.each do |obj|
+        @objects.delete obj
+        add_object_to_quadtree obj
+      end
+
+      return
+
       return  if (add_object_to_quadtree object)
       @parent_quadtree.reset_object object  if (@parent_quadtree)
     end
