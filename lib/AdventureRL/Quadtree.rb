@@ -65,61 +65,53 @@ module AdventureRL
 
       split_quadtrees  unless (has_quadtrees?)
 
-      return @quadtrees.values.map do |quadtree|
+      return get_quadtrees.map do |quadtree|
         next quadtree.add_object_to_quadtree(object)
       end .any?
+    end
+
+    # Returns <tt>true</tt> if the given <tt>object</tt>
+    # collides with any other object and <tt>false</tt> if not.
+    def collides? object
+      validate_object_has_mask object
+      return collides_for?(object)
+    end
+
+    def collides_for? object
+      return false  unless (collides_with? object)
+      return (
+        @objects.any? do |obj|
+          next obj != object && obj.collides_with?(object)
+        end ||
+        get_quadtrees.any? do |quadtree|
+          next quadtree.collides_for?(object)
+        end
+      )
     end
 
     # Returns all objects, that collide with <tt>object</tt>.
     def get_colliding_objects object
       validate_object_has_mask object
-      return query_for(object)
+      return get_colliding_objects_for(object)
     end
 
-    def query_for object
+    def get_colliding_objects_for object
       colliding_objects = []
       return colliding_objects  unless (collides_with? object)
-
-      # TODO
-      @queried = true
-
       colliding_objects.concat(@objects.select do |obj|
-        next obj.collides_with?(object)  unless (obj == object)
-        next false
+        next obj != object && obj.collides_with?(object)
       end)
-      @quadtrees.values.each do |quadtree|
-        colliding_objects.concat quadtree.query_for(object)
-      end  if (has_quadtrees?)
+      get_quadtrees.each do |quadtree|
+        colliding_objects.concat quadtree.get_colliding_objects_for(object)
+      end
       return colliding_objects
     end
 
     # Reset this and all child Quadtrees.
-    # (Recalculate in which Quadtree each object is supposed to be.)
+    # Removes all stored objects.
     def reset
-      # @objects.each do |object|
-      #   reset_object object
-      # end
-
       @objects.clear
-      @quadtrees.values.each &:reset  if (has_quadtrees?)
-
-      #@quadtrees = @quadtrees.map do |corner, quadtree|
-      #  next [corner, nil]
-      #end .to_h
-    end
-
-    # TODO
-    def reset_object object
-      objects = [object].flatten
-      objects.each do |obj|
-        @objects.delete obj
-        add_object_to_quadtree obj
-      end
-
-      return
-
-      return  if (add_object_to_quadtree object)
-      @parent_quadtree.reset_object object  if (@parent_quadtree)
+      get_quadtrees.each &:reset
     end
 
     # TODO
@@ -131,34 +123,7 @@ module AdventureRL
         -1
       )
       @queried = false
-      @quadtrees.values.each &:draw  if (has_quadtrees?)
-
-      return
-      # Top
-      Gosu.draw_line(
-        *get_real_corner(:left, :top).values,  0xff_ff0000,
-        *get_real_corner(:right, :top).values, 0xff_ff0000,
-        100
-      )
-      # Right
-      Gosu.draw_line(
-        *get_real_corner(:right, :top).values,    0xff_ff0000,
-        *get_real_corner(:right, :bottom).values, 0xff_ff0000,
-        100
-      )
-      # Bottom
-      Gosu.draw_line(
-        *get_real_corner(:right, :bottom).values, 0xff_ff0000,
-        *get_real_corner(:left, :bottom).values,  0xff_ff0000,
-        100
-      )
-      # Left
-      Gosu.draw_line(
-        *get_real_corner(:left, :bottom).values, 0xff_ff0000,
-        *get_real_corner(:left, :top).values,    0xff_ff0000,
-        100
-      )
-      @quadtrees.values.each &:draw  if (has_quadtrees?)
+      get_quadtrees.each &:draw
     end
 
     private
@@ -168,6 +133,11 @@ module AdventureRL
           "Expected an instance of Mask or an object that has a Mask, but got",
           "`#{object.inspect}:#{object.class.name}'."
         )
+      end
+
+      # Returns all the children Quadtrees.
+      def get_quadtrees
+        return @quadtrees.values.compact
       end
 
       # Returns <tt>true</tt> if this Quadtree has already been split
@@ -255,7 +225,7 @@ module AdventureRL
       def move_objects_to_quadtrees
         return  if (@objects.empty?)
         @objects.each do |object|
-          @quadtrees.values.detect do |quadtree|
+          get_quadtrees.detect do |quadtree|
             next quadtree.add_object_to_quadtree(object)
           end
         end

@@ -3,9 +3,8 @@ module AdventureRL
     DEFAULT_SOLID_TAG = :default
 
     def initialize
-      @quadtrees     = {}
-      @objects       = {}
-      @has_reset_for = []
+      @quadtrees   = {}
+      @objects     = {}
       @reset_queue = {}
     end
 
@@ -38,39 +37,8 @@ module AdventureRL
         next nil
       end .compact.any? do |quadtree|
         next objects.any? do |obj|
-          next quadtree.get_colliding_objects(obj).any?
+          next quadtree.collides?(obj)
         end
-      end
-    end
-
-    # Resets all Quadtrees for all Mask objects
-    # with given <tt>solid_tag</tt>(s).
-    def reset_for solid_tag = DEFAULT_SOLID_TAG
-      solid_tags = [solid_tag].flatten
-      return  if (solid_tags.all? { |tag| @has_reset_for.include?(tag) })
-      @quadtrees.map do |quadtree_tag, quadtree|
-        if (solid_tags.include?(quadtree_tag) && !@has_reset_for.include?(quadtree_tag))
-          @has_reset_for << quadtree_tag
-          next quadtree
-        end
-        next nil
-      end #.compact.each do |quadtree|  #(&:reset)
-        # quadtree.reset
-        # quadtree.add_object @objects[reset_tag]
-      # end
-      @has_reset_for.each do |reset_tag|
-        #@quadtrees[reset_tag] = Quadtree.new objects: @objects[reset_tag]
-        @quadtrees[reset_tag].reset
-        @quadtrees[reset_tag].add_object @objects[reset_tag]
-      end
-    end
-
-    def reset_object object, solid_tag = DEFAULT_SOLID_TAG
-      objects = [object].flatten
-      solid_tags = [solid_tag].flatten
-      solid_tags.each do |tag|
-        @reset_queue[tag] ||= []
-        @reset_queue[tag].concat objects
       end
     end
 
@@ -87,10 +55,18 @@ module AdventureRL
       end
     end
 
+    def reset_object object, solid_tag = DEFAULT_SOLID_TAG
+      objects = [object].flatten
+      solid_tags = [solid_tag].flatten
+      solid_tags.each do |tag|
+        @reset_queue[tag] ||= []
+        @reset_queue[tag].concat objects
+      end
+    end
+
     # Called once every frame by Window.
     def update
       reset
-      @has_reset_for = []
     end
 
     # TODO

@@ -40,8 +40,6 @@ module AdventureRL
           # Update SolidsManager with @solid_tags, if this Mask was moved.
 
         else
-          #@solids_manager.reset
-          #@solids_manager.reset_for @solid_tags
           @solids_manager.reset_object self, @solid_tags
         end
       end
