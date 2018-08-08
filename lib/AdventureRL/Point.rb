@@ -63,54 +63,28 @@ module AdventureRL
       return nil
     end
 
+    # Set the new position with the given arguments.
+    # <tt>args</tt> may be:
+    #   Two integers, representing the <tt>x</tt> and <tt>y</tt> axes, respectively.
+    #   A hash containing one or both of the keys <tt>:x</tt> and <tt>:y</tt>.
     def set_position *args
+      new_position = parse_position *args
+      @position[:x] = new_position[:x]  if (new_position.key? :x)
+      @position[:y] = new_position[:y]  if (new_position.key? :y)
       @real_point = nil
-      case args.size
-      when 2
-        @position[:x] = args[0]
-        @position[:y] = args[1]
-      when 1
-        Helpers::Error.error(
-          "Ambiguous argument `#{args[0]}' for Point#set_position"
-        )  unless (args[0].is_a?(Hash))
-        Helpers::Error.error(
-          'Hash must include either :x, :y, or both keys for Point#set_position'
-        )  unless (args[0].keys.include_any?(:x, :y))
-        @position[:x] = args[0][:x]  if (args[0][:x])
-        @position[:y] = args[0][:y]  if (args[0][:y])
-      else
-        Helpers::Error.error(
-          'Invalid amount of arguments for Point#set_position.',
-          'Pass either two arguments representing the x and y axes, respectively, or',
-          'pass a single hash with the keys :x and :y with their respective axes values.'
-        )
-      end
       return get_position
     end
     alias_method :move_to, :set_position
 
+    # Move the Point relative to the given arguments.
+    # <tt>args</tt> may be:
+    #   Two integers, representing the <tt>x</tt> and <tt>y</tt> axes, respectively.
+    #   A hash containing one or both of the keys <tt>:x</tt> and <tt>:y</tt>.
     def move_by *args
+      incremental_position = parse_position *args
+      @position[:x] += incremental_position[:x]  if (incremental_position.key? :x)
+      @position[:y] += incremental_position[:y]  if (incremental_position.key? :y)
       @real_point = nil
-      case args.size
-      when 2
-        @position[:x] += args[0]
-        @position[:y] += args[1]
-      when 1
-        Helpers::Error.error(
-          "Ambiguous argument `#{args[0]}' for Point#move_by"
-        )  unless (args[0].is_a?(Hash))
-        Helpers::Error.error(
-          'Hash must include either :x, :y, or both keys for Point#move_by'
-        )  unless (args[0].keys.include_any?(:x, :y))
-        @position[:x] += args[0][:x]  if (args[0][:x])
-        @position[:y] += args[0][:y]  if (args[0][:y])
-      else
-        Helpers::Error.error(
-          'Invalid amount of arguments for Point#move_by.',
-          'Pass either two arguments representing the x and y axes, respectively, or',
-          'pass a single hash with the keys :x and :y with their respective axes values.'
-        )
-      end
       return get_position
     end
 
@@ -182,5 +156,32 @@ module AdventureRL
     def get_real_position
       return get_real_point.get_position
     end
+
+    private
+
+      def parse_position *args
+        position = {}
+        case args.size
+        when 2
+          position[:x] = args[0]
+          position[:y] = args[1]
+        when 1
+          Helpers::Error.error(
+            "Ambiguous argument `#{args[0]}' for Point##{__method__}"
+          )  unless (args[0].is_a?(Hash))
+          Helpers::Error.error(
+            "Hash must include either :x, :y, or both keys for Point##{__method__}"
+          )  unless (args[0].keys.include_any?(:x, :y))
+          position[:x] = args[0][:x]  if (args[0][:x])
+          position[:y] = args[0][:y]  if (args[0][:y])
+        else
+          Helpers::Error.error(
+            "Invalid amount of arguments for Point##{__method__}.",
+            "Pass either two arguments representing the x and y axes, respectively, or",
+            "pass a single hash with the keys :x and :y with their respective axes values."
+          )
+        end
+        return position
+      end
   end
 end
