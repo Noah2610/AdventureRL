@@ -68,10 +68,10 @@ module AdventureRL
     #   Two integers, representing the <tt>x</tt> and <tt>y</tt> axes, respectively.
     #   A hash containing one or both of the keys <tt>:x</tt> and <tt>:y</tt>.
     def set_position *args
+      @real_point = nil
       new_position = parse_position *args
       @position[:x] = new_position[:x]  if (new_position.key? :x)
       @position[:y] = new_position[:y]  if (new_position.key? :y)
-      @real_point = nil
       return get_position
     end
     alias_method :move_to, :set_position
@@ -81,10 +81,10 @@ module AdventureRL
     #   Two integers, representing the <tt>x</tt> and <tt>y</tt> axes, respectively.
     #   A hash containing one or both of the keys <tt>:x</tt> and <tt>:y</tt>.
     def move_by *args
+      @real_point = nil
       incremental_position = parse_position *args
       @position[:x] += incremental_position[:x]  if (incremental_position.key? :x)
       @position[:y] += incremental_position[:y]  if (incremental_position.key? :y)
-      @real_point = nil
       return get_position
     end
 

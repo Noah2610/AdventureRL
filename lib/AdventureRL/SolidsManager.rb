@@ -42,6 +42,17 @@ module AdventureRL
       end
     end
 
+    # Pass an <tt>object</tt> (or multiple), to queue it/them for
+    # resetting next update.
+    def reset_object object, solid_tag = DEFAULT_SOLID_TAG
+      objects = [object].flatten
+      solid_tags = [solid_tag].flatten
+      solid_tags.each do |tag|
+        @reset_queue[tag] ||= []
+        @reset_queue[tag].concat objects
+      end
+    end
+
     # Resets for every object in <tt>@reset_queue</tt>.
     def reset
       @reset_queue.each do |solid_tag, objects|
@@ -52,15 +63,6 @@ module AdventureRL
           quadtree.reset_object objects
         end
         @reset_queue[solid_tag] = []
-      end
-    end
-
-    def reset_object object, solid_tag = DEFAULT_SOLID_TAG
-      objects = [object].flatten
-      solid_tags = [solid_tag].flatten
-      solid_tags.each do |tag|
-        @reset_queue[tag] ||= []
-        @reset_queue[tag].concat objects
       end
     end
 

@@ -16,9 +16,7 @@ module AdventureRL::Extensions::HashExtension
     end .to_h
   end
 end
-class Hash
-  include AdventureRL::Extensions::HashExtension
-end
+Hash.include AdventureRL::Extensions::HashExtension
 
 module AdventureRL::Extensions::ArrayExtension
   def include_all? *vals
@@ -32,18 +30,14 @@ module AdventureRL::Extensions::ArrayExtension
     end
   end
 end
-class Array
-  include AdventureRL::Extensions::ArrayExtension
-end
+Array.include AdventureRL::Extensions::ArrayExtension
 
 module AdventureRL::Extensions::RangeExtension
   def sample
     return self.to_a.sample
   end
 end
-class Range
-  include AdventureRL::Extensions::RangeExtension
-end
+Range.include AdventureRL::Extensions::RangeExtension
 
 module AdventureRL::Extensions::StringAndSymbolExtension
   def upper?
@@ -53,9 +47,13 @@ module AdventureRL::Extensions::StringAndSymbolExtension
     return self == self.downcase
   end
 end
-class String
-  include AdventureRL::Extensions::StringAndSymbolExtension
+String.include AdventureRL::Extensions::StringAndSymbolExtension
+Symbol.include AdventureRL::Extensions::StringAndSymbolExtension
+
+module AdventureRL::Extensions::IntegerAndFloatExtension
+  def sign
+    return self / self.abs
+  end
 end
-class Symbol
-  include AdventureRL::Extensions::StringAndSymbolExtension
-end
+Integer.include AdventureRL::Extensions::IntegerAndFloatExtension
+Float.include AdventureRL::Extensions::IntegerAndFloatExtension

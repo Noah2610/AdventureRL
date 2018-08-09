@@ -114,6 +114,15 @@ module AdventureRL
       get_quadtrees.each &:reset
     end
 
+    # Remove and (try to) re-add the given <tt>object</tt>(s) (single or multiple).
+    def reset_object object
+      objects = [object].flatten
+      objects.each do |obj|
+        @objects.delete obj
+        add_object_to_quadtree obj
+      end
+    end
+
     # TODO
     def draw
       Gosu.draw_rect(
