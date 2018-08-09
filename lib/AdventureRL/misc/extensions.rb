@@ -52,6 +52,7 @@ Symbol.include AdventureRL::Extensions::StringAndSymbolExtension
 
 module AdventureRL::Extensions::IntegerAndFloatExtension
   def sign
+    return 0  if (self == 0)
     return self / self.abs
   end
 end

@@ -62,8 +62,8 @@ module AdventureRL
           larger_axis = :x  if (incremental_position[:x].abs >= incremental_position[:y].abs)
           larger_axis = :y  if (incremental_position[:y].abs >  incremental_position[:x].abs)
           smaller_axis = (larger_axis == :x) ? :y : :x
-          larger_axis_sign  = incremental_position[larger_axis].sign   rescue 0
-          smaller_axis_sign = incremental_position[smaller_axis].sign  rescue 0
+          larger_axis_sign  = incremental_position[larger_axis].sign
+          smaller_axis_sign = incremental_position[smaller_axis].sign
           smaller_axis_increment_at = (incremental_position[larger_axis].abs.to_f / incremental_position[smaller_axis].abs.to_f).round  rescue nil
           remaining_values = {
             larger_axis  => ((incremental_position[larger_axis].abs  % 1) * larger_axis_sign),
