@@ -42,6 +42,7 @@ module AdventureRL
         id:        _args[:id]
       }
     end
+    alias_method :in, :set_timeout
 
     # Set an interval for a method.
     # Call a method in regular intervals.  
@@ -67,6 +68,7 @@ module AdventureRL
         id:        _args[:id]
       }
     end
+    alias_method :every, :set_interval
 
     # If you passed an <tt>:id</tt> to your timeout when you set it with #set_timeout,
     # then you can remove / clear it before it executes by calling this method and

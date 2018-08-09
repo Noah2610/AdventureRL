@@ -51,7 +51,11 @@ module AdventureRL
           event = Event.new(:mouse_down)
           event.on_trigger do |object, btn_name|
             next  unless (object.methods.include? :on_mouse_down)
-            object.on_mouse_down btn_name  if (object.collides_with? get_mouse_point)
+            if (object.method(:on_mouse_down).arity > 0)
+              object.on_mouse_down btn_name
+            else
+              object.on_mouse_down
+            end  if (object.collides_with? get_mouse_point)
           end
           return event
         end
@@ -60,7 +64,11 @@ module AdventureRL
           event = Event.new(:mouse_up)
           event.on_trigger do |object, btn_name|
             next  unless (object.methods.include? :on_mouse_up)
-            object.on_mouse_up btn_name  if (object.collides_with? get_mouse_point)
+            if (object.method(:on_mouse_up).arity > 0)
+              object.on_mouse_up btn_name
+            else
+              object.on_mouse_up
+            end  if (object.collides_with? get_mouse_point)
           end
           return event
         end
@@ -69,7 +77,11 @@ module AdventureRL
           event = Event.new(:mouse_press)
           event.on_trigger do |object, btn_name|
             next  unless (object.methods.include? :on_mouse_press)
-            object.on_mouse_press btn_name  if (object.collides_with? get_mouse_point)
+            if (object.method(:on_mouse_press).arity > 0)
+              object.on_mouse_press btn_name
+            else
+              object.on_mouse_press
+            end  if (object.collides_with? get_mouse_point)
           end
           return event
         end

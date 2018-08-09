@@ -107,6 +107,15 @@ module AdventureRL
 
       # Call this every frame to move with the stored velocity.
       def move
+        # TODO
+        # unless @tmp
+        #   @tmp ||= TimingHandler.new
+        #   @tmp.every seconds: 0.5 do
+        #     puts get_incremental_position_for_velocity[:x].round 2
+        #   end
+        # end
+        # @tmp.update
+
         move_by get_incremental_position_for_velocity  if (any_velocity?)
         decrease_velocity
         @has_increased_velocity_for = {

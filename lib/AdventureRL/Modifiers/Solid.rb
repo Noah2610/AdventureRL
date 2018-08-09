@@ -69,24 +69,31 @@ module AdventureRL
             larger_axis  => ((incremental_position[larger_axis].abs  % 1) * larger_axis_sign),
             smaller_axis => ((incremental_position[smaller_axis].abs % 1) * smaller_axis_sign),
           }
-          incremental_position[larger_axis].floor.abs.times do |axis_index|
-            initial_previous_position = @position.dup
 
-            if (remaining_values.values.any? { |val| val.abs > 0 })
-              tmp_in_collision_count = 0
-              remaining_values.each do |remaining_axis, remaining_value|
-                next  if (remaining_value == 0)
-                previous_position = @position.dup
-                @position[remaining_axis] += remaining_value
-                remaining_values[remaining_axis] = 0
-                if (in_collision?)
-                  tmp_in_collision_count += 1
-                  @position = previous_position
-                  break
-                end
+          if (remaining_values.values.any? { |val| val.abs > 0 })
+            tmp_in_collision_count = 0
+            remaining_values.each do |remaining_axis, remaining_value|
+              next  if (remaining_value == 0)
+              previous_position = @position.dup
+              @position[remaining_axis] += remaining_value
+              remaining_values[remaining_axis] = 0
+              if (in_collision?)
+                tmp_in_collision_count += 1
+                @position = previous_position
+                next  # break
               end
-              break  if (tmp_in_collision_count == 2)  # NOTE: Slight performance improvement
-            end  if (@precision_over_performance)
+            end
+            return  if (tmp_in_collision_count == 2)  # NOTE: Slight performance improvement
+          end  if (@precision_over_performance)
+
+          # NOTE
+          # We use #to_i here, because a negative float's #floor method decreases its value. Example:
+          #   1.75.floor   # =>  1.0
+          #   -1.75.floor  # => -2.0
+          #   1.75.to_i    # =>  1.0
+          #   -1.75.to_i   # => -1.0
+          incremental_position[larger_axis].to_i.abs.times do |axis_index|
+            initial_previous_position = @position.dup
 
             tmp_in_collision_count = 0
             previous_position = @position.dup
@@ -100,7 +107,7 @@ module AdventureRL
             previous_position = @position.dup
 
             if (smaller_axis_increment_at &&
-                ((axis_index + 1) % smaller_axis_increment_at == 0)
+                (((axis_index + 1) % smaller_axis_increment_at) == 0)
                )
               @position[smaller_axis] += smaller_axis_sign
               if (in_collision?)

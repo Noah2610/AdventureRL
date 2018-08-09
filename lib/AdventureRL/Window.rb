@@ -145,6 +145,11 @@ module AdventureRL
       @_mouse_buttons_event_handler.button_up btnid
     end
 
+    # Show cursor.
+    def needs_cursor?
+      return true
+    end
+
     # Default #update method.
     # If you overwrite this, be sure to call <tt>super</tt>
     # in your method.
