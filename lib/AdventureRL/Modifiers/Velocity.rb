@@ -10,6 +10,10 @@ module AdventureRL
           x: 10,
           y: 10
         },
+        base_velocity: {
+          x: 0,
+          y: 0
+        },
         quick_turn_around: false
       )
 
@@ -23,6 +27,7 @@ module AdventureRL
         @max_velocity               = @max_velocity_original.dup
         @velocity_decay             = velocity_settings.get :velocity_decay
         @velocity_quick_turn_around = velocity_settings.get :quick_turn_around
+        @base_velocity              = velocity_settings.get :base_velocity
         @velocity_deltatime         = Deltatime.new
         @has_increased_velocity_for = {
           x: false,
@@ -60,18 +65,19 @@ module AdventureRL
       def increase_velocity_by *args
         incremental_velocity = parse_position *args
         @velocity.keys.each do |axis|
-          if (incremental_velocity.key? axis)
-            velocity_sign = @velocity[axis].sign
-            @velocity[axis]  = 0  unless (velocity_sign == incremental_velocity[axis].sign)  if (@velocity_quick_turn_around)
-            @velocity[axis] += incremental_velocity[axis]
-            case velocity_sign
-            when 1
-              @velocity[axis] = get_max_velocity(axis)   if (@velocity[axis] > get_max_velocity(axis))
-            when -1
-              @velocity[axis] = -get_max_velocity(axis)  if (@velocity[axis] < -get_max_velocity(axis))
-            end
-            @has_increased_velocity_for[axis] = true
+          next  unless (incremental_velocity.key? axis)
+          velocity_sign = @velocity[axis].sign
+          incremental_velocity_sign = incremental_velocity[axis].sign
+          @velocity[axis]  = 0  unless (velocity_sign == incremental_velocity_sign)  if (@velocity_quick_turn_around)
+          @velocity[axis]  = @base_velocity[axis] * incremental_velocity_sign        if (@velocity[axis] == 0)
+          @velocity[axis] += incremental_velocity[axis]
+          case velocity_sign
+          when 1
+            @velocity[axis] = get_max_velocity(axis)   if (@velocity[axis] > get_max_velocity(axis))
+          when -1
+            @velocity[axis] = -get_max_velocity(axis)  if (@velocity[axis] < -get_max_velocity(axis))
           end
+          @has_increased_velocity_for[axis] = true
         end
       end
 

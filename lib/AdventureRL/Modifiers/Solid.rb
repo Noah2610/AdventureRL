@@ -70,26 +70,48 @@ module AdventureRL
             smaller_axis => ((incremental_position[smaller_axis].abs % 1) * smaller_axis_sign),
           }
           incremental_position[larger_axis].floor.abs.times do |axis_index|
-            previous_position = @position.dup
+            initial_previous_position = @position.dup
+
             if (remaining_values.values.any? { |val| val.abs > 0 })
+              tmp_in_collision_count = 0
               remaining_values.each do |remaining_axis, remaining_value|
                 next  if (remaining_value == 0)
+                previous_position = @position.dup
                 @position[remaining_axis] += remaining_value
                 remaining_values[remaining_axis] = 0
+                if (in_collision?)
+                  tmp_in_collision_count += 1
+                  @position = previous_position
+                  break
+                end
               end
-              if (in_collision?)
-                @position = previous_position
-                break
-              end
-            end
+              break  if (tmp_in_collision_count == 2)  # NOTE: Slight performance improvement
+            end  if (@precision_over_performance)
+
+            tmp_in_collision_count = 0
             previous_position = @position.dup
-            @position[larger_axis]  += larger_axis_sign
-            @position[smaller_axis] += smaller_axis_sign  if (
-              smaller_axis_increment_at &&
-              ((axis_index + 1) % smaller_axis_increment_at == 0)
-            )
+
+            @position[larger_axis] += larger_axis_sign
             if (in_collision?)
               @position = previous_position
+              tmp_in_collision_count += 1
+            end  if (@precision_over_performance)
+
+            previous_position = @position.dup
+
+            if (smaller_axis_increment_at &&
+                ((axis_index + 1) % smaller_axis_increment_at == 0)
+               )
+              @position[smaller_axis] += smaller_axis_sign
+              if (in_collision?)
+                @position = previous_position
+                tmp_in_collision_count += 1
+              end  if (@precision_over_performance)
+            end
+
+            break  if (tmp_in_collision_count == 2)
+            if (!@precision_over_performance && in_collision?)
+              @position = initial_previous_position
               break
             end
           end
