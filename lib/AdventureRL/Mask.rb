@@ -262,6 +262,9 @@ module AdventureRL
           ) || (
             other_sides[:right] >= this_sides[:left] &&
             other_sides[:right] <= this_sides[:right]
+          ) || (
+            other_sides[:left]  <= this_sides[:left] &&
+            other_sides[:right] >= this_sides[:right]
           )
         ) && (
           (
@@ -270,6 +273,9 @@ module AdventureRL
           ) || (
             other_sides[:bottom] >= this_sides[:top] &&
             other_sides[:bottom] <= this_sides[:bottom]
+          ) || (
+            other_sides[:top]    <= this_sides[:top] &&
+            other_sides[:bottom] >= this_sides[:bottom]
           )
         )
       ) || (!checked && mask.collides_with_mask?(self, true))

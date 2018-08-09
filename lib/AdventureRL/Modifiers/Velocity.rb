@@ -63,12 +63,14 @@ module AdventureRL
       #   Two integers, representing the <tt>x</tt> and <tt>y</tt> axes, respectively.
       #   A hash containing one or both of the keys <tt>:x</tt> and <tt>:y</tt>.
       def increase_velocity_by *args
+        opts = {}
+        opts = args.last  if (args.last.is_a? Hash)
         incremental_velocity = parse_position *args
         @velocity.keys.each do |axis|
           next  unless (incremental_velocity.key? axis)
           velocity_sign = @velocity[axis].sign
           incremental_velocity_sign = incremental_velocity[axis].sign
-          @velocity[axis]  = 0  unless (velocity_sign == incremental_velocity_sign)  if (@velocity_quick_turn_around)
+          @velocity[axis]  = 0  unless (velocity_sign == incremental_velocity_sign)  if ((@velocity_quick_turn_around || opts[:quick_turn_around]) && !opts[:no_quick_turn_around])
           @velocity[axis]  = @base_velocity[axis] * incremental_velocity_sign        if (@velocity[axis] == 0)
           @velocity[axis] += incremental_velocity[axis]
           case velocity_sign
@@ -96,10 +98,6 @@ module AdventureRL
         end
       end
 
-      # TODO
-      def increase_max_velocity_by *args
-      end
-
       # Resets the max velocity to the original values.
       def reset_max_velocity
         @max_velocity = @max_velocity_original.dup
@@ -107,15 +105,6 @@ module AdventureRL
 
       # Call this every frame to move with the stored velocity.
       def move
-        # TODO
-        # unless @tmp
-        #   @tmp ||= TimingHandler.new
-        #   @tmp.every seconds: 0.5 do
-        #     puts get_incremental_position_for_velocity[:x].round 2
-        #   end
-        # end
-        # @tmp.update
-
         move_by get_incremental_position_for_velocity  if (any_velocity?)
         decrease_velocity
         @has_increased_velocity_for = {
