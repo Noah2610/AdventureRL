@@ -38,4 +38,5 @@ module AdventureRL
   require DIR[:src].join     'Quadtree'
   require DIR[:src].join     'SolidsManager'  # NOTE: require before Modifiers!
   require_dir DIR[:src].join('Modifiers')
+  require DIR[:src].join     'Textbox'
 end
