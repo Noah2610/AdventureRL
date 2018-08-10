@@ -1,9 +1,13 @@
 # This file purely <tt>require</tt>s code files.
 module AdventureRL
-  def self.require_dir dir
+  def self.require_dir dir, options = {}
     directory = Pathname.new dir.to_s
     Helpers::Error.error_no_directory directory  unless (Helpers::Error.directory_exists? directory)
-    directory.each_child do |file|
+    options[:priority] = [options[:priority]].flatten.compact
+    options[:priority].map! do |filename|
+      next directory.join("#{filename.sub(/\.rb\z/,'')}.rb")
+    end
+    directory.children.sort_by_array(options[:priority]).each do |file|
       filepath = file.to_path
       require filepath  if (filepath.match?(/\.rb\z/))
     end
@@ -29,10 +33,8 @@ module AdventureRL
   require DIR[:src].join     'ClipPlayer'
   require DIR[:src].join     'Audio'
   require DIR[:src].join     'AudioPlayer'
-  require DIR[:src].join     'Event'
-  require_dir DIR[:src].join('Events')
-  require DIR[:src].join     'EventHandler'
-  require_dir DIR[:src].join('EventHandlers')
+  require_dir DIR[:src].join('Events'),        priority: 'Event'
+  require_dir DIR[:src].join('EventHandlers'), priority: ['EventHandler', 'Buttons']
   require DIR[:src].join     'Quadtree'
   require DIR[:src].join     'SolidsManager'  # NOTE: require before Modifiers!
   require_dir DIR[:src].join('Modifiers')

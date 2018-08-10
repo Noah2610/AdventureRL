@@ -1,4 +1,6 @@
 module AdventureRL::Extensions  end
+
+# HASH
 module AdventureRL::Extensions::HashExtension
   def keys_to_sym
     return self.map do |key, val|
@@ -18,6 +20,7 @@ module AdventureRL::Extensions::HashExtension
 end
 Hash.include AdventureRL::Extensions::HashExtension
 
+# ARRAY
 module AdventureRL::Extensions::ArrayExtension
   def include_all? *vals
     return vals.all? do |val|
@@ -29,9 +32,21 @@ module AdventureRL::Extensions::ArrayExtension
       next self.include? val
     end
   end
+  def sort_by_array *array
+    array.flatten!
+    return self.sort do |one, two|
+      indexes = [
+        array.index(one),
+        array.index(two)
+      ]
+      next (indexes[0] || Float::INFINITY) <=> (indexes[1] || Float::INFINITY)  if (indexes.any?)
+      next one <=> two
+    end
+  end
 end
 Array.include AdventureRL::Extensions::ArrayExtension
 
+# RANGE
 module AdventureRL::Extensions::RangeExtension
   def sample
     return self.to_a.sample
@@ -39,6 +54,7 @@ module AdventureRL::Extensions::RangeExtension
 end
 Range.include AdventureRL::Extensions::RangeExtension
 
+# STRING and SYMBOL
 module AdventureRL::Extensions::StringAndSymbolExtension
   def upper?
     return self == self.upcase
@@ -50,6 +66,7 @@ end
 String.include AdventureRL::Extensions::StringAndSymbolExtension
 Symbol.include AdventureRL::Extensions::StringAndSymbolExtension
 
+# INTEGER and FLOAT
 module AdventureRL::Extensions::IntegerAndFloatExtension
   def sign
     return 0  if (self == 0)
@@ -57,4 +74,4 @@ module AdventureRL::Extensions::IntegerAndFloatExtension
   end
 end
 Integer.include AdventureRL::Extensions::IntegerAndFloatExtension
-Float.include AdventureRL::Extensions::IntegerAndFloatExtension
+Float.include   AdventureRL::Extensions::IntegerAndFloatExtension

@@ -117,7 +117,7 @@ module AdventureRL
         end
 
         def get_event_button_down
-          event = Event.new(:button_down)
+          event = Events::Event.new(:button_down)
           event.on_trigger do |object, btn_name, mod_keys|
             next  unless (object.methods.include? :on_button_down)
             case object.method(:on_button_down).arity.abs
@@ -133,7 +133,7 @@ module AdventureRL
         end
 
         def get_event_button_up
-          event = Event.new(:button_up)
+          event = Events::Event.new(:button_up)
           event.on_trigger do |object, btn_name, mod_keys|
             next  unless (object.methods.include? :on_button_up)
             case object.method(:on_button_up).arity.abs
@@ -149,7 +149,7 @@ module AdventureRL
         end
 
         def get_event_button_press
-          event = Event.new(:button_press)
+          event = Events::Event.new(:button_press)
           event.on_trigger do |object, btn_name, mod_keys|
             next  unless (object.methods.include? :on_button_press)
             case object.method(:on_button_press).arity.abs
