@@ -58,6 +58,12 @@ module AdventureRL
         return nil
       end
 
+      def set_velocity *args
+        new_velocity = parse_position *args
+        @velocity[:x] = new_velocity[:x]  if (new_velocity.key? :x)
+        @velocity[:y] = new_velocity[:y]  if (new_velocity.key? :y)
+      end
+
       # Increase the velocity.
       # <tt>args</tt> may be:
       #   Two integers, representing the <tt>x</tt> and <tt>y</tt> axes, respectively.

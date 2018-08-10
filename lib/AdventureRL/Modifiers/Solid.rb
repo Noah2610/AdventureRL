@@ -39,6 +39,13 @@ module AdventureRL
         previous_position = get_position.dup
         incremental_position = parse_position(*args)
 
+        # NOTE:
+        # This is a bit of a hacky workaround for some
+        # weird Pusher behaviour with Velocity and Gravity.
+        previous_precision_over_performance = @precision_over_performance.dup
+        opts = args.first.is_a?(Hash) ? args.first : nil
+        @precision_over_performance = opts[:precision_over_performance]  if (opts.key? :precision_over_performance)
+
         if (@precision_over_performance)
           move_by_steps incremental_position
         else
@@ -47,6 +54,7 @@ module AdventureRL
           move_by_steps incremental_position  unless (move_by_handle_collision_with_previous_position previous_position)
         end
 
+        @precision_over_performance = previous_precision_over_performance
         if (@position == previous_position)
           return false
         else

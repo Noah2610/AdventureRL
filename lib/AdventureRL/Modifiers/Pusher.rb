@@ -27,13 +27,13 @@ module AdventureRL
         end
 
         def get_moving_direction_from previous_position
-          # current - previous
           return get_position.map do |axis, position|
             next [axis, (position - previous_position[axis])]
           end .to_h
         end
 
         def push_objects objects, direction
+          direction[:precision_over_performance] = @precision_over_performance
           return objects.all? do |object|
             next object.move_by(direction)
           end
