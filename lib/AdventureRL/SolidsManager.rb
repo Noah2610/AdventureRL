@@ -32,14 +32,22 @@ module AdventureRL
     def collides? object, solid_tag = DEFAULT_SOLID_TAG
       objects    = [object].flatten
       solid_tags = [solid_tag].flatten
-      return @quadtrees.map do |quadtree_tag, quadtree|
-        next quadtree  if (solid_tags.include?(quadtree_tag))
-        next nil
-      end .compact.any? do |quadtree|
+      get_quadtrees_for(solid_tags).any? do |quadtree|
         next objects.any? do |obj|
           next quadtree.collides?(obj)
         end
       end
+    end
+
+    # Returns all objects colliding with <tt>object</tt>(s).
+    def get_colliding_objects object, solid_tag = DEFAULT_SOLID_TAG
+      objects    = [object].flatten
+      solid_tags = [solid_tag].flatten
+      return get_quadtrees_for(solid_tags).map do |quadtree|
+        next objects.map do |obj|
+          next quadtree.get_colliding_objects(obj)
+        end
+      end .flatten
     end
 
     # Pass an <tt>object</tt> (or multiple), to queue it/them for
@@ -75,5 +83,15 @@ module AdventureRL
     def draw
       @quadtrees.values.each &:draw
     end
+
+    private
+
+      def get_quadtrees_for solid_tag = DEFAULT_SOLID_TAG
+        solid_tags = [solid_tag].flatten
+        return @quadtrees.map do |quadtree_tag, quadtree|
+          next quadtree  if (solid_tags.include?(quadtree_tag))
+          next nil
+        end .compact
+      end
   end
 end

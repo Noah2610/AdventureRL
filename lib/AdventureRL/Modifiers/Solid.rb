@@ -33,7 +33,7 @@ module AdventureRL
       # Overwrite #move_by method, so that collision checking with other objects
       # with a mutual solid tag is done, and movement prevented if necessary.
       def move_by *args
-        return  if (is_static?)
+        return false  if (is_static?)
 
         @real_point = nil
         previous_position = get_position.dup
@@ -47,7 +47,12 @@ module AdventureRL
           move_by_steps incremental_position  unless (move_by_handle_collision_with_previous_position previous_position)
         end
 
-        @solids_manager.reset_object self, @solid_tags  if (@position != previous_position)
+        if (@position == previous_position)
+          return false
+        else
+          @solids_manager.reset_object self, @solid_tags
+          return true
+        end
       end
 
       # Overwrite the #move_to method, so we can
@@ -62,6 +67,11 @@ module AdventureRL
       # with another solid Mask which has a mutual solid tag.
       def in_collision?
         return @solids_manager.collides?(self, @solid_tags)
+      end
+
+      # Returns all currently colliding objects (if any).
+      def get_colliding_objects
+        return @solids_manager.get_colliding_objects(self, @solid_tags)
       end
 
       # Returns <tt>true</tt> if this is a static solid Mask,
