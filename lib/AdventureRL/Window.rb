@@ -81,6 +81,7 @@ module AdventureRL
     # to take advantage of the framework's button events.
     def button_down btnid
       EventHandlers::Buttons.button_down btnid
+      Menu.button_down btnid
     end
 
     # If you use #button_up in your game,
@@ -88,6 +89,7 @@ module AdventureRL
     # to take advantage of the framework's button events.
     def button_up btnid
       EventHandlers::Buttons.button_up btnid
+      Menu.button_up btnid
     end
 
     # Show cursor.
@@ -102,6 +104,7 @@ module AdventureRL
       @_layer.update
       @_solids_manager.update
       EventHandlers::Buttons.update
+      Menu.update
     end
 
     # Default #draw method.

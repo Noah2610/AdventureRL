@@ -24,11 +24,16 @@ module AdventureRL
         BUTTON_EVENT_HANDLERS.each &:update
       end
 
-      def initialize
+      DEFAULT_SETTINGS = Settings.new(
+        auto_update: true
+      )
+
+      def initialize settings = {}
+        @settings = DEFAULT_SETTINGS.merge settings
         super
         @pressable_buttons = []
         @events = get_events
-        BUTTON_EVENT_HANDLERS << self
+        BUTTON_EVENT_HANDLERS << self  if (@settings.get(:auto_update))
       end
 
       # Add one or multiple button character(s) <tt>btns</tt>,

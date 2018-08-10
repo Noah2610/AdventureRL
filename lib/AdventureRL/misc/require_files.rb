@@ -40,4 +40,5 @@ module AdventureRL
   require_dir DIR[:src].join('Modifiers')
   require DIR[:src].join     'Textbox'
   require DIR[:src].join     'Button'
+  require DIR[:src].join     'Menu'
 end

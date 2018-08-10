@@ -4,7 +4,7 @@ module AdventureRL
     # You can subscribe an object to a specific Event using its name,
     # through the EventHandler.
     class EventHandler
-      def initialize
+      def initialize settings = {}
         @events = []
       end
 
