@@ -23,6 +23,7 @@ module AdventureRL
       def initialize settings = {}
         solid_settings              = DEFAULT_SOLID_SETTINGS.merge settings
         @solid_tags                 = [solid_settings.get(:solid_tag)].flatten.sort
+        @solid_tags_collides_with   = @solid_tags.dup
         @solid_static               = solid_settings.get :static  # Basically disables #move_by
         @solids_manager             = Window.get_window.get_solids_manager
         @precision_over_performance = solid_settings.get :precision_over_performance
@@ -38,6 +39,10 @@ module AdventureRL
         @real_point = nil
         previous_position = get_position.dup
         incremental_position = parse_position(*args)
+        expected_position = {
+          x: (previous_position[:x] + (incremental_position.key?(:x) ? incremental_position[:x] : 0)),
+          y: (previous_position[:y] + (incremental_position.key?(:y) ? incremental_position[:y] : 0))
+        }
 
         # NOTE:
         # This is a bit of a hacky workaround for some
@@ -55,12 +60,8 @@ module AdventureRL
         end
 
         @precision_over_performance = previous_precision_over_performance
-        if (@position == previous_position)
-          return false
-        else
-          @solids_manager.reset_object self, @solid_tags
-          return true
-        end
+        @solids_manager.reset_object self, get_solid_tags  unless (@position == previous_position)
+        return @position == expected_position
       end
 
       # Overwrite the #move_to method, so we can
@@ -68,24 +69,36 @@ module AdventureRL
       def move_to *args
         previous_position = get_position.dup
         super
-        @solids_manager.reset_object self, @solid_tags  if (@position != previous_position)
+        @solids_manager.reset_object self, get_solid_tags  if (@position != previous_position)
       end
 
       # Returns <tt>true</tt> if this Mask is currently in collision
       # with another solid Mask which has a mutual solid tag.
       def in_collision?
-        return @solids_manager.collides?(self, @solid_tags)
+        return @solids_manager.collides?(self, get_solid_tags_collides_with)
       end
 
       # Returns all currently colliding objects (if any).
       def get_colliding_objects
-        return @solids_manager.get_colliding_objects(self, @solid_tags)
+        return @solids_manager.get_colliding_objects(self, get_solid_tags_collides_with)
       end
 
       # Returns <tt>true</tt> if this is a static solid Mask,
       # which means it cannot be moved with #move_by.
       def is_static?
         return !!@solid_static
+      end
+
+      # Returns this Mask's solid tags,
+      # which other Masks use to check collision against _this_ Mask.
+      def get_solid_tags
+        return @solid_tags
+      end
+
+      # Returns the solid tags,
+      # which this Mask uses to check collision against _other_ Masks.
+      def get_solid_tags_collides_with
+        return @solid_tags_collides_with || @solid_tags
       end
 
       private

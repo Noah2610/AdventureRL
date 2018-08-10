@@ -15,7 +15,7 @@ module AdventureRL
               @position = previous_position
               return false
             end
-            direction = get_moving_direction_from previous_position
+            direction = get_position_difference_from previous_position
             if (push_objects(colliding_objects, direction))
               return true
             else
@@ -26,7 +26,7 @@ module AdventureRL
           return true
         end
 
-        def get_moving_direction_from previous_position
+        def get_position_difference_from previous_position
           return get_position.map do |axis, position|
             next [axis, (position - previous_position[axis])]
           end .to_h
