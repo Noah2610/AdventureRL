@@ -44,10 +44,7 @@ module AdventureRL
         else
           @position[:x] += incremental_position[:x]  if (incremental_position.key? :x)
           @position[:y] += incremental_position[:y]  if (incremental_position.key? :y)
-          if (in_collision?)
-            @position = previous_position
-            move_by_steps incremental_position
-          end
+          move_by_steps incremental_position  unless (move_by_handle_collision_with_previous_position previous_position)
         end
 
         @solids_manager.reset_object self, @solid_tags  if (@position != previous_position)
@@ -106,17 +103,26 @@ module AdventureRL
             initial_previous_position = @position.dup
 
             tmp_in_collision_count = 0
-            tmp_in_collision_count += 1  unless (move_by_steps_by larger_axis, larger_axis_sign)
+
+            previous_position = @position.dup
+            @position[larger_axis] += larger_axis_sign
+            tmp_in_collision_count += 1  unless (
+              move_by_handle_collision_with_previous_position(previous_position)
+            )  if (@precision_over_performance)
 
             if (smaller_axis_increment_at &&
                 (((axis_index + 1) % smaller_axis_increment_at) == 0)
                )
-              tmp_in_collision_count += 1  unless (move_by_steps_by smaller_axis, smaller_axis_sign)
+              previous_position = @position.dup
+              @position[smaller_axis] += smaller_axis_sign
+              tmp_in_collision_count += 1  unless (
+                move_by_handle_collision_with_previous_position(previous_position)
+              )  if (@precision_over_performance)
             end
 
             return  unless (tmp_in_collision_count < 2)
-            if (!@precision_over_performance)
-              return  unless (move_by_steps_handle_collision_with_previous_position initial_previous_position)
+            unless (@precision_over_performance)
+              return  unless (move_by_handle_collision_with_previous_position initial_previous_position)
             end
           end
         end
@@ -129,9 +135,8 @@ module AdventureRL
             previous_position = @position.dup
             @position[remaining_axis] += remaining_value
             remaining_values[remaining_axis] = 0
-            if (in_collision?)
+            unless (move_by_handle_collision_with_previous_position previous_position)
               tmp_in_collision_count += 1
-              @position = previous_position
               next  # break
             end
           end
@@ -139,17 +144,9 @@ module AdventureRL
           return true
         end
 
-        def move_by_steps_by axis, step
-          previous_position = @position.dup
-          @position[axis] += step
-          if (in_collision?)
-            @position = previous_position
-            return false
-          end  if (@precision_over_performance)
-          return true
-        end
-
-        def move_by_steps_handle_collision_with_previous_position previous_position
+        # Returns <tt>true</tt> if there was no collision, and
+        # returns <tt>false</tt> if there was and it had to reset to the <tt>previous_position</tt>.
+        def move_by_handle_collision_with_previous_position previous_position
           if (in_collision?)
             @position = previous_position
             return false
