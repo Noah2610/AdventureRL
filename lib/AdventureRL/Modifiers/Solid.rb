@@ -11,7 +11,8 @@ module AdventureRL
     module Solid
       DEFAULT_SOLID_SETTINGS = Settings.new(
         solid_tag:                  SolidsManager::DEFAULT_SOLID_TAG,
-        precision_over_performance: true
+        precision_over_performance: true,
+        static:                     false
       )
 
       # Additionally to the Mask's settings Hash or Settings instance,
@@ -22,6 +23,7 @@ module AdventureRL
       def initialize settings = {}
         solid_settings              = DEFAULT_SOLID_SETTINGS.merge settings
         @solid_tags                 = [solid_settings.get(:solid_tag)].flatten.sort
+        @solid_static               = solid_settings.get :static  # Basically disables #move_by
         @solids_manager             = Window.get_window.get_solids_manager
         @precision_over_performance = solid_settings.get :precision_over_performance
         super
@@ -31,6 +33,8 @@ module AdventureRL
       # Overwrite #move_by method, so that collision checking with other objects
       # with a mutual solid tag is done, and movement prevented if necessary.
       def move_by *args
+        return  if (is_static?)
+
         @real_point = nil
         previous_position = get_position.dup
         incremental_position = parse_position(*args)
@@ -49,12 +53,32 @@ module AdventureRL
         @solids_manager.reset_object self, @solid_tags  if (@position != previous_position)
       end
 
+      # Overwrite the #move_to method, so we can
+      # reset the object for the solids_manager if necessary.
+      def move_to *args
+        previous_position = get_position.dup
+        super
+        @solids_manager.reset_object self, @solid_tags  if (@position != previous_position)
+      end
+
+      # Returns <tt>true</tt> if this Mask is currently in collision
+      # with another solid Mask which has a mutual solid tag.
       def in_collision?
         return @solids_manager.collides?(self, @solid_tags)
       end
 
+      # Returns <tt>true</tt> if this is a static solid Mask,
+      # which means it cannot be moved with #move_by.
+      def is_static?
+        return !!@solid_static
+      end
+
       private
 
+        # This is the ugliest method in the project.
+        # I can live with there being __one__ ugly method.
+        # Also, it _does_ do some complicated stuff, so cut it some slack.
+        # It didn't ask to be this way.
         def move_by_steps incremental_position
           incremental_position[:x] ||= 0
           incremental_position[:y] ||= 0
@@ -70,21 +94,7 @@ module AdventureRL
             smaller_axis => ((incremental_position[smaller_axis].abs % 1) * smaller_axis_sign),
           }
 
-          if (remaining_values.values.any? { |val| val.abs > 0 })
-            tmp_in_collision_count = 0
-            remaining_values.each do |remaining_axis, remaining_value|
-              next  if (remaining_value == 0)
-              previous_position = @position.dup
-              @position[remaining_axis] += remaining_value
-              remaining_values[remaining_axis] = 0
-              if (in_collision?)
-                tmp_in_collision_count += 1
-                @position = previous_position
-                next  # break
-              end
-            end
-            return  if (tmp_in_collision_count == 2)  # NOTE: Slight performance improvement
-          end  if (@precision_over_performance)
+          return  unless (move_by_steps_for_remaining_values remaining_values)
 
           # NOTE
           # We use #to_i here, because a negative float's #floor method decreases its value. Example:
@@ -96,32 +106,55 @@ module AdventureRL
             initial_previous_position = @position.dup
 
             tmp_in_collision_count = 0
-            previous_position = @position.dup
-
-            @position[larger_axis] += larger_axis_sign
-            if (in_collision?)
-              @position = previous_position
-              tmp_in_collision_count += 1
-            end  if (@precision_over_performance)
-
-            previous_position = @position.dup
+            tmp_in_collision_count += 1  unless (move_by_steps_by larger_axis, larger_axis_sign)
 
             if (smaller_axis_increment_at &&
                 (((axis_index + 1) % smaller_axis_increment_at) == 0)
                )
-              @position[smaller_axis] += smaller_axis_sign
-              if (in_collision?)
-                @position = previous_position
-                tmp_in_collision_count += 1
-              end  if (@precision_over_performance)
+              tmp_in_collision_count += 1  unless (move_by_steps_by smaller_axis, smaller_axis_sign)
             end
 
-            break  if (tmp_in_collision_count == 2)
-            if (!@precision_over_performance && in_collision?)
-              @position = initial_previous_position
-              break
+            return  unless (tmp_in_collision_count < 2)
+            if (!@precision_over_performance)
+              return  unless (move_by_steps_handle_collision_with_previous_position initial_previous_position)
             end
           end
+        end
+
+        def move_by_steps_for_remaining_values remaining_values
+          return true  if (!@precision_over_performance || remaining_values.values.all? { |val| val == 0 })
+          tmp_in_collision_count = 0
+          remaining_values.each do |remaining_axis, remaining_value|
+            next  if (remaining_value == 0)
+            previous_position = @position.dup
+            @position[remaining_axis] += remaining_value
+            remaining_values[remaining_axis] = 0
+            if (in_collision?)
+              tmp_in_collision_count += 1
+              @position = previous_position
+              next  # break
+            end
+          end
+          return false  if (tmp_in_collision_count == 2)  # NOTE: Slight performance improvement
+          return true
+        end
+
+        def move_by_steps_by axis, step
+          previous_position = @position.dup
+          @position[axis] += step
+          if (in_collision?)
+            @position = previous_position
+            return false
+          end  if (@precision_over_performance)
+          return true
+        end
+
+        def move_by_steps_handle_collision_with_previous_position previous_position
+          if (in_collision?)
+            @position = previous_position
+            return false
+          end
+          return true
         end
     end
   end
