@@ -24,6 +24,8 @@ module AdventureRL
   require DIR[:src].join     'TimingHandler'
   require DIR[:src].join     'Point'
   require DIR[:src].join     'Mask'
+  require DIR[:src].join     'SolidsManager'  # NOTE: require before Modifiers!
+  require_dir DIR[:src].join('Modifiers')
   require DIR[:src].join     'Rectangle'
   require DIR[:src].join     'Image'
   require DIR[:src].join     'Layer'
@@ -36,8 +38,6 @@ module AdventureRL
   require_dir DIR[:src].join('Events'),        priority: 'Event'
   require_dir DIR[:src].join('EventHandlers'), priority: ['EventHandler', 'Buttons']
   require DIR[:src].join     'Quadtree'
-  require DIR[:src].join     'SolidsManager'  # NOTE: require before Modifiers!
-  require_dir DIR[:src].join('Modifiers')
   require DIR[:src].join     'Textbox'
   require DIR[:src].join     'Button'
   require DIR[:src].join     'Menu'

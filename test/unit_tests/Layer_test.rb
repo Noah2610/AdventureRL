@@ -23,7 +23,7 @@ class LayerTest < UnitTest
     @mask = Mask.new
   end
 
-  def test_add_child
+  def test_add_object
     @layer.add @mask, :mask
 
     assert @layer.added?(:mask), 'The Mask should be added to Layer (check by id).'
@@ -32,7 +32,7 @@ class LayerTest < UnitTest
     reset
   end
 
-  def test_get_child
+  def test_get_object
     @layer.add @mask, :mask
 
     assert_equal @mask, @layer.get(:mask), 'Layer should return the Mask.'
@@ -40,7 +40,7 @@ class LayerTest < UnitTest
     reset
   end
 
-  def test_remove_child
+  def test_remove_object
     @layer.add @mask, :mask
 
     assert_equal @mask, @layer.remove(:mask), 'Should remove the Mask.'

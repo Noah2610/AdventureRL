@@ -6,6 +6,7 @@ module AdventureRL
   # Layer also has a Mask.
   class Layer < Mask
     include Helpers::Error
+    include Modifiers::Inventory
 
     # Default settings.
     # <tt>settings</tt> passed to #new take precedence.
@@ -29,10 +30,6 @@ module AdventureRL
       rotation: 0
     )
 
-    # The unnamed child <tt>id</tt>.
-    # This <tt>id</tt> will be used for children which aren't given an <tt>id</tt>.
-    CHILD_UNNAMED_ID = :NO_NAME
-
     # Initialize Layer with a <tt>settings</tt> Hash.
     # See DEFAULT_SETTINGS for valid keys.
     def initialize settings = {}
@@ -40,69 +37,18 @@ module AdventureRL
       super @settings #.get.reject { |key,val| next key == :assign_to }
       @scale    = @settings.get :scale
       @rotation = @settings.get :rotation
-      @children = {}
     end
 
     # Add any object to this Layer.
     # Pass an optional <tt>id</tt>, which can be used to
     # access or remove the object afterwards.
-    def add_child object, id = CHILD_UNNAMED_ID
-      @children[id] = []  unless (@children[id])
-      @children[id] << object
+    def add_object object, id = DEFAULT_INVENTORY_ID
+      super
       object.set_layer self  if (object.methods.include?(:set_layer) || object_mask_has_method?(object, :set_layer))
     end
-    alias_method :add, :add_child
-    alias_method :<<,  :add_child
-
-    # Returns true, if child with <tt>id</tt> has been added to this Layer.
-    # <tt>id</tt> can also be the object itself.
-    def added_child? id
-      return (
-        @children.key?(id) ||
-        get_children.include?(id)
-      )
-    end
-    alias_method :added?, :added_child?
-    alias_method :has?,   :added_child?
-
-    # Returns all its children objects.
-    # If optional argument <tt>id</tt> is passed,
-    # then return all children with that <tt>id</tt>.
-    def get_children id = nil
-      return @children.values.flatten  unless (id)
-      return @children[id]
-    end
-
-    # Returns the _last_ child with the given <tt>id</tt>.
-    # If no <tt>id</tt> is passed, return the last child with the unnamed <tt>id</tt>.
-    def get_child id = CHILD_UNNAMED_ID
-      return @children[id].last
-    end
-    alias_method :get, :get_child
-
-    # Removes all children with the given <tt>id</tt>.
-    # <tt>id</tt> can also be an added object itself;
-    # all objects with the same <tt>id</tt> will be removed.
-    # If no <tt>id</tt> is given, remove _all_ children.
-    def remove_children id = nil
-      return @children.clear      unless (id)
-      return @children.delete id  if     (@children.key? id)
-      return @children.delete((@children.detect do |key, val|
-        next id == val
-      end || []).first)
-    end
-
-    # Removes the _last_ child with the given <tt>id</tt>.
-    # <tt>id</tt> can also be the object to be removed itself.
-    # If no <tt>id</tt> is given, remove the _last_ child with the unnamed <tt>id</tt>.
-    def remove_child id = CHILD_UNNAMED_ID
-      return @children[id].delete_at -1  if (@children.key? id)
-      key = (@children.detect do |key, val|
-        next id == val
-      end || []) .first
-      return @children[key].delete id
-    end
-    alias_method :remove, :remove_child
+    alias_method :add_item, :add_object
+    alias_method :add,      :add_object
+    alias_method :<<,       :add_object
 
     # Returns the current scale.
     # <tt>target</tt> can be either <tt>:x</tt>, <tt>:y</tt>, or <tt>:all</tt>.
@@ -195,14 +141,14 @@ module AdventureRL
     end
 
     # Call this every frame.
-    # This updates all its <tt>@children</tt>,
+    # This updates all its inventory objects (its children),
     # if they have an #update method.
     def update
       call_method_on_children :update
     end
 
     # Call this every frame.
-    # This draws all its <tt>@children</tt>,
+    # This draws all its inventory objects (its children),
     # if they have a #draw method.
     def draw
       Gosu.scale(@scale[:x], @scale[:y], x, y) do
@@ -241,7 +187,7 @@ module AdventureRL
       end
 
       def call_method_on_children method_name, *args
-        get_children.each do |child|
+        get_objects.each do |child|
           meth = nil
           if    (child.methods.include?(method_name))
             meth = child.method(method_name)

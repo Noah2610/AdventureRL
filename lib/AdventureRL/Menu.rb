@@ -33,9 +33,9 @@ module AdventureRL
       MENUS << self  if (@settings.get(:auto_update))
     end
 
-    # Overwrite #add_child method, so we can
+    # Overwrite #add_object method, so we can
     # validate, that the given <tt>object</tt> is a Button.
-    def add_child object, id = CHILD_UNNAMED_ID
+    def add_object object, id = DEFAULT_INVENTORY_ID
       Helpers::Error.error(
         "Expected given object to be a Button, but got",
         "'#{object.inspect}:#{object.class.name}`."
@@ -43,9 +43,10 @@ module AdventureRL
       super
       @mouse_buttons_event_handler.subscribe object
     end
-    alias_method :add_button, :add_child
-    alias_method :add,        :add_child
-    alias_method :<<,         :add_child
+    alias_method :add_button, :add_object
+    alias_method :add_item,   :add_object
+    alias_method :add,        :add_object
+    alias_method :<<,         :add_object
 
     def show
       @active = true
