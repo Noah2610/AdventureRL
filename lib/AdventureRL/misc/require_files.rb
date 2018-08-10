@@ -30,6 +30,7 @@ module AdventureRL
   require DIR[:src].join     'Audio'
   require DIR[:src].join     'AudioPlayer'
   require DIR[:src].join     'Event'
+  require_dir DIR[:src].join('Events')
   require DIR[:src].join     'EventHandler'
   require_dir DIR[:src].join('EventHandlers')
   require DIR[:src].join     'Quadtree'

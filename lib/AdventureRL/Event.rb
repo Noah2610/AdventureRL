@@ -16,20 +16,24 @@ module AdventureRL
       return @objects
     end
 
-    # Add an <tt>object</tt> to this Event.
+    # Add one or multiple <tt>object</tt>(s) to this Event.
     def add_object object
-      Helpers::Error.error(
-        "Object `#{object.inspect}:#{object.class.name}' cannot be given",
-        "to this Event `#{self.inspect}:#{self.class.name}'."
-      )  unless (valid_object? object)
-      @objects << object  unless (@objects.include? object)
+      [object].flatten.each do |obj|
+        Helpers::Error.error(
+          "Object `#{obj.inspect}:#{obj.class.name}' cannot be given",
+          "to this Event `#{self.inspect}:#{self.class.name}'."
+        )  unless (valid_object? obj)
+        @objects << obj  unless (@objects.include? obj)
+      end
     end
     alias_method :add, :add_object
     alias_method :<<,  :add_object
 
-    # Remove an <tt>object</tt> from this Event.
+    # Remove one or multiple <tt>object</tt>(s) from this Event.
     def remove_object object
-      @object.delete object
+      [object].flatten.each do |obj|
+        @object.delete obj
+      end
     end
 
     # Pass a block, which will be called when this Event is triggered (see #trigger).

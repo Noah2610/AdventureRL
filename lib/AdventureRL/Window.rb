@@ -25,12 +25,8 @@ module AdventureRL
         origin:   settings.get(:origin)
       )
       Helpers::PipeMethods.pipe_methods_from self, to: @_layer
-      @_target_fps                  = settings.get(:fps)
-      @_deltatime                   = Deltatime.new
-      @_timing_handler              = TimingHandler.new
-      @_buttons_event_handler       = EventHandlers::Buttons.new
-      @_mouse_buttons_event_handler = EventHandlers::MouseButtons.new
-      @_solids_manager              = SolidsManager.new
+      @_target_fps     = settings.get(:fps)
+      @_solids_manager = SolidsManager.new
       super(
         get_size(:width), get_size(:height),
         fullscreen:      settings.get(:fullscreen),
@@ -58,37 +54,10 @@ module AdventureRL
       return @_target_fps
     end
 
-    # Returns the value of the last calculated deltatime.
-    def get_deltatime
-      return @_deltatime.get_deltatime
-    end
-    alias_method :get_dt, :get_deltatime
-
-    # Returns EventHandlers::Buttons.
-    def get_buttons_event_handler
-      return @_buttons_event_handler
-    end
-
-    # Wrapper method for EventHandlers::Buttons#add_pressable_button.
-    def add_pressable_button btn_char
-      get_buttons_event_handler.add_pressable_button btn_char
-    end
-
-    # Returns EventHandlers::MouseButtons.
-    def get_mouse_buttons_event_handler
-      return @_mouse_buttons_event_handler
-    end
-
     # Returns SolidsManager.
     def get_solids_manager
       return @_solids_manager
     end
-
-    # Resets Deltatime.
-    def reset_deltatime
-      @_deltatime.reset
-    end
-    alias_method :reset_dt, :get_deltatime
 
     # Wrapper method around Gosu::Window#fullscreen?,
     # just to follow the design pattern.
@@ -107,42 +76,18 @@ module AdventureRL
       set_fullscreen !is_fullscreen?
     end
 
-    # Wrapper method for TimingHandler#set_timeout
-    def set_timeout *args, &block
-      @_timing_handler.set_timeout *args, &block
-    end
-
-    # Wrapper method for TimingHandler#set_interval
-    def set_interval *args, &block
-      @_timing_handler.set_interval *args, &block
-    end
-
-    # Wrapper method for TimingHandler#remove_timeout
-    def remove_timeout *args
-      @_timing_handler.remove_timeout *args
-    end
-    alias_method :clear_timeout, :remove_timeout
-
-    # Wrapper method for TimingHandler#remove_interval
-    def remove_interval *args
-      @_timing_handler.remove_interval *args
-    end
-    alias_method :clear_interval, :remove_interval
-
     # If you use #button_down in your game,
     # be sure to call <tt>super</tt> at the beginning of the method,
     # to take advantage of the framework's button events.
     def button_down btnid
-      @_buttons_event_handler.button_down       btnid
-      @_mouse_buttons_event_handler.button_down btnid
+      EventHandlers::Buttons.button_down btnid
     end
 
     # If you use #button_up in your game,
     # be sure to call <tt>super</tt> at the beginning of the method,
     # to take advantage of the framework's button events.
     def button_up btnid
-      @_buttons_event_handler.button_up       btnid
-      @_mouse_buttons_event_handler.button_up btnid
+      EventHandlers::Buttons.button_up btnid
     end
 
     # Show cursor.
@@ -156,10 +101,7 @@ module AdventureRL
     def update
       @_layer.update
       @_solids_manager.update
-      @_buttons_event_handler.update
-      @_mouse_buttons_event_handler.update
-      @_timing_handler.update
-      @_deltatime.update
+      EventHandlers::Buttons.update
     end
 
     # Default #draw method.
@@ -167,8 +109,6 @@ module AdventureRL
     # if you overwrite this method.
     def draw
       @_layer.draw
-      # TODO
-      #@_solids_manager.draw
     end
 
     private

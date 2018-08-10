@@ -1,10 +1,34 @@
 module AdventureRL
   module EventHandlers
     class Buttons < EventHandler
+      # This constant will be filled with
+      # EventHandlers::Buttons and EventHandlers::MouseButtons
+      # instances as they are created.
+      # It is used by the following class methods
+      # EventHandler::Buttons#button_down,
+      # EventHandler::Buttons#button_up, and
+      # EventHandler::Buttons#update.
+      BUTTON_EVENT_HANDLERS = []
+
+      def self.button_down btnid
+        BUTTON_EVENT_HANDLERS.each do |handler|
+          handler.button_down btnid
+        end
+      end
+      def self.button_up btnid
+        BUTTON_EVENT_HANDLERS.each do |handler|
+          handler.button_up btnid
+        end
+      end
+      def self.update
+        BUTTON_EVENT_HANDLERS.each &:update
+      end
+
       def initialize
         super
         @pressable_buttons = []
         @events = get_events
+        BUTTON_EVENT_HANDLERS << self
       end
 
       # Add one or multiple button character(s) <tt>btns</tt>,
@@ -96,10 +120,13 @@ module AdventureRL
           event = Event.new(:button_down)
           event.on_trigger do |object, btn_name, mod_keys|
             next  unless (object.methods.include? :on_button_down)
-            if (object.method(:on_button_down).arity.abs == 2)
-              object.on_button_down btn_name, mod_keys
-            else
+            case object.method(:on_button_down).arity.abs
+            when 0
+              object.on_button_down
+            when 1
               object.on_button_down btn_name
+            when 2
+              object.on_button_down btn_name, mod_keys
             end
           end
           return event
@@ -109,10 +136,13 @@ module AdventureRL
           event = Event.new(:button_up)
           event.on_trigger do |object, btn_name, mod_keys|
             next  unless (object.methods.include? :on_button_up)
-            if (object.method(:on_button_up).arity.abs == 2)
-              object.on_button_up btn_name, mod_keys
-            else
+            case object.method(:on_button_up).arity.abs
+            when 0
+              object.on_button_up
+            when 1
               object.on_button_up btn_name
+            when 2
+              object.on_button_up btn_name, mod_keys
             end
           end
           return event
@@ -122,10 +152,13 @@ module AdventureRL
           event = Event.new(:button_press)
           event.on_trigger do |object, btn_name, mod_keys|
             next  unless (object.methods.include? :on_button_press)
-            if (object.method(:on_button_press).arity.abs == 2)
-              object.on_button_press btn_name, mod_keys
-            else
+            case object.method(:on_button_press).arity.abs
+            when 0
+              object.on_button_press
+            when 1
               object.on_button_press btn_name
+            when 2
+              object.on_button_press btn_name, mod_keys
             end
           end
           return event

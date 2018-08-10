@@ -25,17 +25,23 @@ module AdventureRL
     def initialize settings = {}
       @settings = DEFAULT_SETTINGS.merge settings
       super @settings
-      @color          = nil
-      @color_original = @settings.get :color
-      @z_index        = @settings.get :z_index
+      @color           = nil
+      @color_temporary = nil
+      @color_original  = @settings.get :color
+      @z_index         = @settings.get :z_index
     end
 
     def set_color color
       @color = color
     end
 
+    # Set the color only for the next frame.
+    def set_temporary_color color
+      @color_temporary = color
+    end
+
     def get_color
-      return @color || @color_original
+      return @color_temporary || @color || @color_original
     end
 
     def reset_color
@@ -50,6 +56,7 @@ module AdventureRL
         get_color,
         @z_index
       )
+      @color_temporary = nil
     end
   end
 end

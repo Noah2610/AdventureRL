@@ -4,7 +4,6 @@ module AdventureRL
 
     DEFAULT_SETTINGS = Settings.new(
       max_objects: 1,
-      parent:      nil,
       position: {
         x: 0,
         y: 0
@@ -32,7 +31,6 @@ module AdventureRL
       @settings = DEFAULT_SETTINGS.merge(Quadtree.get_default_settings).merge(settings)
       super @settings
       @max_objects     = @settings.get :max_objects
-      @parent_quadtree = @settings.get :parent
       @quadtrees = {
         top_left:     nil,
         top_right:    nil,
@@ -48,7 +46,7 @@ module AdventureRL
     def add_object object
       objects = [object].flatten
       objects.each do |obj|
-        validate_object_has_mask obj
+        validate_object_has_mask_or_point obj
         add_object_to_quadtree obj
       end
     end
@@ -73,7 +71,7 @@ module AdventureRL
     # Returns <tt>true</tt> if the given <tt>object</tt>
     # collides with any other object and <tt>false</tt> if not.
     def collides? object
-      validate_object_has_mask object
+      validate_object_has_mask_or_point object
       return collides_for?(object)
     end
 
@@ -91,7 +89,7 @@ module AdventureRL
 
     # Returns all objects, that collide with <tt>object</tt>.
     def get_colliding_objects object
-      validate_object_has_mask object
+      validate_object_has_mask_or_point object
       return get_colliding_objects_for(object)
     end
 
@@ -123,23 +121,22 @@ module AdventureRL
       end
     end
 
-    # TODO
-    def draw
-      Gosu.draw_rect(
-        *get_real_corner(:left, :top).values,
-        *get_size.values,
-        (@queried ? 0xff_00ff00 : 0xff_ff0000),
-        -1
-      )
-      @queried = false
-      get_quadtrees.each &:draw
+    # Remove the given <tt>object</tt>(s) (single or multiple) from the Quadtree (or any children).
+    def remove_object object
+      objects = [object].flatten
+      objects.each do |obj|
+        @objects.delete obj
+        get_quadtrees.each do |quadtree|
+          quadtree.remove_object obj
+        end
+      end
     end
 
     private
 
-      def validate_object_has_mask object
-        object.get_mask  rescue error(
-          "Expected an instance of Mask or an object that has a Mask, but got",
+      def validate_object_has_mask_or_point object
+        object.has_point?  rescue error(  # NOTE: #has_point? method must be available for both Point and Mask
+          "Expected an instance of Mask/Point or an object that has a Mask/Point, but got",
           "`#{object.inspect}:#{object.class.name}'."
         )
       end
@@ -174,7 +171,6 @@ module AdventureRL
 
       def get_split_quadtree_top_left
         return Quadtree.new(Settings.new(
-          parent:      self,
           position:    get_position,
           size:        get_size.map do |side, size|
             next [side, (size.to_f * 0.5).round]
@@ -186,7 +182,6 @@ module AdventureRL
 
       def get_split_quadtree_top_right
         return Quadtree.new(Settings.new(
-          parent:      self,
           position:    get_position.map do |axis, pos|
             next [axis, pos + (get_size(:width).to_f * 0.5).round]  if (axis == :x)
             next [axis, pos]
@@ -201,7 +196,6 @@ module AdventureRL
 
       def get_split_quadtree_bottom_left
         return Quadtree.new(Settings.new(
-          parent:      self,
           position:    get_position.map do |axis, pos|
             next [axis, pos + (get_size(:height).to_f * 0.5).round]  if (axis == :y)
             next [axis, pos]
@@ -216,7 +210,6 @@ module AdventureRL
 
       def get_split_quadtree_bottom_right
         return Quadtree.new(Settings.new(
-          parent:      self,
           position:    get_position.map do |axis, pos|
             next [axis, pos + (get_size(:width).to_f  * 0.5).round]  if (axis == :x)
             next [axis, pos + (get_size(:height).to_f * 0.5).round]  if (axis == :y)
