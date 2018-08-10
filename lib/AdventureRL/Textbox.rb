@@ -89,6 +89,7 @@ module AdventureRL
       draw_border
       draw_background
       draw_text
+      @color_temporary = nil
     end
 
     private

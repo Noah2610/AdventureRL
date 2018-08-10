@@ -39,4 +39,5 @@ module AdventureRL
   require DIR[:src].join     'SolidsManager'  # NOTE: require before Modifiers!
   require_dir DIR[:src].join('Modifiers')
   require DIR[:src].join     'Textbox'
+  require DIR[:src].join     'Button'
 end
