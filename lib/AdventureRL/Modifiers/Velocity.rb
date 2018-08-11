@@ -2,14 +2,17 @@ module AdventureRL
   module Modifiers
     module Velocity
       DEFAULT_VELOCITY_SETTINGS = Settings.new(
+        # Does NOT use Deltatime
         max_velocity: {
           x: 100,
           y: 100
         },
+        # DOES use Deltatime
         velocity_decay: {
-          x: 10,
-          y: 10
+          x: 750,
+          y: 750
         },
+        # Does NOT use Deltatime
         base_velocity: {
           x: 0,
           y: 0
@@ -147,10 +150,10 @@ module AdventureRL
             next  if (@velocity[axis] == 0 || @has_increased_velocity_for[axis])
             case @velocity[axis].sign
             when 1
-              @velocity[axis] -= @velocity_decay[axis]
+              @velocity[axis] -= @velocity_decay[axis] * @velocity_deltatime.dt
               @velocity[axis]  = 0  if (@velocity[axis] < 0)
             when -1
-              @velocity[axis] += @velocity_decay[axis]
+              @velocity[axis] += @velocity_decay[axis] * @velocity_deltatime.dt
               @velocity[axis]  = 0  if (@velocity[axis] > 0)
             end
           end

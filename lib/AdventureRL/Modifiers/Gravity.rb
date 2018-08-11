@@ -4,7 +4,7 @@ module AdventureRL
       #include AdventureRL::Modifiers::Velocity  # NOTE: This modifier relies on Modifiers::Velocity
 
       DEFAULT_GRAVITY_SETTINGS = Settings.new(
-        gravity_force:     10.0,
+        gravity_force:     1000.0,
         gravity_direction: {
           x: 0.0,
           y: 1.0
@@ -32,7 +32,10 @@ module AdventureRL
           if (in_collision?)
             @velocity[axis] = 0.0
           else  #if ([0, @gravity_direction[axis].sign].include? get_velocity(axis).sign)
-            increase_velocity_by axis => (@gravity_force * @gravity_direction[axis]), no_quick_turn_around: true
+            increase_velocity_by(
+              axis => ((@gravity_force * @gravity_direction[axis]) * @velocity_deltatime.dt),
+              no_quick_turn_around: true
+            )
           end
           set_position previous_position
         end

@@ -81,7 +81,7 @@ module AdventureRL
     def get_size target = :all
       target = target.to_sym
       return @size          if (target == :all)
-      return @size[target]  if (@size.keys.include?(target))
+      return @size[target]  if (@size.key?(target))
       return nil
     end
 
@@ -103,7 +103,7 @@ module AdventureRL
     def get_origin target = :all
       target = target.to_sym
       return @origin          if (target == :all)
-      return @origin[target]  if (@origin.keys.include?(target))
+      return @origin[target]  if (@origin.key?(target))
       return nil
     end
 
