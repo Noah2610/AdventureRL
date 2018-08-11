@@ -6,6 +6,7 @@ module AdventureRL
       @quadtrees   = {}
       @objects     = {}
       @reset_queue = {}
+      @cache       = {}
     end
 
     # Add one (or multiple) <tt>object</tt>(s)
@@ -32,10 +33,9 @@ module AdventureRL
     def collides? object, solid_tag = DEFAULT_SOLID_TAG
       objects    = [object].flatten
       solid_tags = [solid_tag].flatten
-      get_quadtrees_for(solid_tags).any? do |quadtree|
-        next objects.any? do |obj|
-          next quadtree.collides?(obj)
-        end
+      return objects.any? do |obj|
+        handle_collides_cache_for obj, solid_tags
+        next @cache[obj][:collides?]
       end
     end
 
@@ -43,10 +43,9 @@ module AdventureRL
     def get_colliding_objects object, solid_tag = DEFAULT_SOLID_TAG
       objects    = [object].flatten
       solid_tags = [solid_tag].flatten
-      return get_quadtrees_for(solid_tags).map do |quadtree|
-        next objects.map do |obj|
-          next quadtree.get_colliding_objects(obj)
-        end
+      return objects.map do |obj|
+        handle_colliding_objects_cache_for obj, solid_tags
+        next @cache[obj][:colliding_objects]
       end .flatten
     end
 
@@ -74,6 +73,11 @@ module AdventureRL
       end
     end
 
+    def reset_cache_for object
+      @collides_cache.delete          object
+      @colliding_objects_cache.delete object
+    end
+
     # Called once every frame by Window.
     def update
       reset
@@ -87,6 +91,42 @@ module AdventureRL
           next quadtree  if (solid_tags.include?(quadtree_tag))
           next nil
         end .compact
+      end
+
+      def handle_collides_cache_for object, solid_tags
+        cached = @cache[object]
+        update_collides_cache_for object, solid_tags  unless (
+          cached                                     &&
+          (cached[:position] == object.get_position) &&
+          (cached[:size]     == object.get_size)
+        )
+      end
+
+      def update_collides_cache_for object, solid_tags
+        @cache[object] ||= {}
+        @cache[object][:position]  = object.get_position.dup
+        @cache[object][:size]      = object.get_size.dup
+        @cache[object][:collides?] = get_quadtrees_for(solid_tags).any? do |quadtree|
+          next quadtree.collides?(object)
+        end
+      end
+
+      def handle_colliding_objects_cache_for object, solid_tags
+        cached = @cache[object]
+        update_colliding_objects_cache_for object, solid_tags  unless (
+          cached                                     &&
+          (cached[:position] == object.get_position) &&
+          (cached[:size]     == object.get_size)
+        )
+      end
+
+      def update_colliding_objects_cache_for object, solid_tags
+        @cache[object] ||= {}
+        @cache[object][:position]          = object.get_position.dup
+        @cache[object][:size]              = object.get_size.dup
+        @cache[object][:colliding_objects] = get_quadtrees_for(solid_tags).map do |quadtree|
+          next quadtree.get_colliding_objects(object)
+        end .flatten
       end
   end
 end

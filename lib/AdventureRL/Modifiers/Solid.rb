@@ -11,7 +11,7 @@ module AdventureRL
     module Solid
       DEFAULT_SOLID_SETTINGS = Settings.new(
         solid_tag:                  SolidsManager::DEFAULT_SOLID_TAG,
-        precision_over_performance: true,
+        precision_over_performance: false,
         static:                     false,
         auto_update:                true
       )
@@ -201,6 +201,7 @@ module AdventureRL
             @position = previous_position
             return false
           end
+          #@solids_manager.reset_cache_for self
           return true
         end
     end
