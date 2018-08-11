@@ -28,6 +28,7 @@ module AdventureRL
   require_dir DIR[:src].join('Modifiers')
   require DIR[:src].join     'Rectangle'
   require DIR[:src].join     'Image'
+  require DIR[:src].join     'Animation'
   require DIR[:src].join     'Layer'
   require DIR[:src].join     'FileGroup'
   require DIR[:src].join     'FileGroupPlayer'

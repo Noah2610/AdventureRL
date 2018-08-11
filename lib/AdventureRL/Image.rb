@@ -3,9 +3,10 @@ module AdventureRL
     include Helpers::Error
 
     DEFAULT_SETTINGS = Settings.new(
-      file:    'DEFAULT_IMAGE_FILE.png',
-      retro:   true,
-      z_index: 0,
+      file:              'DEFAULT_IMAGE_FILE.png',
+      retro:             true,
+      z_index:           0,
+      dont_create_image: false,  # Used by Animation
       position: {
         x: 0,
         y: 0
@@ -34,7 +35,7 @@ module AdventureRL
       super @settings
       @z_index       = @settings.get :z_index
       @image_options = get_image_options_from @settings
-      @image         = get_image_from @settings.get(:file)
+      @image         = get_image_from @settings.get(:file)  unless (@settings.get(:dont_create_image))
     end
 
     def draw
