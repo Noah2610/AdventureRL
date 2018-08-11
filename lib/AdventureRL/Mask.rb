@@ -85,6 +85,17 @@ module AdventureRL
       return nil
     end
 
+    # Set a new Mask size.
+    # <tt>args</tt> are very similar to Point#set_position,
+    # only that the axes (<tt>:x</tt> and <tt>:y</tt>) are replaced with
+    # <tt>:width</tt> and <tt>:height</tt>.
+    def set_size *args
+      new_size = parse_size(*args)
+      @size[:width]  = new_size[:width]   if (new_size.key? :width)
+      @size[:height] = new_size[:height]  if (new_size.key? :height)
+    end
+    alias_method :resize, :set_size
+
     # Returns the set origin.
     # Can pass an optional <tt>target</tt> argument,
     # which can be either an axis (<tt>:x</tt> or <tt>:y</tt>),
@@ -339,6 +350,31 @@ module AdventureRL
           meth = assigned_to.method(method_name)  if (assigned_to.methods.include?(method_name))
           meth.call(*args)                        if (meth)
         end
+      end
+
+      def parse_size *args
+        size = {}
+        case args.size
+        when 2
+          size[:width]  = args[0]
+          size[:height] = args[1]
+        when 1
+          Helpers::Error.error(
+            "Ambiguous argument `#{args[0]}' for Mask##{__method__}"
+          )  unless (args[0].is_a?(Hash))
+          Helpers::Error.error(
+            "Hash must include either :width, :height, or both keys for Mask##{__method__}"
+          )  unless (args[0].keys.include_any?(:width, :height))
+          size[:width]  = args[0][:width]   if (args[0][:width])
+          size[:height] = args[0][:height]  if (args[0][:height])
+        else
+          Helpers::Error.error(
+            "Invalid amount of arguments for Mask##{__method__}.",
+            "Pass either two arguments representing the width and height axes, respectively, or",
+            "pass a single hash with the keys :width and :height with their respective axes values."
+          )
+        end
+        return size
       end
 
       # Returns this Masks Layer scale, if it has one.
