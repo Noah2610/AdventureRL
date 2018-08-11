@@ -3,9 +3,10 @@
 ---
 # Window settings
 window:
-  caption:    'AdventureRL Window Caption!'
-  fps:        30
-  fullscreen: false
+  caption:            'AdventureRL Window Caption!'
+  fps:                30
+  fullscreen:         false
+  has_solids_manager: true
   size:
     width:  960
     height: 540

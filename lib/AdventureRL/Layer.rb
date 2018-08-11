@@ -11,6 +11,12 @@ module AdventureRL
     # Default settings.
     # <tt>settings</tt> passed to #new take precedence.
     DEFAULT_SETTINGS = Settings.new(
+      scale: {
+        x: 1,
+        y: 1
+      },
+      rotation: 0,
+      has_solids_manager: false,
       position: {
         x: 0,
         y: 0
@@ -22,12 +28,7 @@ module AdventureRL
       origin: {
         x: :left,
         y: :top
-      },
-      scale: {
-        x: 1,
-        y: 1
-      },
-      rotation: 0
+      }
     )
 
     # Initialize Layer with a <tt>settings</tt> Hash.
@@ -35,8 +36,10 @@ module AdventureRL
     def initialize settings = {}
       @settings = DEFAULT_SETTINGS.merge settings
       super @settings #.get.reject { |key,val| next key == :assign_to }
-      @scale    = @settings.get :scale
-      @rotation = @settings.get :rotation
+      @scale              = @settings.get :scale
+      @rotation           = @settings.get :rotation
+      @has_solids_manager = !!@settings.get(:has_solids_manager)
+      @solids_manager     = SolidsManager.new  if (has_solids_manager?)
     end
 
     # Add any object to this Layer.
@@ -140,11 +143,26 @@ module AdventureRL
       )
     end
 
+    # Returns <tt>true</tt> if this Layer has a SolidsManager.
+    def has_solids_manager?
+      return @has_solids_manager
+    end
+
+    # Returns a SolidsManager, if it has one.
+    def get_solids_manager
+      return @solids_manager  if (has_solids_manager?)
+      if (parent_layer = get_layer)
+        return parent_layer.get_solids_manager
+      end
+      return nil
+    end
+
     # Call this every frame.
     # This updates all its inventory objects (its children),
     # if they have an #update method.
     def update
       call_method_on_children :update
+      get_solids_manager.update  if (has_solids_manager?)
     end
 
     # Call this every frame.

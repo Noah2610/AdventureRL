@@ -12,12 +12,12 @@ module AdventureRL
       )
 
       def initialize settings = {}
-        gravity_settings   = DEFAULT_GRAVITY_SETTINGS.merge settings
+        @settings          = DEFAULT_GRAVITY_SETTINGS.merge settings
         @gravity           = 0.0
-        @gravity_force     = gravity_settings.get :gravity_force
-        @gravity_direction = gravity_settings.get :gravity_direction
+        @gravity_force     = @settings.get :gravity_force
+        @gravity_direction = @settings.get :gravity_direction
         #@max_velocity = @max_velocity_original.dup
-        super
+        super @settings
         @max_velocity_original[:y] = Float::INFINITY
         @max_velocity[:y]          = @max_velocity_original[:y].dup
         @velocity_decay[:y]        = 0

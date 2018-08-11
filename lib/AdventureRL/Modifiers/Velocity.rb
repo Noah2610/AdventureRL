@@ -21,22 +21,22 @@ module AdventureRL
       )
 
       def initialize settings = {}
-        velocity_settings = DEFAULT_VELOCITY_SETTINGS.merge settings
+        @settings = DEFAULT_VELOCITY_SETTINGS.merge settings
         @velocity = {
           x: 0.0,
           y: 0.0
         }
-        @max_velocity_original      = velocity_settings.get :max_velocity
+        @max_velocity_original      = @settings.get :max_velocity
         @max_velocity               = @max_velocity_original.dup
-        @velocity_decay             = velocity_settings.get :velocity_decay
-        @velocity_quick_turn_around = velocity_settings.get :quick_turn_around
-        @base_velocity              = velocity_settings.get :base_velocity
+        @velocity_decay             = @settings.get :velocity_decay
+        @velocity_quick_turn_around = @settings.get :quick_turn_around
+        @base_velocity              = @settings.get :base_velocity
         @velocity_deltatime         = Deltatime.new
         @has_increased_velocity_for = {
           x: false,
           y: false
         }
-        super
+        super @settings
       end
 
       # Returns the velocity.

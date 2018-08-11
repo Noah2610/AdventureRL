@@ -20,13 +20,14 @@ module AdventureRL
         DEFAULT_SETTINGS.get(:window)
       ).merge(settings_arg)
       @_layer = Layer.new(
-        position: settings.get(:position),
-        size:     settings.get(:size),
-        origin:   settings.get(:origin)
+        position:           settings.get(:position),
+        size:               settings.get(:size),
+        origin:             settings.get(:origin),
+        has_solids_manager: settings.get(:has_solids_manager)
       )
       Helpers::PipeMethods.pipe_methods_from self, to: @_layer
       @_target_fps     = settings.get(:fps)
-      @_solids_manager = SolidsManager.new
+      #@_solids_manager = SolidsManager.new
       super(
         get_size(:width), get_size(:height),
         fullscreen:      settings.get(:fullscreen),
@@ -55,9 +56,9 @@ module AdventureRL
     end
 
     # Returns SolidsManager.
-    def get_solids_manager
-      return @_solids_manager
-    end
+    #def get_solids_manager
+    #  return @_solids_manager
+    #end
 
     # Wrapper method around Gosu::Window#fullscreen?,
     # just to follow the design pattern.
@@ -102,7 +103,7 @@ module AdventureRL
     # in your method.
     def update
       @_layer.update
-      @_solids_manager.update
+      #@_solids_manager.update
       EventHandlers::Buttons.update
       Menu.update
     end

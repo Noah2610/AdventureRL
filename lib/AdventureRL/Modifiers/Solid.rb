@@ -12,7 +12,8 @@ module AdventureRL
       DEFAULT_SOLID_SETTINGS = Settings.new(
         solid_tag:                  SolidsManager::DEFAULT_SOLID_TAG,
         precision_over_performance: true,
-        static:                     false
+        static:                     false,
+        auto_update:                true
       )
 
       # Additionally to the Mask's settings Hash or Settings instance,
@@ -21,20 +22,28 @@ module AdventureRL
       # They are used for collision checking with other Solid Mask objects
       # that have a mutual solid tag.
       def initialize settings = {}
-        solid_settings              = DEFAULT_SOLID_SETTINGS.merge settings
-        @solid_tags                 = [solid_settings.get(:solid_tag)].flatten.sort
+        @settings                   = DEFAULT_SOLID_SETTINGS.merge settings
+        @solid_tags                 = [@settings.get(:solid_tag)].flatten.sort
         @solid_tags_collides_with   = @solid_tags.dup
-        @solid_static               = solid_settings.get :static  # Basically disables #move_by
-        @solids_manager             = Window.get_window.get_solids_manager
-        @precision_over_performance = solid_settings.get :precision_over_performance
+        @solid_static               = @settings.get :static  # Basically disables #move_by
+        @precision_over_performance = @settings.get :precision_over_performance
+        assign_to_solids_manager  if (@settings.get :auto_update)
+        #@solids_manager.add_object self, @solid_tags  if (@settings.get :auto_update)
+        super @settings
+      end
+
+      # Overwrite #set_layer method, so we can get the SolidsManager
+      # from the Layer, if it has one.
+      def set_layer layer
         super
-        @solids_manager.add_object self, @solid_tags
+        assign_to_solids_manager
       end
 
       # Overwrite #move_by method, so that collision checking with other objects
       # with a mutual solid tag is done, and movement prevented if necessary.
       def move_by *args
-        return false  if (is_static?)
+        return false  if     (is_static?)
+        return super  unless (@solids_manager)
 
         @real_point = nil
         previous_position = get_position.dup
@@ -69,17 +78,20 @@ module AdventureRL
       def move_to *args
         previous_position = get_position.dup
         super
+        return  unless (@solids_manager)
         @solids_manager.reset_object self, get_solid_tags  if (@position != previous_position)
       end
 
       # Returns <tt>true</tt> if this Mask is currently in collision
       # with another solid Mask which has a mutual solid tag.
       def in_collision?
+        return false  unless (@solids_manager)
         return @solids_manager.collides?(self, get_solid_tags_collides_with)
       end
 
       # Returns all currently colliding objects (if any).
       def get_colliding_objects
+        return []  unless (@solids_manager)
         return @solids_manager.get_colliding_objects(self, get_solid_tags_collides_with)
       end
 
@@ -102,6 +114,13 @@ module AdventureRL
       end
 
       private
+
+        def assign_to_solids_manager
+          layer = get_layer
+          return  unless (layer && layer.has_solids_manager?)
+          @solids_manager = layer.get_solids_manager
+          @solids_manager.add_object self, @solid_tags  if (@solids_manager)
+        end
 
         # This is the ugliest method in the project.
         # I can live with there being __one__ ugly method.
