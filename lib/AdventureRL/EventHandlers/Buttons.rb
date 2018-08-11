@@ -25,13 +25,15 @@ module AdventureRL
       end
 
       DEFAULT_SETTINGS = Settings.new(
-        auto_update: true
+        pressable_buttons: [],
+        auto_update:       true
       )
 
       def initialize settings = {}
         @settings = DEFAULT_SETTINGS.merge settings
         super
         @pressable_buttons = []
+        add_pressable_button @settings.get(:pressable_buttons)
         @events = get_events
         BUTTON_EVENT_HANDLERS << self  if (@settings.get(:auto_update))
       end

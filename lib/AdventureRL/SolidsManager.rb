@@ -79,11 +79,6 @@ module AdventureRL
       reset
     end
 
-    # TODO
-    def draw
-      @quadtrees.values.each &:draw
-    end
-
     private
 
       def get_quadtrees_for solid_tag = DEFAULT_SOLID_TAG

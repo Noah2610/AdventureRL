@@ -26,7 +26,6 @@ module AdventureRL
     def next_image
       @current_image_index += 1
       @current_image_index  = 0  if (@current_image_index >= @images.size)
-      puts @current_image_index
       @image = @images[@current_image_index]
       set_timeout
     end

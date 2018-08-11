@@ -25,7 +25,7 @@ module AdventureRL
   require DIR[:src].join     'Point'
   require DIR[:src].join     'Mask'
   require DIR[:src].join     'SolidsManager'  # NOTE: require before Modifiers!
-  require_dir DIR[:src].join('Modifiers')
+  require_dir DIR[:src].join('Modifiers'),     priority: 'Velocity'
   require DIR[:src].join     'Rectangle'
   require DIR[:src].join     'Image'
   require DIR[:src].join     'Animation'

@@ -71,12 +71,14 @@ module AdventureRL
       def increase_velocity_by *args
         opts = {}
         opts = args.last  if (args.last.is_a? Hash)
+        quick_turn_around = @velocity_quick_turn_around
+        quick_turn_around = opts[:quick_turn_around]  unless (opts[:quick_turn_around].nil?)
         incremental_velocity = parse_position *args
         @velocity.keys.each do |axis|
           next  unless (incremental_velocity.key? axis)
           velocity_sign = @velocity[axis].sign
           incremental_velocity_sign = incremental_velocity[axis].sign
-          @velocity[axis]  = 0  unless (velocity_sign == incremental_velocity_sign)  if ((@velocity_quick_turn_around || opts[:quick_turn_around]) && !opts[:no_quick_turn_around])
+          @velocity[axis]  = 0  unless (velocity_sign == incremental_velocity_sign)  if (quick_turn_around && !opts[:no_quick_turn_around])
           @velocity[axis]  = @base_velocity[axis] * incremental_velocity_sign        if (@velocity[axis] == 0)
           @velocity[axis] += incremental_velocity[axis]
           case velocity_sign
@@ -88,6 +90,7 @@ module AdventureRL
           @has_increased_velocity_for[axis] = true
         end
       end
+      alias_method :add_velocity, :increase_velocity_by
 
       def set_max_velocity *args
         new_max_velocity = parse_position *args

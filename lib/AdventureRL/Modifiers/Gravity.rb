@@ -16,7 +16,11 @@ module AdventureRL
         @gravity           = 0.0
         @gravity_force     = gravity_settings.get :gravity_force
         @gravity_direction = gravity_settings.get :gravity_direction
+        #@max_velocity = @max_velocity_original.dup
         super
+        @max_velocity_original[:y] = Float::INFINITY
+        @max_velocity[:y]          = @max_velocity_original[:y].dup
+        @velocity_decay[:y]        = 0
       end
 
       # Apply gravitational force.
