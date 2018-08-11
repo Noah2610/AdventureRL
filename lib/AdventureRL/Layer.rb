@@ -31,6 +31,8 @@ module AdventureRL
       }
     )
 
+    MASK_ID = :mask
+
     # Initialize Layer with a <tt>settings</tt> Hash.
     # See DEFAULT_SETTINGS for valid keys.
     def initialize settings = {}
@@ -46,7 +48,8 @@ module AdventureRL
     # Pass an optional <tt>id</tt>, which can be used to
     # access or remove the object afterwards.
     def add_object object, id = DEFAULT_INVENTORY_ID
-      super
+      id = MASK_ID  if (object.is_a? Mask)
+      super object, id
       object.set_layer self  if (object.methods.include?(:set_layer) || object_mask_has_method?(object, :set_layer))
     end
     alias_method :add_item, :add_object
@@ -155,6 +158,29 @@ module AdventureRL
         return parent_layer.get_solids_manager
       end
       return nil
+    end
+
+    # Overwrite the method Point#move_by, so we can
+    # also call #move_by on all Mask children.
+    # We use a little hacky workaround, by moving all children back
+    # the amount of incremental movement, then move this Layer forward,
+    # and then move all the children Masks via #move_by.
+    def move_by *args
+      incremental_position = parse_position(*args)
+      incremental_position[:x] ||= 0
+      incremental_position[:y] ||= 0
+      # Move all children Masks back via #set_position.
+      get_objects(MASK_ID).each do |mask|
+        mask.set_position(
+          (mask.x - incremental_position[:x]),
+          (mask.y - incremental_position[:y])
+        )
+      end
+      super  # Move Layer forward
+      # Move all children Masks forward via #move_by.
+      get_objects(MASK_ID).each do |mask|
+        mask.move_by incremental_position
+      end
     end
 
     # Call this every frame.
