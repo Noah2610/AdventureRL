@@ -61,10 +61,15 @@ module AdventureRL
       end
 
       def get_file_content file = @file
+        file = Pathname.new file  unless (file.is_a? Pathname)
         begin
           return YAML.load_file(file.to_path) || {}
         rescue
-          error "Couldn't load settings file: '#{file.to_path}'", 'Is it a valid YAML file?'
+          begin
+            return JSON.parse(file.read, symbolize_names: true)
+          rescue
+            error "Couldn't load settings file: '#{file.to_path}'", 'Is it a valid YAML or JSON file?'
+          end
         end
       end
   end
