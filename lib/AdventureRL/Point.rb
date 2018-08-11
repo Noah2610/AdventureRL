@@ -160,23 +160,31 @@ module AdventureRL
     private
 
       def parse_position *args
+        args.flatten!
         position = {}
         case args.size
         when 2
           position[:x] = args[0]
           position[:y] = args[1]
         when 1
-          Helpers::Error.error(
-            "Ambiguous argument `#{args[0]}' for Point##{__method__}"
-          )  unless (args[0].is_a?(Hash))
-          Helpers::Error.error(
-            "Hash must include either :x, :y, or both keys for Point##{__method__}"
-          )  unless (args[0].keys.include_any?(:x, :y))
-          position[:x] = args[0][:x]  if (args[0][:x])
-          position[:y] = args[0][:y]  if (args[0][:y])
+          if    (args[0].is_a? Hash)
+            Helpers::Error.error(
+              "Hash must include either :x, :y, or both keys for Point##{__method__}"
+            )  unless (args[0].keys.include_any?(:x, :y))
+            position[:x] = args[0][:x]  if (args[0][:x])
+            position[:y] = args[0][:y]  if (args[0][:y])
+          elsif (args[0].is_a? Point)
+            position[:x] = args[0].x
+            position[:y] = args[0].y
+          else
+            Helpers::Error.error(
+              "Ambiguous argument `#{args[0]}' for Point##{__method__}"
+            )
+          end
         else
           Helpers::Error.error(
-            "Invalid amount of arguments for Point##{__method__}.",
+            "Invalid amount of arguments for Point##{__method__}. Got",
+            "`#{args.inspect}:#{args.class.name}'",
             "Pass either two arguments representing the x and y axes, respectively, or",
             "pass a single hash with the keys :x and :y with their respective axes values."
           )

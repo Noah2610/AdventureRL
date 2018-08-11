@@ -42,7 +42,8 @@ module AdventureRL
       # Returns the _last_ object with the given <tt>id</tt>.
       # If no <tt>id</tt> is passed, return the last object with the unnamed <tt>id</tt>.
       def get_object id = DEFAULT_INVENTORY_ID
-        return @inventory[id].last
+        return @inventory[id].last  if (@inventory.key? id)
+        return nil
       end
       alias_method :get, :get_object
 

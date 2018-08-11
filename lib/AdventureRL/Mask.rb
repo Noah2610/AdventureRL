@@ -85,6 +85,24 @@ module AdventureRL
       return nil
     end
 
+    # Returns the real size of the Mask (including Layer scaling).
+    # Can pass an optional <tt>target</tt> argument,
+    # which can be either an axis (<tt>:width</tt> or <tt>:height</tt>),
+    # or <tt>:all</tt>, which returns a Hash with both values.
+    def get_real_size target = :all
+      size = get_size target
+      case target
+      when :all
+        return size.map do |size_axis, val|
+          axis = (size_axis == :width) ? :x : :y
+          next [size_axis, val * get_scale(axis)]
+        end .to_h
+      when :width, :height
+        axis = (target == :width) ? :x : :y
+        return size * get_scale(axis)
+      end
+    end
+
     # Returns the set origin.
     # Can pass an optional <tt>target</tt> argument,
     # which can be either an axis (<tt>:x</tt> or <tt>:y</tt>),
@@ -124,7 +142,14 @@ module AdventureRL
     def get_real_side side
       axis = :x  if ([:left, :right].include? side)
       axis = :y  if ([:top, :bottom].include? side)
-      side_pos  = get_side(side) * get_scale(axis)
+      side_pos = nil
+      if    ([:top, :left].include? side)
+        side_pos = get_side(side) * get_scale(axis)
+      elsif ([:bottom, :right].include? side)
+        opposite_side = (side == :bottom) ? :top : :left
+        size_axis = (axis == :x) ? :width : :height
+        side_pos = (get_side(opposite_side) * get_scale(axis)) + get_real_size(size_axis)
+      end
       return side_pos  unless (has_layer?)
       case side
       when :left, :right
@@ -240,6 +265,47 @@ module AdventureRL
       return nil
     end
 
+    # TODO:
+    # FIX THIS METHOD!!! IT DOESN'T WORK!
+    # Sets the new position for Point, relative to the Mask's center.
+    # The given position will be the new center position.
+    # <tt>args</tt> can be passed with the same format as Point#set_position.
+    def set_center_position *args
+      new_center_position = parse_position(*args)
+      center              = get_center
+      new_center_position[:x] = center.x  unless (new_center_position.key? :x)
+      new_center_position[:y] = center.y  unless (new_center_position.key? :y)
+      return  if (center.get_position == new_center_position)
+      #set_position(
+      #  x: (0 + (new_center_position[:x] - center.x)),
+      #  y: (0 + (new_center_position[:y] - center.y))
+      #)
+      #return
+      new_pos = {
+        x: nil,
+        y: nil
+      }
+      case @origin[:x]
+      when :left
+        new_pos[:x] = (get_size(:width).to_f * 0.5).round - new_center_position[:x]
+      when :right
+        width = get_size :width
+        new_pos[:x] = width + (width.to_f * 0.5).round + new_center_position[:x]
+      when :center
+        new_pos[:x] = new_center_position[:x]
+      end
+      case @origin[:y]
+      when :top
+        new_pos[:y] = (get_size(:height).to_f * 0.5).round - new_center_position[:y]
+      when :bottom
+        new_pos[:y] = new_center_position[:y] + (get_size(:height).to_f * 0.5).round
+      when :center
+        new_pos[:y] = new_center_position[:y]
+      end
+      set_position new_pos
+      puts get_position.to_s
+    end
+
     # Returns true if this Mask collides with <tt>other</tt> ...
     # - Mask,
     # - Point,
@@ -252,8 +318,8 @@ module AdventureRL
 
     # Returns true if this Mask collides with <tt>other</tt> Mask.
     def collides_with_mask? mask, checked = false
-      this_sides  = get_real_sides
-      other_sides = mask.get_real_sides
+      this_sides  = get_sides      # get_real_sides
+      other_sides = mask.get_sides # mask.get_real_sides
       return (
         (
           (
@@ -283,8 +349,8 @@ module AdventureRL
 
     # Returns true if this Mask collides with <tt>other</tt> Point.
     def collides_with_point? point
-      real_point = point.get_real_point
-      real_sides = get_real_sides
+      real_point = point.get_point  # point.get_real_point
+      real_sides = get_sides        # get_real_sides
       return (
         real_point.x >= real_sides[:left]  &&
         real_point.x <= real_sides[:right] &&

@@ -19,12 +19,12 @@ module AdventureRL
       settings = Settings.new(
         DEFAULT_SETTINGS.get(:window)
       ).merge(settings_arg)
-      @_layer = Layer.new(
+      @_camera = Camera.new(
         position: settings.get(:position),
         size:     settings.get(:size),
         origin:   settings.get(:origin)
       )
-      Helpers::PipeMethods.pipe_methods_from self, to: @_layer
+      Helpers::PipeMethods.pipe_methods_from self, to: @_camera
       @_target_fps     = settings.get(:fps)
       @_solids_manager = SolidsManager.new
       super(
@@ -101,7 +101,7 @@ module AdventureRL
     # If you overwrite this, be sure to call <tt>super</tt>
     # in your method.
     def update
-      @_layer.update
+      @_camera.update
       @_solids_manager.update
       EventHandlers::Buttons.update
       Menu.update
@@ -111,7 +111,7 @@ module AdventureRL
     # You might want to call <tt>super</tt>
     # if you overwrite this method.
     def draw
-      @_layer.draw
+      @_camera.draw
     end
 
     private

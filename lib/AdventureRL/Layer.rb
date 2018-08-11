@@ -43,6 +43,7 @@ module AdventureRL
     # Pass an optional <tt>id</tt>, which can be used to
     # access or remove the object afterwards.
     def add_object object, id = DEFAULT_INVENTORY_ID
+      id ||= DEFAULT_INVENTORY_ID
       super
       object.set_layer self  if (object.methods.include?(:set_layer) || object_mask_has_method?(object, :set_layer))
     end
@@ -72,18 +73,11 @@ module AdventureRL
     end
 
     # Set the layer scaling.
-    # Pass an <tt>axis</tt>, either <tt>:x</tt> or <tt>:y</tt>,
-    # and an <tt>amount</tt> as an Integer or Float.
-    def set_scale axis, amount
-      error(
-        "Passed argument `axis' needs to be one of the following:",
-        "  #{@scale.keys.map(&:inspect).join(', ')}"
-      )  unless (@scale.key? axis)
-      error(
-        "Passed argument `amount' needs to be an Integer or Float, but got",
-        "  #{amount.inspect}.#{amount.class.name}"
-      )  unless ([Integer, Float].include? amount.class)
-      @scale[axis] = amount
+    # Same arguments may be passed as with Point#set_position.
+    def set_scale *args
+      new_scale  = parse_position *args
+      @scale[:x] = new_scale[:x]  if (new_scale.key? :x)
+      @scale[:y] = new_scale[:y]  if (new_scale.key? :y)
     end
 
     # Increase (or decrease) the layer scaling by an <tt>amount</tt>.

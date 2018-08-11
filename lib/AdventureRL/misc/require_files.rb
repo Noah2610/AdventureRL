@@ -30,6 +30,7 @@ module AdventureRL
   require DIR[:src].join     'Image'
   require DIR[:src].join     'Animation'
   require DIR[:src].join     'Layer'
+  require DIR[:src].join     'Camera'
   require DIR[:src].join     'FileGroup'
   require DIR[:src].join     'FileGroupPlayer'
   require DIR[:src].join     'Clip'
