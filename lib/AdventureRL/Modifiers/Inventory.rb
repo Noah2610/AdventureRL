@@ -4,8 +4,8 @@ module AdventureRL
       DEFAULT_INVENTORY_ID = :NO_NAME
 
       def initialize *args
-        super
         @inventory = {}
+        super
       end
 
       # Add any object to this Inventory.
