@@ -54,6 +54,10 @@ module AdventureRL
       return merged_settings
     end
 
+    def each
+      return get.each
+    end
+
     private
 
       def validate_file_exists file = @file

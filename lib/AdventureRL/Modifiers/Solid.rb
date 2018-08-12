@@ -11,6 +11,7 @@ module AdventureRL
     module Solid
       DEFAULT_SOLID_SETTINGS = Settings.new(
         solid_tag:                  SolidsManager::DEFAULT_SOLID_TAG,
+        solid_tag_collides_with:    nil,
         precision_over_performance: false,
         static:                     false,
         auto_update:                true
@@ -24,12 +25,21 @@ module AdventureRL
       def initialize settings = {}
         @settings                   = DEFAULT_SOLID_SETTINGS.merge settings
         @solid_tags                 = [@settings.get(:solid_tag)].flatten.sort
-        @solid_tags_collides_with   = @solid_tags.dup
+        @solid_tags_collides_with   = [@settings.get(:solid_tag_collides_with) || @solid_tags].flatten.sort
         @solid_static               = @settings.get :static  # Basically disables #move_by
         @precision_over_performance = @settings.get :precision_over_performance
         assign_to_solids_manager  if (@settings.get :auto_update)
         #@solids_manager.add_object self, @solid_tags  if (@settings.get :auto_update)
         super @settings
+      end
+
+      def add_to_solids_manager solids_manager
+        Helpers::Error.error(
+          "Expected argument to be a SolidsManager, but got",
+          "'#{solids_manager.inspect}:#{solids_manager.class.name}`."
+        )  unless (solids_manager.is_a? SolidsManager)
+        @solids_manager = solids_manager
+        @solids_manager.add_object self, get_solid_tags
       end
 
       # Overwrite #set_layer method, so we can get the SolidsManager
@@ -55,7 +65,7 @@ module AdventureRL
 
         # NOTE:
         # This is a bit of a hacky workaround for some
-        # weird Pusher behaviour with Velocity and Gravity.
+        # weird Pusher behavior with Velocity and Gravity.
         previous_precision_over_performance = @precision_over_performance.dup
         opts = args.first.is_a?(Hash) ? args.first : nil
         @precision_over_performance = opts[:precision_over_performance]  if (opts.key? :precision_over_performance)
@@ -119,7 +129,7 @@ module AdventureRL
           layer = get_layer
           return  unless (layer && layer.has_solids_manager?)
           @solids_manager = layer.get_solids_manager
-          @solids_manager.add_object self, @solid_tags  if (@solids_manager)
+          @solids_manager.add_object self, get_solid_tags  if (@solids_manager)
         end
 
         # This is the ugliest method in the project.

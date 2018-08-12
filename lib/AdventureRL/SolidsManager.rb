@@ -15,6 +15,7 @@ module AdventureRL
       objects    = [object].flatten
       solid_tags = [solid_tag].flatten
       solid_tags.each do |tag|
+        # TODO: do I still need @objects ?
         if (@objects[tag])
           @objects[tag].concat objects
         else

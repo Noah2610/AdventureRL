@@ -47,8 +47,9 @@ module AdventureRL
     # Add any object to this Layer.
     # Pass an optional <tt>id</tt>, which can be used to
     # access or remove the object afterwards.
-    def add_object object, id = DEFAULT_INVENTORY_ID
-      id = MASK_ID  if (object.is_a? Mask)
+    def add_object object, id = nil
+      id   = MASK_ID  if (id.nil? && object.is_a?(Mask))
+      id ||= DEFAULT_INVENTORY_ID
       super object, id
       object.set_layer self  if (object.methods.include?(:set_layer) || object_mask_has_method?(object, :set_layer))
     end
@@ -148,15 +149,13 @@ module AdventureRL
 
     # Returns <tt>true</tt> if this Layer has a SolidsManager.
     def has_solids_manager?
-      return @has_solids_manager
+      return @has_solids_manager || (has_layer? ? get_layer.has_solids_manager? : false)
     end
 
     # Returns a SolidsManager, if it has one.
     def get_solids_manager
-      return @solids_manager  if (has_solids_manager?)
-      if (parent_layer = get_layer)
-        return parent_layer.get_solids_manager
-      end
+      return @solids_manager               if (@solids_manager)
+      return get_layer.get_solids_manager  if (has_layer?)
       return nil
     end
 
@@ -169,8 +168,11 @@ module AdventureRL
       incremental_position = parse_position(*args)
       incremental_position[:x] ||= 0
       incremental_position[:y] ||= 0
+      objects = get_objects.select do |object|
+        next object.is_a?(Mask)
+      end
       # Move all children Masks back via #set_position.
-      get_objects(MASK_ID).each do |mask|
+      objects.each do |mask|
         mask.set_position(
           (mask.x - incremental_position[:x]),
           (mask.y - incremental_position[:y])
@@ -178,8 +180,8 @@ module AdventureRL
       end
       super  # Move Layer forward
       # Move all children Masks forward via #move_by.
-      get_objects(MASK_ID).each do |mask|
-        mask.move_by incremental_position
+      objects.each do |mask|
+        mask.move_by incremental_position#.merge(precision_over_performance: true)
       end
     end
 

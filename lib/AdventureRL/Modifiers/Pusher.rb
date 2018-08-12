@@ -6,6 +6,21 @@ module AdventureRL
     module Pusher
       #include AdventureRL::Modifiers::Solid  # NOTE: This modifier relies on Modifiers::Solid
 
+      # Overwrite Modifiers::Solid#move_by to add the
+      # <tt>:pushed_by_pusher</tt> option.
+      # This skips pushing the Pusher that pushed this Pusher,
+      # to avoid an endless pushing of Pushers, where one Pusher
+      # pushes the other Pusher before that Pusher pushes the first Pusher, ...
+      def move_by *args
+        if (args.last.is_a?(Hash))
+          @pushed_by_pusher = [args.last[:pushed_by_pusher], self].flatten.reject { |x| !x }
+        else
+          @pushed_by_pusher = [self]
+        end
+        super
+        @pushed_by_pusher = false
+      end
+
       private
 
         def move_by_handle_collision_with_previous_position previous_position
@@ -35,7 +50,8 @@ module AdventureRL
         def push_objects objects, direction
           direction[:precision_over_performance] = @precision_over_performance
           return objects.all? do |object|
-            next object.move_by(direction)
+            next true  if (@pushed_by_pusher && @pushed_by_pusher.include?(object))
+            next object.move_by(direction.merge(pushed_by_pusher: @pushed_by_pusher))
           end
         end
     end
