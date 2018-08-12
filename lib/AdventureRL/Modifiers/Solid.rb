@@ -144,21 +144,48 @@ module AdventureRL
 
       # Returns <tt>true</tt> if this Mask is currently in collision
       # with another solid Mask which has a mutual solid tag.
+      # TODO: Write documentation for callback method.
       def in_collision?
-        return false  unless (@solids_manager)
-        return @solids_manager.collides?(self, get_solid_tags_collides_with)
+        if (@solids_manager)
+          is_colliding = @solids_manager.collides?(self, get_solid_tags_collides_with)
+        else
+          is_colliding = false
+        end
+        is_colliding  if (is_colliding && methods.include?(:is_colliding))
+        return is_colliding
       end
 
       # Returns all currently colliding objects (if any).
+      # TODO: Write documentation for callback method.
       def get_colliding_objects
-        return []  unless (@solids_manager)
-        return @solids_manager.get_colliding_objects(self, get_solid_tags_collides_with)
+        if (@solids_manager)
+          colliding_objects = @solids_manager.get_colliding_objects(self, get_solid_tags_collides_with)
+        else
+          colliding_objects = []
+        end
+        is_colliding_with_objects colliding_objects  if (colliding_objects.any? && methods.include?(:is_colliding_with_objects))
+        return colliding_objects
+      end
+
+      # Makes this Solid Mask static.
+      def make_static
+        @solid_static = true
       end
 
       # Returns <tt>true</tt> if this is a static solid Mask,
       # which means it cannot be moved with #move_by.
       def is_static?
         return !!@solid_static
+      end
+
+      def set_solid_tags *new_solid_tags
+        @solids_manager.remove_object self, get_solid_tags  if (@solids_manager)
+        @solid_tags = [new_solid_tags].flatten.compact
+        @solids_manager.add_object self,    get_solid_tags  if (@solids_manager)
+      end
+
+      def set_solid_tags_collides_with *new_solid_tags_collides_with
+        @solid_tags_collides_with = [new_solid_tags_collides_with].flatten.compact
       end
 
       # Returns this Mask's solid tags,

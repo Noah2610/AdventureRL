@@ -43,6 +43,9 @@ module AdventureRL::Extensions::ArrayExtension
       next one <=> two
     end
   end
+  def mean
+    return (self.sum.to_f / self.size.to_f)
+  end
 end
 Array.include AdventureRL::Extensions::ArrayExtension
 

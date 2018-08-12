@@ -12,6 +12,8 @@ module AdventureRL
       # to avoid an endless pushing of Pushers, where one Pusher
       # pushes the other Pusher before that Pusher pushes the first Pusher, ...
       def move_by *args
+        return  if (is_static?)
+
         if (args.last.is_a?(Hash))
           @pushed_by_pusher = [args.last[:pushed_by_pusher], self].flatten.reject { |x| !x }
         else
