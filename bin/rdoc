@@ -3,7 +3,7 @@
 
 root="$( dirname "$0" )/.."
 dir="${root}/lib"
-main="${dir}/AdventureRL.rb"
+main="${dir}/adventure_rl.rb"
 output_dir="${root}/rdoc"
 
 rdoc --main "$main" --op "$output_dir" $dir

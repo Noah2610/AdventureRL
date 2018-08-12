@@ -8,7 +8,7 @@ SimpleCov.start do
   add_filter /\/test\//
 end  if (ENV['COVERAGE'])
 
-require 'AdventureRL'
+require 'adventure_rl'
 
 module TestHelper
   AP_OPTIONS = {

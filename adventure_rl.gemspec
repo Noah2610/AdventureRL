@@ -1,29 +1,30 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift lib  unless ($LOAD_PATH.include? lib)
 require 'AdventureRL/version'
-github_url = 'Point-N-Click adventure game framework using videos.'
+github_url = 'https://github.com/Noah2610/AdventureRL'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'AdventureRL'
+  spec.name          = 'adventure_rl'
   spec.version       = AdventureRL::VERSION
-  spec.authors       = ['Noah']
+  spec.authors       = ['Noah Rosenzweig']
   spec.email         = ['rosenzweig.noah@gmail.com']
-
-  spec.summary       = github_url
-  spec.description   = %q{
-Point-N-Click adventure game framework using videos for all animations.
-Written in Ruby with the Gosu gem.
-  } .strip
-  spec.homepage      = 'https://github.com/Noah2610/AdventureRL'
+  spec.summary       = <<-SUMMARY_END
+  Game framework built on top of Gosu.
+  SUMMARY_END
+  spec.description   = <<-DESCRIPTION_END
+  This video game framework is written using the Gosu game development library.
+  It was originally intended to be used for writing Point-N-Click adventure games,
+  but has become a more general 2D video game framework.
+  It's interesting features include video and audio playback capabilities.
+  The project is definitely lacking some documentation.
+  Although I have been trying to write documentation using rdoc and write tests
+  with Minitest, I do not think that I have been doing either of those very successfully.
+  I don't think many people aside from myself will be able to use it properly,
+  as I have built it specifically for my needs.
+  Thank you for reading, have a nice day :)
+  DESCRIPTION_END
+  spec.homepage      = github_url
   spec.license       = 'MIT'
-
-  # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
-  # to allow pushing to a single host or delete this section to allow pushing to any host.
-  if (spec.respond_to? :metadata)
-    spec.metadata['allowed_push_host'] = github_url  # ?
-  else
-    raise 'RubyGems 2.0 or newer is required to protect against public gem pushes.'
-  end
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.

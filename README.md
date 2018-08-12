@@ -4,7 +4,7 @@ Point-N-Click adventure game framework, using real video recordings as animation
 ## Installation
 Add this line to your application's Gemfile:
 ```ruby
-gem 'AdventureRL'
+gem 'adventure_rl'
 ```
 And then execute:
 ```
@@ -12,7 +12,7 @@ $ bundle
 ```
 Or install it yourself as:
 ```
-$ gem install AdventureRL
+$ gem install adventure_rl
 ```
 
 ## Documentation

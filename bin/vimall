@@ -1,5 +1,5 @@
 #!/usr/bin/bash
 IFS=$'\n'
-files=('./README.md' './bin/*' './default_settings.yml' './AdventureRL.gemspec' './Gemfile' './vimrc' './Rakefile' './.gitignore')
+files=('./README.md' './bin/*' './default_settings.yml' './adventure_rl.gemspec' './Gemfile' './vimrc' './Rakefile' './.gitignore')
 files_find=($( find . -iname '*.rb' ))
 vim +'source ./vimrc' ${files[@]} ${files_find[@]}

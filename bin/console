@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require 'AdventureRL'
+require 'adventure_rl'
 require 'irb'
 require 'virb/default'
 IRB.start(__FILE__)

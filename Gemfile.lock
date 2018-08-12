@@ -7,7 +7,7 @@ GIT
 PATH
   remote: .
   specs:
-    AdventureRL (0.0.0)
+    adventure_rl (0.0.0)
       gosu (~> 0.13.3)
 
 GEM
@@ -32,7 +32,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  AdventureRL!
+  adventure_rl!
   argument_parser!
   awesome_print
   bundler (~> 1.16)
@@ -44,4 +44,4 @@ DEPENDENCIES
   virb
 
 BUNDLED WITH
-   1.16.2
+   1.16.3
