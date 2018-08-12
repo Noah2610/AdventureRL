@@ -17,6 +17,9 @@ module AdventureRL
       },
       rotation: 0,
       has_solids_manager: false,
+      solids_manager: {
+        use_cache: false
+      },
       position: {
         x: 0,
         y: 0

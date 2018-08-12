@@ -26,7 +26,7 @@ module AdventureRL
 
       DEFAULT_SETTINGS = Settings.new(
         pressable_buttons: [],
-        auto_update:       true
+        auto_update:       false
       )
 
       def initialize settings = {}
@@ -59,7 +59,7 @@ module AdventureRL
             button.each do |btn_name, btn_buttons|
               pressable_button = {
                 name: btn_name,
-                ids:  btn_buttons.map do |btn|
+                ids:  [btn_buttons].flatten.map do |btn|
                   validate_button btn
                   next Gosu.char_to_button_id btn
                 end

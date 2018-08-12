@@ -2,11 +2,17 @@ module AdventureRL
   class SolidsManager
     DEFAULT_SOLID_TAG = :default
 
-    def initialize
+    DEFAULT_SETTINGS = Settings.new(
+      use_cache: false
+    )
+
+    def initialize settings = {}
+      @settings    = DEFAULT_SETTINGS.merge settings
       @quadtrees   = {}
       @objects     = {}
       @reset_queue = {}
       @cache       = {}
+      @use_cache   = @settings.get :use_cache
     end
 
     # Add one (or multiple) <tt>object</tt>(s)
@@ -97,6 +103,8 @@ module AdventureRL
       def handle_collides_cache_for object, solid_tags
         cached = @cache[object]
         update_collides_cache_for object, solid_tags  unless (
+          # TODO: Remove cache or improve, it can break stuff
+          @use_cache &&
           cached                                     &&
           (cached[:position] == object.get_position) &&
           (cached[:size]     == object.get_size)
@@ -115,6 +123,8 @@ module AdventureRL
       def handle_colliding_objects_cache_for object, solid_tags
         cached = @cache[object]
         update_colliding_objects_cache_for object, solid_tags  unless (
+          # TODO: Remove cache or improve, it can break stuff
+          @use_cache &&
           cached                                     &&
           (cached[:position] == object.get_position) &&
           (cached[:size]     == object.get_size)

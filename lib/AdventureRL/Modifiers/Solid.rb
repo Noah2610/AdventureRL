@@ -107,8 +107,6 @@ module AdventureRL
         previous_precision_over_performance = @precision_over_performance.dup
         opts = args.last.is_a?(Hash) ? args.last : nil
 
-        puts 'PUSHING'  if (is_a?(Player) && opts && opts[:pushed_by_pusher])
-
         @precision_over_performance = opts[:precision_over_performance]  if (opts.key? :precision_over_performance)
 
         if ([:highest].include? @precision_over_performance)
@@ -116,6 +114,10 @@ module AdventureRL
         else
           @position[:x] += incremental_position[:x]  if (incremental_position.key? :x)
           @position[:y] += incremental_position[:y]  if (incremental_position.key? :y)
+
+          # TODO
+          #puts 'PUSHING'  if (is_a?(Player) && opts && opts[:pushed_by_pusher])
+
           unless (move_by_handle_collision_with_previous_position previous_position)
             move_by_steps incremental_position  if ([:medium, :high].include? @precision_over_performance)
           end
