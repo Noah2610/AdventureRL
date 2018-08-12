@@ -9,12 +9,50 @@ module AdventureRL
     # Solid Masks will only collide with other Solid Masks that have a mutual solid tag.
     # The default solid tag is <tt>:default</tt>.
     module Solid
+      # NOTE: possible <tt>:precision_over_performance</tt> values:
+      # :low (or anything other than the higher values)::
+      #   Lowest precision, highest performance.
+      #   Never check every pixel between previous and new positions.
+      #   If there is collision at new position, jump to previous position and return.
+      #   The larger the movement steps, the more distance there will be to the colliding object.
+      #   - -- __CANNOT__ fully close gaps to Solids.
+      #   - -- __CAN__ phase through Solids at high speeds (especially when it lags).
+      #   - -- __CAN__ get stuck in place temporarily when moving on both axes but only colliding on one of them.
+      #   - + Only __one collision check__ per call to #move_by, highest performance.
+      #
+      # :medium::
+      #   Medium precision, medium (varying) performance.
+      #   Only checks every pixel in path if the expected destination collides.
+      #   Even then, collision checking is used somewhat sparingly.
+      #   - -- __CAN__ phase through Solids at high speeds (especially when it lags).
+      #   - -- __CAN__ get stuck in place temporarily when moving on both axes but only colliding on one of them.
+      #   - + __CAN__ _almost_ fully close gaps to Solids (no sub-pixel collision checks).
+      #
+      # :high::
+      #   High precision, low to medium (varying) performance.
+      #   Only checks every pixel in path if the expected destination collides.
+      #   When checking every pixel in path, check both axes separately, to improve precision.
+      #   - -- __CAN__ phase through Solids at high speeds (especially when it lags).
+      #   - + __CANNOT__ get stuck in place temporarily when moving on both axes but only colliding on one of them.
+      #   - + __CAN__ fully close gaps to Solids.
+      #
+      # :highest::
+      #   Highest precision, least performance.
+      #   Always check every pixel between previous and new positions.
+      #   Depending on the amount of (moving) Solid objects on screen,
+      #   - -- Depending on the amount of (moving) Solids,
+      #     this can get very laggy at high speeds                    =>
+      #     lag produces larger steps (usually), because of Deltatime =>
+      #     larger steps produce more collision checks and more lag.
+      #   - + __CANNOT__ phase through Solids, no matter what the speed is.
+      #   - + __CANNOT__ get stuck in place temporarily when moving on both axes but only colliding on one of them.
+      #   - + __CAN__ fully close gaps to Solids.
       DEFAULT_SOLID_SETTINGS = Settings.new(
         solid_tag:                  SolidsManager::DEFAULT_SOLID_TAG,
         solid_tag_collides_with:    nil,
-        precision_over_performance: false,
+        precision_over_performance: :medium,
         static:                     false,
-        auto_update:                true
+        auto_update:                false
       )
 
       # Additionally to the Mask's settings Hash or Settings instance,
@@ -67,15 +105,20 @@ module AdventureRL
         # This is a bit of a hacky workaround for some
         # weird Pusher behavior with Velocity and Gravity.
         previous_precision_over_performance = @precision_over_performance.dup
-        opts = args.first.is_a?(Hash) ? args.first : nil
+        opts = args.last.is_a?(Hash) ? args.last : nil
+
+        puts 'PUSHING'  if (is_a?(Player) && opts && opts[:pushed_by_pusher])
+
         @precision_over_performance = opts[:precision_over_performance]  if (opts.key? :precision_over_performance)
 
-        if (@precision_over_performance)
+        if ([:highest].include? @precision_over_performance)
           move_by_steps incremental_position
         else
           @position[:x] += incremental_position[:x]  if (incremental_position.key? :x)
           @position[:y] += incremental_position[:y]  if (incremental_position.key? :y)
-          move_by_steps incremental_position  unless (move_by_handle_collision_with_previous_position previous_position)
+          unless (move_by_handle_collision_with_previous_position previous_position)
+            move_by_steps incremental_position  if ([:medium, :high].include? @precision_over_performance)
+          end
         end
 
         @precision_over_performance = previous_precision_over_performance
@@ -168,7 +211,7 @@ module AdventureRL
             @position[larger_axis] += larger_axis_sign
             tmp_in_collision_count += 1  unless (
               move_by_handle_collision_with_previous_position(previous_position)
-            )  if (@precision_over_performance)
+            )  if ([:high, :highest].include? @precision_over_performance)
 
             if (smaller_axis_increment_at &&
                 (((axis_index + 1) % smaller_axis_increment_at) == 0)
@@ -177,18 +220,19 @@ module AdventureRL
               @position[smaller_axis] += smaller_axis_sign
               tmp_in_collision_count += 1  unless (
                 move_by_handle_collision_with_previous_position(previous_position)
-              )  if (@precision_over_performance)
+              )  if ([:high, :highest].include? @precision_over_performance)
             end
 
             return  unless (tmp_in_collision_count < 2)
-            unless (@precision_over_performance)
+            if ([:medium].include? @precision_over_performance)
               return  unless (move_by_handle_collision_with_previous_position initial_previous_position)
             end
           end
         end
 
         def move_by_steps_for_remaining_values remaining_values
-          return true  if (!@precision_over_performance || remaining_values.values.all? { |val| val == 0 })
+          return true  unless ([:high, :highest].include? @precision_over_performance)
+          return true  if     (remaining_values.values.all? { |val| val == 0 })
           tmp_in_collision_count = 0
           remaining_values.each do |remaining_axis, remaining_value|
             next  if (remaining_value == 0)
@@ -211,7 +255,6 @@ module AdventureRL
             @position = previous_position
             return false
           end
-          #@solids_manager.reset_cache_for self
           return true
         end
     end

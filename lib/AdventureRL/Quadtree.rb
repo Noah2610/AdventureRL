@@ -3,7 +3,7 @@ module AdventureRL
     include Helpers::MethodHelper
 
     DEFAULT_SETTINGS = Settings.new(
-      max_objects: 1,
+      max_objects: 4,
       position: {
         x: 0,
         y: 0

@@ -181,7 +181,7 @@ module AdventureRL
       super  # Move Layer forward
       # Move all children Masks forward via #move_by.
       objects.each do |mask|
-        mask.move_by incremental_position#.merge(precision_over_performance: true)
+        mask.move_by incremental_position
       end
     end
 

@@ -18,9 +18,13 @@ module AdventureRL
       next_image
     end
 
-    # Call this every frame, to ensure that the animation is playing.
-    def update
+    def update_animation
       @timing_handler.update
+    end
+
+    # Call this (or #update_animation) every frame, to ensure that the animation is playing.
+    def update
+      update_animation
     end
 
     def next_image
