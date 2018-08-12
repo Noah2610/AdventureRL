@@ -161,6 +161,7 @@ module AdventureRL
 
       def parse_position *args
         position = {}
+        args[0] = args[0].get_position  if (args[0].is_a? Point)
         case args.size
         when 2
           position[:x] = args[0]

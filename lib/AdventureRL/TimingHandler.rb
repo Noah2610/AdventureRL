@@ -9,6 +9,8 @@ module AdventureRL
         timeouts:  [],
         intervals: []
       }
+      @elapsed_seconds = 0.0
+      @deltatime = Deltatime.new
     end
 
     # #update should be called every frame,
@@ -17,6 +19,13 @@ module AdventureRL
     def update
       handle_timeouts
       handle_intervals
+      @elapsed_seconds += @deltatime.dt
+      @deltatime.update
+    end
+
+    # Reset the Deltatime
+    def reset
+      @deltatime.reset
     end
 
     # Set a timeout for a method.
@@ -189,7 +198,7 @@ module AdventureRL
       end
 
       def get_elapsed_seconds
-        return Gosu.milliseconds.to_f / 1000.0
+        return @elapsed_seconds
       end
   end
 end

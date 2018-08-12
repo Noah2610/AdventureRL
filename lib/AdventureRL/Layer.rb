@@ -205,7 +205,7 @@ module AdventureRL
           Gosu.translate(*get_corner(:left, :top).get_position.values) do
             call_method_on_children :draw
           end
-          #draw_debug  # TODO: Clean up
+          draw_debug  # TODO: Clean up
         end
       end
     end

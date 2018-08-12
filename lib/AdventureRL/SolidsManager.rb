@@ -9,7 +9,6 @@ module AdventureRL
     def initialize settings = {}
       @settings    = DEFAULT_SETTINGS.merge settings
       @quadtrees   = {}
-      @objects     = {}
       @reset_queue = {}
       @cache       = {}
       @use_cache   = @settings.get :use_cache
@@ -21,12 +20,6 @@ module AdventureRL
       objects    = [object].flatten
       solid_tags = [solid_tag].flatten
       solid_tags.each do |tag|
-        # TODO: do I still need @objects ?
-        if (@objects[tag])
-          @objects[tag].concat objects
-        else
-          @objects[tag] = objects
-        end
         if (@quadtrees[tag])
           @quadtrees[tag].add_object objects
         else
@@ -34,6 +27,19 @@ module AdventureRL
         end
       end
     end
+    alias_method :add, :add_object
+
+    def remove_object object, solid_tag = DEFAULT_SOLID_TAG
+      objects    = [object].flatten
+      solid_tags = [solid_tag].flatten
+      objects.each do |obj|
+        @cache.delete obj
+      end
+      get_quadtrees_for(solid_tags).each do |quadtree|
+        quadtree.remove_object objects
+      end
+    end
+    alias_method :remove, :remove_object
 
     # Returns <tt>true</tt> if the given <tt>object</tt> (or multiple objects),
     # collide with any other objects with a mutual <tt>solid_tag</tt>.
@@ -43,6 +49,11 @@ module AdventureRL
       return objects.any? do |obj|
         handle_collides_cache_for obj, solid_tags
         next @cache[obj][:collides?]
+      end  if (@use_cache)
+      return objects.any? do |obj|
+        next get_quadtrees_for(solid_tags).any? do |quadtree|
+          next quadtree.collides?(obj)
+        end
       end
     end
 
@@ -53,6 +64,11 @@ module AdventureRL
       return objects.map do |obj|
         handle_colliding_objects_cache_for obj, solid_tags
         next @cache[obj][:colliding_objects]
+      end .flatten  if (@use_cache)
+      return objects.map do |obj|
+        next get_quadtrees_for(solid_tags).map do |quadtree|
+          next quadtree.get_colliding_objects(obj)
+        end
       end .flatten
     end
 

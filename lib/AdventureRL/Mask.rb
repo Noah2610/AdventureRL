@@ -320,7 +320,6 @@ module AdventureRL
         "`#{layer.inspect}:#{layer.class.name}'."
       )  unless (layer.is_a? Layer)
       @layer = layer
-      #get_point.set_layer @layer
     end
 
     # Returns the parent Layer.

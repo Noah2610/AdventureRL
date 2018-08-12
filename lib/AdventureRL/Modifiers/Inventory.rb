@@ -51,24 +51,53 @@ module AdventureRL
       # all objects with the same <tt>id</tt> will be removed.
       # If no <tt>id</tt> is given, remove _all_ objects.
       def remove_objects id = nil
-        return @inventory.clear      unless (id)
-        return @inventory.delete id  if     (@inventory.key? id)
+        unless (id)
+          get_objects.each do |object|
+            object.removed  if (object.methods.include? :removed)
+          end
+          return @inventory.clear
+        end
+        if (@inventory.key? id)
+          objects = @inventory.delete(id)
+          objects.each do |object|
+            object.removed  if (object.methods.include? :removed)
+          end
+          return objects
+        end
         return @inventory.delete((@inventory.detect do |key, val|
-          next id == val
+          if (id == val)
+            @inventory[key].each do |object|
+              object.removed  if (object.methods.include? :removed)
+            end
+            next true
+          end
+          next false
         end || []).first)
       end
 
       # Removes the _last_ object with the given <tt>id</tt>.
       # <tt>id</tt> can also be the object to be removed itself.
       # If no <tt>id</tt> is given, remove the _last_ object with the unnamed <tt>id</tt>.
-      def remove_object id = DEFAULT_INVENTORY_ID
-        return @inventory[id].delete_at -1  if (@inventory.key? id)
+      def remove_object id = DEFAULT_INVENTORY_ID, call_removed_method = true
+        if (@inventory.key? id)
+          object = @inventory[id].delete_at(-1)
+          object.removed  if (call_removed_method && object.methods.include?(:removed))
+          return object
+        end
         key = (@inventory.detect do |key, val|
           next id == val
         end || []) .first
-        return @inventory[key].delete id
+        object = @inventory[key].delete id
+        object.removed  if (call_removed_method && object.methods.include?(:removed))
+        return object
       end
       alias_method :remove, :remove_object
+
+      # When removed is called on an object that has an Inventory,
+      # then also call #remove_objects on that object.
+      def removed
+        remove_objects
+      end
     end
   end
 end

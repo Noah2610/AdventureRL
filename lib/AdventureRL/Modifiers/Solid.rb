@@ -67,7 +67,6 @@ module AdventureRL
         @solid_static               = @settings.get :static  # Basically disables #move_by
         @precision_over_performance = @settings.get :precision_over_performance
         assign_to_solids_manager  if (@settings.get :auto_update)
-        #@solids_manager.add_object self, @solid_tags  if (@settings.get :auto_update)
         super @settings
       end
 
@@ -84,7 +83,13 @@ module AdventureRL
       # from the Layer, if it has one.
       def set_layer layer
         super
-        assign_to_solids_manager
+        assign_to_solids_manager  if (@settings.get :auto_update)
+      end
+
+      # This method is called when this object is removed from an Inventory.
+      # When it is removed, also remove it from the SolidsManager.
+      def removed
+        @solids_manager.remove_object self, get_solid_tags  if (@solids_manager)
       end
 
       # Overwrite #move_by method, so that collision checking with other objects
