@@ -12,15 +12,25 @@ module AdventureRL
         next Gosu.const_get "MS_OTHER_#{n.to_s}"
       end)
 
+      DEFAULT_SETTINGS = Settings.new(
+        only_mouse_buttons: true
+      )
+
+      def initialize settings = {}
+        @settings           = DEFAULT_SETTINGS.merge settings
+        @only_mouse_buttons = @settings.get :only_mouse_buttons
+        super @settings
+      end
+
       def button_down btnid
-        return  unless (MOUSE_BUTTON_IDS.include? btnid)
+        super  unless (@only_mouse_buttons)
         trigger(
           :mouse_down,
           get_semantic_button_name(btnid),
           shift:   shift_button_pressed?,
           control: control_button_pressed?,
           alt:     alt_button_pressed?
-        )
+        )  if (MOUSE_BUTTON_IDS.include?(btnid))
       end
 
       def button_up btnid
@@ -59,11 +69,11 @@ module AdventureRL
       private
 
         def get_events
-          return [
+          return super.concat([
             get_event_mouse_down,
             get_event_mouse_up,
             get_event_mouse_press
-          ]
+          ])
         end
 
         def get_event_mouse_down

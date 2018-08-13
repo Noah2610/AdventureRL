@@ -40,11 +40,11 @@ module AdventureRL
     # See DEFAULT_SETTINGS for valid keys.
     def initialize settings = {}
       @settings = DEFAULT_SETTINGS.merge settings
-      super @settings #.get.reject { |key,val| next key == :assign_to }
       @scale              = @settings.get :scale
       @rotation           = @settings.get :rotation
       @has_solids_manager = !!@settings.get(:has_solids_manager)
       @solids_manager     = SolidsManager.new  if (has_solids_manager?)
+      super @settings #.get.reject { |key,val| next key == :assign_to }
     end
 
     # Add any object to this Layer.

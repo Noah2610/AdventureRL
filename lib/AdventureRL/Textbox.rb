@@ -38,16 +38,20 @@ module AdventureRL
 
     def initialize settings = {}
       @settings = DEFAULT_SETTINGS.merge settings
-      super @settings
       @font_cache = {}  # This Hash will be filled with any loaded Gosu::Font (see #set_font_size)
       set_font_size @settings.get(:font_size)
       @text           = @settings.get :text
       @font_color     = @settings.get :font_color
       @text_alignment = @settings.get :text_alignment
       @border_padding = @settings.get :border_padding
-      @color_original = @settings.get :background_color
       @border_color   = @settings.get :border_color
       @border_size    = @settings.get :border_size
+      super @settings
+      @color_original = @settings.get :background_color
+    end
+
+    def get_text
+      return @text
     end
 
     def set_text text

@@ -33,7 +33,8 @@ module AdventureRL
         @settings = DEFAULT_SETTINGS.merge settings
         super
         @pressable_buttons = []
-        add_pressable_button @settings.get(:pressable_buttons)
+        pressable_buttons = [@settings.get(:pressable_buttons)].flatten
+        add_pressable_button pressable_buttons  if (pressable_buttons.any?)
         @events = get_events
         BUTTON_EVENT_HANDLERS << self  if (@settings.get(:auto_update))
       end

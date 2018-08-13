@@ -22,13 +22,16 @@ module AdventureRL
 
     DEFAULT_SETTINGS = Settings.new(
       active:      false,
-      auto_update: true
+      auto_update: false,
+      mouse_buttons_event_handler: {
+        auto_update: false
+      }
     )
 
     def initialize settings = {}
       @settings = DEFAULT_SETTINGS.merge settings
+      @mouse_buttons_event_handler = EventHandlers::MouseButtons.new @settings.get(:mouse_buttons_event_handler)
       super @settings
-      @mouse_buttons_event_handler = EventHandlers::MouseButtons.new auto_update: false
       @active = @settings.get :active
       MENUS << self  if (@settings.get(:auto_update))
     end
@@ -48,11 +51,11 @@ module AdventureRL
     alias_method :add,        :add_object
     alias_method :<<,         :add_object
 
-    def show
+    def activate
       @active = true
     end
 
-    def hide
+    def deactivate
       @active = false
     end
 
