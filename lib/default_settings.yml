@@ -16,4 +16,5 @@ window:
   origin:
     x: :left
     y: :top
+  background_z_index: -1
 ...

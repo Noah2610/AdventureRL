@@ -26,7 +26,9 @@ module AdventureRL
         has_solids_manager: settings.get(:has_solids_manager)
       )
       Helpers::PipeMethods.pipe_methods_from self, to: @_layer
-      @_target_fps     = settings.get(:fps)
+      @_target_fps        = settings.get(:fps)
+      @background_color   = settings.get(:background_color)    if (settings.get(:background_color))
+      @background_z_index = settings.get(:background_z_index)
       #@_solids_manager = SolidsManager.new
       super(
         get_size(:width), get_size(:height),
@@ -113,6 +115,16 @@ module AdventureRL
     # if you overwrite this method.
     def draw
       @_layer.draw
+      draw_background_color  if (@background_color)
+    end
+
+    def draw_background_color
+      Gosu.draw_rect(
+        *get_corner(:left, :top).values,
+        *get_size.values,
+        @background_color,
+        @background_z_index
+      )
     end
 
     # Overwrite the Gosu#show method, so we can

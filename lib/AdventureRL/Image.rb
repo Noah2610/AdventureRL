@@ -32,10 +32,10 @@ module AdventureRL
     # in your passed Settings instance or hash.
     def initialize settings = {}
       @settings = DEFAULT_SETTINGS.merge settings
-      super @settings
       @z_index       = @settings.get :z_index
       @image_options = get_image_options_from @settings
       @image         = get_image_from @settings.get(:file)  unless (@settings.get(:dont_create_image))
+      super @settings
     end
 
     def draw

@@ -20,7 +20,7 @@ module AdventureRL
         width:  0,
         height: 0
       },
-      background_color: 0xff_000000,  # Background color
+      background_color: 0xff_000000,
       z_index: 0,
       position: {
         x: 0,
