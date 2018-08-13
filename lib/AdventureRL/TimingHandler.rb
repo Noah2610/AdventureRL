@@ -11,16 +11,37 @@ module AdventureRL
       }
       @elapsed_seconds = 0.0
       @deltatime = Deltatime.new
+      @is_running = true
     end
 
     # #update should be called every frame,
     # this is where it checks if any methods need to be called
     # and calls them if necessary.
     def update
+      return  if (is_paused?)
       handle_timeouts
       handle_intervals
       @elapsed_seconds += @deltatime.dt
       @deltatime.update
+    end
+
+    def continue
+      return  if (is_running?)
+      @is_running = true
+      reset
+    end
+
+    def pause
+      return  if (is_paused?)
+      @is_running = false
+    end
+
+    def is_running?
+      return !!@is_running
+    end
+
+    def is_paused?
+      return !is_running?
     end
 
     # Reset the Deltatime

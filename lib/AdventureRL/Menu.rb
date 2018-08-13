@@ -21,10 +21,11 @@ module AdventureRL
     end
 
     DEFAULT_SETTINGS = Settings.new(
-      active:      false,
-      auto_update: false,
+      active:         false,
+      auto_update:    false,
       mouse_buttons_event_handler: {
-        auto_update: false
+        auto_update:        false,
+        only_mouse_buttons: true
       }
     )
 
@@ -39,12 +40,12 @@ module AdventureRL
     # Overwrite #add_object method, so we can
     # validate, that the given <tt>object</tt> is a Button.
     def add_object object, id = DEFAULT_INVENTORY_ID
-      Helpers::Error.error(
-        "Expected given object to be a Button, but got",
-        "'#{object.inspect}:#{object.class.name}`."
-      )  unless (object.is_a? Button)
+      #Helpers::Error.error(
+      #  "Expected given object to be a Button, but got",
+      #  "'#{object.inspect}:#{object.class.name}`."
+      #)  unless (object.is_a? Button)
       super
-      @mouse_buttons_event_handler.subscribe object
+      @mouse_buttons_event_handler.subscribe object  if (object.is_a? Button)
     end
     alias_method :add_button, :add_object
     alias_method :add_item,   :add_object
