@@ -84,9 +84,10 @@ module AdventureRL
           object.removed  if (call_removed_method && object.methods.include?(:removed))
           return object
         end
-        key = (@inventory.detect do |key, val|
-          next id == val
+        key = (@inventory.detect do |k, val|
+          next val.include?(id)
         end || []) .first
+        return nil  unless (@inventory.key? key)
         object = @inventory[key].delete id
         object.removed  if (call_removed_method && object.methods.include?(:removed))
         return object
