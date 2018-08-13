@@ -33,7 +33,7 @@ module AdventureRL
       # Remove one or multiple <tt>object</tt>(s) from this Event.
       def remove_object object
         [object].flatten.each do |obj|
-          @object.delete obj
+          @objects.delete obj
         end
       end
 

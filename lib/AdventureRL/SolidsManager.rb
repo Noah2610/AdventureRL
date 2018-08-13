@@ -41,6 +41,17 @@ module AdventureRL
     end
     alias_method :remove, :remove_object
 
+    def remove_object_from_all_quadtrees object
+      objects    = [object].flatten
+      objects.each do |obj|
+        @cache.delete obj
+      end
+      @quadtrees.values.flatten.each do |quadtree|
+        quadtree.remove_object objects
+      end
+    end
+    alias_method :remove_from_all_quadtrees, :remove_object_from_all_quadtrees
+
     # Returns <tt>true</tt> if the given <tt>object</tt> (or multiple objects),
     # collide with any other objects with a mutual <tt>solid_tag</tt>.
     def collides? object, solid_tag = DEFAULT_SOLID_TAG

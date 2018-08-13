@@ -87,9 +87,15 @@ module AdventureRL
       end
 
       # This method is called when this object is removed from an Inventory.
-      # When it is removed, also remove it from the SolidsManager.
       def removed
-        @solids_manager.remove_object self, get_solid_tags  if (@solids_manager)
+        remove_from_solids_manager
+      end
+
+      # When it is removed, also remove it from the SolidsManager.
+      # TODO: Do this properly.
+      def remove_from_solids_manager
+        #@solids_manager.remove_object self, [get_solid_tags, get_solid_tags_collides_with].flatten  if (@solids_manager)
+        @solids_manager.remove_object_from_all_quadtrees self  if (@solids_manager)
       end
 
       # Overwrite #move_by method, so that collision checking with other objects

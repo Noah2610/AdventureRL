@@ -31,7 +31,7 @@ module AdventureRL
       end
 
       # Unsubscribe an <tt>object</tt> from all Event s in this EventHandler.
-      def unsubscribe_object object
+      def unsubscribe object
         @events.each do |event|
           event.remove_object object
         end
