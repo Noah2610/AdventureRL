@@ -115,6 +115,13 @@ module AdventureRL
       @_layer.draw
     end
 
+    # Overwrite the Gosu#show method, so we can
+    # call Deltatime#reset on all previously created Deltatimes.
+    def show
+      Deltatime::DELTATIMES.each &:reset
+      super
+    end
+
     private
 
       def _get_update_inteval_from_fps fps

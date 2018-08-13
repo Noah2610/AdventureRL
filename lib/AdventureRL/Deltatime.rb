@@ -1,10 +1,15 @@
 module AdventureRL
   class Deltatime
+    # This Array is filled with _all_ initialized Deltatime instances.
+    # The point of it is, that they are all reset once the Window opens ( Window#show ).
+    DELTATIMES = []
+
     def initialize
       @last_update_at = nil
       @deltatime      = nil
       set_last_update_at
       set_deltatime
+      DELTATIMES << self
     end
 
     # Returns the value of the last calculated deltatime.
