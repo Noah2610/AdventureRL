@@ -118,7 +118,7 @@ module AdventureRL
         previous_precision_over_performance = @precision_over_performance.dup
         opts = args.last.is_a?(Hash) ? args.last : nil
 
-        @precision_over_performance = opts[:precision_over_performance]  if (opts.key? :precision_over_performance)
+        @precision_over_performance = opts[:precision_over_performance]  if (opts && opts.key?(:precision_over_performance))
 
         if ([:highest].include? @precision_over_performance)
           move_by_steps incremental_position

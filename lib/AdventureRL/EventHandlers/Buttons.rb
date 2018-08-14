@@ -50,10 +50,10 @@ module AdventureRL
         btns.flatten.each do |button|
           if (button.is_a?(Symbol) || button.is_a?(String))
             validate_button button
-            btnid = Gosu.char_to_button_id button
+            btnids = [Gosu.char_to_button_id(button), get_button_constants(button)].flatten.compact
             pressable_button = {
               name: button,
-              ids:  [btnid]
+              ids:  btnids
             }
             @pressable_buttons << pressable_button  unless (@pressable_buttons.include? pressable_button)
           elsif (button.is_a?(Hash))
@@ -62,8 +62,8 @@ module AdventureRL
                 name: btn_name,
                 ids:  [btn_buttons].flatten.map do |btn|
                   validate_button btn
-                  next Gosu.char_to_button_id btn
-                end
+                  next [Gosu.char_to_button_id(btn), get_button_constants(btn)].compact
+                end .flatten
               }
               @pressable_buttons << pressable_button  unless (@pressable_buttons.include? pressable_button)
             end
@@ -176,7 +176,15 @@ module AdventureRL
           Helpers::Error.error(
             "Passed invalid button character. Expected a printable alphanumeric, but got",
             "`#{btn.inspect}:#{btn.class.name}'."
-          )  unless (Gosu.char_to_button_id btn)
+          )  unless (Gosu.char_to_button_id(btn) || get_button_constants(btn))
+        end
+
+        def get_button_constants btn
+          return Gosu.constants.map do |constant_name|
+            constant = Gosu.const_get constant_name
+            next constant  if (constant_name.to_s.sub(/^(KB_|MS_|GP_)/,'').downcase == btn.downcase && constant_name.match?(/_/))
+            next nil
+          end .flatten.compact
         end
 
         def get_semantic_button_name btnid
