@@ -12,6 +12,9 @@ module AdventureRL
       @reset_queue = {}
       @cache       = {}
       @use_cache   = @settings.get :use_cache
+
+      # Objects as keys pointing to the Quadtrees that they are in.
+      @object_quadtrees = {}
     end
 
     # Add one (or multiple) <tt>object</tt>(s)
@@ -121,9 +124,8 @@ module AdventureRL
 
       def get_quadtrees_for solid_tag = DEFAULT_SOLID_TAG
         solid_tags = [solid_tag].flatten
-        return @quadtrees.map do |quadtree_tag, quadtree|
-          next quadtree  if (solid_tags.include?(quadtree_tag))
-          next nil
+        return solid_tags.map do |tag|
+          next @quadtrees[tag]
         end .compact
       end
 

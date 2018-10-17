@@ -63,9 +63,9 @@ module AdventureRL
 
       split_quadtrees  unless (has_quadtrees?)
 
-      return get_quadtrees.map do |quadtree|
+      return get_quadtrees.any? do |quadtree|
         next quadtree.add_object_to_quadtree(object)
-      end .any?
+      end
     end
 
     # Returns <tt>true</tt> if the given <tt>object</tt>
