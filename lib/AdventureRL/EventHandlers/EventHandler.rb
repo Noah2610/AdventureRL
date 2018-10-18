@@ -13,7 +13,7 @@ module AdventureRL
         Helpers::Error.error(
           "Passed `event' is not an instance of `Event'.",
           "Got `#{event.inspect}:#{event.class.name}'."
-        )  unless (event.is_a? Event)
+        )  unless (event.is_a? Events::Event)
         @events << event
       end
       alias_method :add, :add_event
